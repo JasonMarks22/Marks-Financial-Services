@@ -5,7 +5,7 @@ export default function Home() {
         Marks Financial Services
       </h1>
       <p className="mt-4 max-w-md text-lg leading-8 text-zinc-600">
-        Your all-in-one personal finance toolkit — coming soon.
+        Your all-in-one personal finance toolkit — launching soon.
       </p>
     </main>
   );
