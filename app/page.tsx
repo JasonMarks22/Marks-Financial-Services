@@ -1,8 +1,13 @@
 import Link from "next/link";
+import { AuthNav } from "@/components/AuthNav";
 
 export default function Home() {
   return (
-    <main className="flex flex-1 flex-col items-center justify-center bg-green-100 px-6 text-center">
+    <main className="relative flex flex-1 flex-col items-center justify-center bg-green-100 px-6 text-center">
+      {/* Auth links (log in / sign up, or email + log out) in the top corner. */}
+      <div className="absolute right-6 top-6">
+        <AuthNav />
+      </div>
       <h1 className="text-4xl font-semibold tracking-tight text-zinc-900 sm:text-5xl">
         Marks Financial Services
       </h1>

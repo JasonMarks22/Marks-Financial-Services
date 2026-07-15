@@ -13,6 +13,7 @@ import {
   YAxis,
 } from "recharts";
 import { calculateSavingsGoal } from "@/lib/finance/savingsGoal";
+import { SaveAffordance } from "@/components/SaveAffordance";
 
 // BYU navy is the main accent; the interest band uses a lighter blue.
 const NAVY = "#002E5D";
@@ -140,6 +141,7 @@ export default function SavingsGoalPage() {
             Estimate for educational purposes only — not financial advice.
             Assumes a constant return; actual results will vary.
           </p>
+          <SaveAffordance />
         </div>
 
         {/* Growth chart */}

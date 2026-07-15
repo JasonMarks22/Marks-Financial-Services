@@ -14,6 +14,7 @@ import {
   type AllocationKey,
   allocateSavings,
 } from "@/lib/finance/allocator";
+import { SaveAffordance } from "@/components/SaveAffordance";
 
 // BYU navy is the main accent; secondary destinations use lighter blues/greys.
 const NAVY = "#002E5D";
@@ -162,6 +163,7 @@ export default function AllocatorPage() {
               ))}
             </ul>
           </div>
+          <SaveAffordance />
         </div>
 
         {/* The "why" — reasoning for each destination */}

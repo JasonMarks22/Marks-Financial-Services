@@ -15,6 +15,7 @@ import {
   type BudgetCategory,
   calculateBudget,
 } from "@/lib/finance/budget";
+import { SaveAffordance } from "@/components/SaveAffordance";
 
 // BYU navy is the main accent; a graded blue/grey ramp colors the categories.
 const NAVY = "#002E5D";
@@ -262,6 +263,7 @@ export default function BudgetPage() {
               </strong>
             </p>
           )}
+          <SaveAffordance />
         </div>
 
         {/* Spending breakdown chart */}

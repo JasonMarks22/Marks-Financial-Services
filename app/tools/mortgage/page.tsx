@@ -15,6 +15,7 @@ import {
   extraPaymentComparison,
   monthlyCostBreakdown,
 } from "@/lib/finance/mortgage";
+import { SaveAffordance } from "@/components/SaveAffordance";
 
 // BYU navy is the main accent; the rest are lighter blues/greys for the
 // secondary cost bands.
@@ -222,6 +223,7 @@ export default function MortgagePage() {
             Estimate for educational purposes only — not financial advice. Actual
             costs vary by lender, location, taxes, and insurance.
           </p>
+          <SaveAffordance />
         </div>
 
         {/* Extra-payment comparison */}
