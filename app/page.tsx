@@ -9,12 +9,20 @@ export default function Home() {
       <p className="mt-4 max-w-md text-lg leading-8 text-zinc-600">
         Your all-in-one personal finance toolkit — launching soon.
       </p>
-      <Link
-        href="/tools/savings-goal"
-        className="mt-8 inline-block rounded-full bg-[#002E5D] px-6 py-3 text-base font-medium text-white shadow-sm transition-colors hover:bg-[#00224a]"
-      >
-        Try the Savings Goal Calculator →
-      </Link>
+      <div className="mt-8 flex flex-col gap-3 sm:flex-row">
+        <Link
+          href="/tools/savings-goal"
+          className="inline-block rounded-full bg-[#002E5D] px-6 py-3 text-base font-medium text-white shadow-sm transition-colors hover:bg-[#00224a]"
+        >
+          Try the Savings Goal Calculator →
+        </Link>
+        <Link
+          href="/tools/mortgage"
+          className="inline-block rounded-full bg-[#002E5D] px-6 py-3 text-base font-medium text-white shadow-sm transition-colors hover:bg-[#00224a]"
+        >
+          Try the Mortgage Calculator →
+        </Link>
+      </div>
     </main>
   );
 }
