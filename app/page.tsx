@@ -28,6 +28,12 @@ export default function Home() {
         >
           Try the Budget Calculator →
         </Link>
+        <Link
+          href="/tools/allocator"
+          className="inline-block rounded-full bg-[#002E5D] px-6 py-3 text-base font-medium text-white shadow-sm transition-colors hover:bg-[#00224a]"
+        >
+          Try the Savings Allocator →
+        </Link>
       </div>
     </main>
   );
