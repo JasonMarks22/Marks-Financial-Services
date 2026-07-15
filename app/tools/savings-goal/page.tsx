@@ -1,7 +1,8 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { Suspense, useMemo, useState } from "react";
 import Link from "next/link";
+import { useSearchParams } from "next/navigation";
 import {
   Area,
   AreaChart,
@@ -14,6 +15,7 @@ import {
 } from "recharts";
 import { calculateSavingsGoal } from "@/lib/finance/savingsGoal";
 import { SaveAffordance } from "@/components/SaveAffordance";
+import { saveSavingsGoalScenario } from "@/lib/scenarios/savingsGoalScenarios";
 
 // BYU navy is the main accent; the interest band uses a lighter blue.
 const NAVY = "#002E5D";
@@ -37,11 +39,27 @@ function toNumber(value: string): number {
   return Number.isFinite(n) && n > 0 ? n : 0;
 }
 
+// useSearchParams requires a Suspense boundary, so the page itself is a thin
+// wrapper around the actual calculator.
 export default function SavingsGoalPage() {
-  const [goalAmount, setGoalAmount] = useState("50000");
-  const [currentSavings, setCurrentSavings] = useState("5000");
-  const [years, setYears] = useState("10");
-  const [annualRatePercent, setAnnualRatePercent] = useState("4");
+  return (
+    <Suspense fallback={null}>
+      <SavingsGoalCalculator />
+    </Suspense>
+  );
+}
+
+function SavingsGoalCalculator() {
+  // A "Load" from the saved-scenarios page passes inputs as URL query params;
+  // when present they pre-fill the calculator, otherwise use the defaults.
+  const searchParams = useSearchParams();
+  const fromQuery = (key: string, fallback: string) =>
+    searchParams.get(key) ?? fallback;
+
+  const [goalAmount, setGoalAmount] = useState(() => fromQuery("goalAmount", "50000"));
+  const [currentSavings, setCurrentSavings] = useState(() => fromQuery("currentSavings", "5000"));
+  const [years, setYears] = useState(() => fromQuery("years", "10"));
+  const [annualRatePercent, setAnnualRatePercent] = useState(() => fromQuery("rate", "4"));
 
   const result = useMemo(
     () =>
@@ -65,6 +83,17 @@ export default function SavingsGoalPage() {
   );
 
   const goalValue = toNumber(goalAmount);
+
+  // Persist the current inputs as a named scenario (used by SaveAffordance;
+  // only reachable when logged in).
+  async function handleSave(name: string) {
+    return saveSavingsGoalScenario(name, {
+      goal_amount: toNumber(goalAmount),
+      current_savings: toNumber(currentSavings),
+      years: toNumber(years),
+      annual_rate_percent: parseFloat(annualRatePercent) || 0,
+    });
+  }
 
   return (
     <main className="flex flex-1 flex-col items-center bg-white px-6 py-16 text-neutral-900">
@@ -141,7 +170,7 @@ export default function SavingsGoalPage() {
             Estimate for educational purposes only — not financial advice.
             Assumes a constant return; actual results will vary.
           </p>
-          <SaveAffordance />
+          <SaveAffordance onSave={handleSave} />
         </div>
 
         {/* Growth chart */}

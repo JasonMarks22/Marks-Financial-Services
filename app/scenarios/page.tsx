@@ -19,6 +19,11 @@ import {
   getMortgageScenarios,
   type MortgageScenarioRow,
 } from "@/lib/scenarios/mortgageScenarios";
+import {
+  deleteSavingsGoalScenario,
+  getSavingsGoalScenarios,
+  type SavingsGoalScenarioRow,
+} from "@/lib/scenarios/savingsGoalScenarios";
 
 const NAVY = "#002E5D";
 
@@ -29,7 +34,7 @@ const usd = new Intl.NumberFormat("en-US", {
 });
 
 /** Build the mortgage-calculator URL that pre-fills this scenario's inputs. */
-function loadHref(row: MortgageScenarioRow): string {
+function mortgageLoadHref(row: MortgageScenarioRow): string {
   const params = new URLSearchParams({
     homePrice: String(row.home_price),
     downPayment: String(row.down_payment),
@@ -43,23 +48,38 @@ function loadHref(row: MortgageScenarioRow): string {
   return `/tools/mortgage?${params.toString()}`;
 }
 
+/** Build the savings-goal URL that pre-fills this scenario's inputs. */
+function savingsGoalLoadHref(row: SavingsGoalScenarioRow): string {
+  const params = new URLSearchParams({
+    goalAmount: String(row.goal_amount),
+    currentSavings: String(row.current_savings),
+    years: String(row.years),
+    rate: String(row.annual_rate_percent),
+  });
+  return `/tools/savings-goal?${params.toString()}`;
+}
+
 export default function ScenariosPage() {
   const { user, loading } = useAuth();
 
   const [rows, setRows] = useState<MortgageScenarioRow[] | null>(null);
+  const [sgRows, setSgRows] = useState<SavingsGoalScenarioRow[] | null>(null);
   const [error, setError] = useState<string | null>(null);
 
-  // Fetch the user's scenarios once we know who they are. (No state reset is
-  // needed on logout — the logged-out branch below doesn't render rows, and a
-  // fresh login triggers a refetch that replaces them.)
+  // Fetch the user's scenarios (both calculator types) once we know who they
+  // are. (No state reset is needed on logout — the logged-out branch below
+  // doesn't render rows, and a fresh login triggers a refetch.)
   useEffect(() => {
     if (!user) return;
     let cancelled = false;
-    getMortgageScenarios().then(({ data, error }) => {
-      if (cancelled) return;
-      setRows(data);
-      setError(error);
-    });
+    Promise.all([getMortgageScenarios(), getSavingsGoalScenarios()]).then(
+      ([mortgage, savingsGoal]) => {
+        if (cancelled) return;
+        setRows(mortgage.data);
+        setSgRows(savingsGoal.data);
+        setError(mortgage.error ?? savingsGoal.error);
+      },
+    );
     return () => {
       cancelled = true;
     };
@@ -72,6 +92,16 @@ export default function ScenariosPage() {
       setError(`Couldn't delete: ${error}`);
     } else {
       setRows((prev) => (prev ? prev.filter((r) => r.id !== row.id) : prev));
+    }
+  }
+
+  async function handleDeleteSavingsGoal(row: SavingsGoalScenarioRow) {
+    if (!window.confirm(`Delete “${row.name}”? This can't be undone.`)) return;
+    const { error } = await deleteSavingsGoalScenario(row.id);
+    if (error) {
+      setError(`Couldn't delete: ${error}`);
+    } else {
+      setSgRows((prev) => (prev ? prev.filter((r) => r.id !== row.id) : prev));
     }
   }
 
@@ -146,7 +176,7 @@ export default function ScenariosPage() {
                       </div>
                       <div className="flex shrink-0 items-center gap-2">
                         <Link
-                          href={loadHref(row)}
+                          href={mortgageLoadHref(row)}
                           className="rounded-full px-4 py-1.5 text-sm font-medium text-white"
                           style={{ backgroundColor: NAVY }}
                         >
@@ -172,6 +202,68 @@ export default function ScenariosPage() {
                     style={{ color: NAVY }}
                   >
                     mortgage calculator
+                  </Link>{" "}
+                  and hit “Save scenario”.
+                </p>
+              )}
+            </section>
+
+            {/* ---- Savings-goal scenarios ---- */}
+            <section className="mt-10">
+              <h2 className="text-lg font-semibold" style={{ color: NAVY }}>
+                Savings goal calculator
+              </h2>
+
+              {sgRows === null && !error ? (
+                <p className="mt-4 text-sm text-neutral-400">Loading…</p>
+              ) : sgRows && sgRows.length > 0 ? (
+                <ul className="mt-4 space-y-3">
+                  {sgRows.map((row) => (
+                    <li
+                      key={row.id}
+                      className="flex flex-col gap-3 rounded-xl border border-neutral-200 bg-white p-4 shadow-sm sm:flex-row sm:items-center sm:justify-between"
+                    >
+                      <div>
+                        <p className="font-medium text-neutral-900">
+                          {row.name}
+                        </p>
+                        <p className="mt-0.5 text-sm text-neutral-600">
+                          {usd.format(row.goal_amount)} goal ·{" "}
+                          {usd.format(row.current_savings)} saved ·{" "}
+                          {row.years} yrs @ {row.annual_rate_percent}%
+                        </p>
+                        <p className="mt-0.5 text-xs text-neutral-400">
+                          Saved {new Date(row.created_at).toLocaleDateString()}
+                        </p>
+                      </div>
+                      <div className="flex shrink-0 items-center gap-2">
+                        <Link
+                          href={savingsGoalLoadHref(row)}
+                          className="rounded-full px-4 py-1.5 text-sm font-medium text-white"
+                          style={{ backgroundColor: NAVY }}
+                        >
+                          Load
+                        </Link>
+                        <button
+                          type="button"
+                          onClick={() => handleDeleteSavingsGoal(row)}
+                          className="rounded-full border border-neutral-300 px-4 py-1.5 text-sm font-medium text-neutral-600 transition-colors hover:border-red-300 hover:text-red-600"
+                        >
+                          Delete
+                        </button>
+                      </div>
+                    </li>
+                  ))}
+                </ul>
+              ) : (
+                <p className="mt-4 rounded-xl border border-dashed border-neutral-200 p-6 text-center text-sm text-neutral-500">
+                  No saved savings-goal scenarios yet. Run the{" "}
+                  <Link
+                    href="/tools/savings-goal"
+                    className="font-medium underline underline-offset-2"
+                    style={{ color: NAVY }}
+                  >
+                    savings goal calculator
                   </Link>{" "}
                   and hit “Save scenario”.
                 </p>
