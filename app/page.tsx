@@ -1,6 +1,6 @@
 export default function Home() {
   return (
-    <main className="flex flex-1 flex-col items-center justify-center bg-zinc-50 px-6 text-center">
+    <main className="flex flex-1 flex-col items-center justify-center bg-green-100 px-6 text-center">
       <h1 className="text-4xl font-semibold tracking-tight text-zinc-900 sm:text-5xl">
         Marks Financial Services
       </h1>
