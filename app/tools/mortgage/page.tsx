@@ -1,7 +1,8 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { Suspense, useMemo, useState } from "react";
 import Link from "next/link";
+import { useSearchParams } from "next/navigation";
 import {
   Cell,
   Legend,
@@ -16,6 +17,7 @@ import {
   monthlyCostBreakdown,
 } from "@/lib/finance/mortgage";
 import { SaveAffordance } from "@/components/SaveAffordance";
+import { saveMortgageScenario } from "@/lib/scenarios/mortgageScenarios";
 
 // BYU navy is the main accent; the rest are lighter blues/greys for the
 // secondary cost bands.
@@ -52,15 +54,31 @@ function monthsToYearsLabel(months: number): string {
   return `${y} yr ${m} mo`;
 }
 
+// useSearchParams requires a Suspense boundary, so the page itself is a thin
+// wrapper around the actual calculator.
 export default function MortgagePage() {
-  const [homePrice, setHomePrice] = useState("400000");
-  const [downPayment, setDownPayment] = useState("60000");
-  const [termYears, setTermYears] = useState("30");
-  const [rate, setRate] = useState("6.5");
-  const [propertyTax, setPropertyTax] = useState("4800");
-  const [insurance, setInsurance] = useState("1800");
-  const [hoa, setHoa] = useState("0");
-  const [extra, setExtra] = useState("0");
+  return (
+    <Suspense fallback={null}>
+      <MortgageCalculator />
+    </Suspense>
+  );
+}
+
+function MortgageCalculator() {
+  // A "Load" from the saved-scenarios page passes inputs as URL query params;
+  // when present they pre-fill the calculator, otherwise use the defaults.
+  const searchParams = useSearchParams();
+  const fromQuery = (key: string, fallback: string) =>
+    searchParams.get(key) ?? fallback;
+
+  const [homePrice, setHomePrice] = useState(() => fromQuery("homePrice", "400000"));
+  const [downPayment, setDownPayment] = useState(() => fromQuery("downPayment", "60000"));
+  const [termYears, setTermYears] = useState(() => fromQuery("termYears", "30"));
+  const [rate, setRate] = useState(() => fromQuery("rate", "6.5"));
+  const [propertyTax, setPropertyTax] = useState(() => fromQuery("propertyTax", "4800"));
+  const [insurance, setInsurance] = useState(() => fromQuery("insurance", "1800"));
+  const [hoa, setHoa] = useState(() => fromQuery("hoa", "0"));
+  const [extra, setExtra] = useState(() => fromQuery("extra", "0"));
   const [showFullTable, setShowFullTable] = useState(false);
 
   const priceNum = toNumber(homePrice);
@@ -104,6 +122,21 @@ export default function MortgagePage() {
       ),
     [breakdown, extraNum],
   );
+
+  // Persist the current inputs as a named scenario (used by SaveAffordance;
+  // only reachable when logged in).
+  async function handleSave(name: string) {
+    return saveMortgageScenario(name, {
+      home_price: priceNum,
+      down_payment: downNum,
+      term_years: toNumber(termYears),
+      interest_rate: parseFloat(rate) || 0,
+      annual_property_tax: toNumber(propertyTax),
+      annual_insurance: toNumber(insurance),
+      monthly_hoa: toNumber(hoa),
+      extra_monthly: extraNum,
+    });
+  }
 
   const donutData = useMemo(
     () =>
@@ -223,7 +256,7 @@ export default function MortgagePage() {
             Estimate for educational purposes only — not financial advice. Actual
             costs vary by lender, location, taxes, and insurance.
           </p>
-          <SaveAffordance />
+          <SaveAffordance onSave={handleSave} />
         </div>
 
         {/* Extra-payment comparison */}

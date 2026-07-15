@@ -41,6 +41,13 @@ export function AuthNav() {
 
   return (
     <div className="flex items-center justify-end gap-3">
+      <Link
+        href="/scenarios"
+        className="text-sm font-medium underline-offset-2 hover:underline"
+        style={{ color: NAVY }}
+      >
+        My scenarios
+      </Link>
       <span className="text-sm text-neutral-600">{user.email}</span>
       <LogoutButton />
     </div>
