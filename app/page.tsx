@@ -51,6 +51,12 @@ export default function Home() {
         >
           Explore Model Portfolios →
         </Link>
+        <Link
+          href="/portfolios/build"
+          className="inline-block rounded-full bg-[#002E5D] px-6 py-3 text-base font-medium text-white shadow-sm transition-colors hover:bg-[#00224a]"
+        >
+          Build Your Own Portfolio →
+        </Link>
       </div>
     </main>
   );

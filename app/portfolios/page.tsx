@@ -1,11 +1,12 @@
 "use client";
 
 /**
- * Model portfolios page — displays the 7 educational seed portfolios from
- * lib/portfolios/modelPortfolios.ts. No live prices here; this only renders
- * the model definitions.
+ * Portfolios page — the user's own saved portfolios (when logged in) plus the
+ * 7 educational model portfolios from lib/portfolios/modelPortfolios.ts.
+ * No live prices here; this only renders portfolio definitions.
  */
 
+import { useEffect, useState } from "react";
 import Link from "next/link";
 import {
   Cell,
@@ -18,6 +19,12 @@ import {
   MODEL_PORTFOLIOS,
   type ModelPortfolio,
 } from "@/lib/portfolios/modelPortfolios";
+import { useAuth } from "@/lib/auth/AuthContext";
+import {
+  deleteUserPortfolio,
+  getUserPortfolios,
+  type UserPortfolioRow,
+} from "@/lib/portfolios/userPortfolios";
 
 const NAVY = "#002E5D";
 const SPLIT_COLORS = {
@@ -25,6 +32,18 @@ const SPLIT_COLORS = {
   Bonds: "#7FA8D0",
   Cash: "#A9B2BD",
 } as const;
+
+// Ramp for user-portfolio holdings donuts; CASH always renders grey.
+const HOLDING_PALETTE = [
+  "#002E5D",
+  "#1F4B76",
+  "#3E6491",
+  "#5E7EAB",
+  "#7FA8D0",
+  "#C6A15B",
+  "#8DA3BC",
+  "#B0864B",
+];
 
 export default function PortfoliosPage() {
   return (
@@ -56,13 +75,198 @@ export default function PortfoliosPage() {
           shown are examples of the asset classes described.
         </div>
 
-        <div className="mt-8 grid grid-cols-1 gap-6 md:grid-cols-2">
+        {/* User's own portfolios */}
+        <MyPortfoliosSection />
+
+        {/* Educational model portfolios (unchanged) */}
+        <h2
+          className="mt-12 text-2xl font-semibold tracking-tight"
+          style={{ color: "var(--accent)" }}
+        >
+          Model portfolios
+        </h2>
+        <div className="mt-6 grid grid-cols-1 gap-6 md:grid-cols-2">
           {MODEL_PORTFOLIOS.map((p) => (
             <PortfolioCard key={p.id} portfolio={p} />
           ))}
         </div>
       </div>
     </main>
+  );
+}
+
+/* ------------------------------------------------------------------------ */
+
+function MyPortfoliosSection() {
+  const { user, loading } = useAuth();
+  const [rows, setRows] = useState<UserPortfolioRow[] | null>(null);
+  const [error, setError] = useState<string | null>(null);
+
+  // Fetch once the session is known; state updates only in async callbacks.
+  useEffect(() => {
+    if (!user) return;
+    let cancelled = false;
+    getUserPortfolios().then(({ data, error }) => {
+      if (cancelled) return;
+      setRows(data);
+      setError(error);
+    });
+    return () => {
+      cancelled = true;
+    };
+  }, [user]);
+
+  async function handleDelete(row: UserPortfolioRow) {
+    if (!window.confirm(`Delete “${row.name}”? This can't be undone.`)) return;
+    const { error } = await deleteUserPortfolio(row.id);
+    if (error) {
+      setError(`Couldn't delete: ${error}`);
+    } else {
+      setRows((prev) => (prev ? prev.filter((r) => r.id !== row.id) : prev));
+    }
+  }
+
+  return (
+    <section className="mt-10">
+      <div className="flex flex-wrap items-center justify-between gap-3">
+        <h2
+          className="text-2xl font-semibold tracking-tight"
+          style={{ color: "var(--accent)" }}
+        >
+          My portfolios
+        </h2>
+        <Link
+          href="/portfolios/build"
+          className="rounded-full px-5 py-2 text-sm font-medium text-white shadow-sm"
+          style={{ backgroundColor: NAVY }}
+        >
+          + Build a new portfolio
+        </Link>
+      </div>
+
+      {loading ? null : !user ? (
+        <p className="mt-4 rounded-xl border border-dashed border-neutral-300 bg-white p-6 text-center text-sm text-neutral-600">
+          <Link
+            href="/login"
+            className="font-medium underline underline-offset-2"
+            style={{ color: "var(--accent)" }}
+          >
+            Log in
+          </Link>{" "}
+          to see your saved portfolios — or head straight to the{" "}
+          <Link
+            href="/portfolios/build"
+            className="font-medium underline underline-offset-2"
+            style={{ color: "var(--accent)" }}
+          >
+            builder
+          </Link>{" "}
+          and start building now.
+        </p>
+      ) : (
+        <>
+          {error && (
+            <p className="mt-4 rounded-lg bg-red-50 px-4 py-3 text-sm text-red-600">
+              {error}
+            </p>
+          )}
+          {rows === null && !error ? (
+            <p className="mt-4 text-sm text-neutral-400">Loading…</p>
+          ) : rows && rows.length > 0 ? (
+            <div className="mt-4 grid grid-cols-1 gap-6 md:grid-cols-2">
+              {rows.map((row) => (
+                <UserPortfolioCard
+                  key={row.id}
+                  row={row}
+                  onDelete={() => handleDelete(row)}
+                />
+              ))}
+            </div>
+          ) : (
+            !error && (
+              <p className="mt-4 rounded-xl border border-dashed border-neutral-300 bg-white p-6 text-center text-sm text-neutral-500">
+                No portfolios yet — build your first one.
+              </p>
+            )
+          )}
+        </>
+      )}
+    </section>
+  );
+}
+
+function UserPortfolioCard({
+  row,
+  onDelete,
+}: {
+  row: UserPortfolioRow;
+  onDelete: () => void;
+}) {
+  const chartData = row.holdings.filter((h) => h.weight > 0);
+
+  return (
+    <div className="flex flex-col rounded-xl border border-neutral-200 bg-white p-6 shadow-sm">
+      <div className="flex items-baseline justify-between gap-2">
+        <h3 className="text-lg font-semibold" style={{ color: "var(--accent)" }}>
+          {row.name}
+        </h3>
+        <span className="shrink-0 rounded-full border border-neutral-200 px-3 py-0.5 text-xs font-medium text-neutral-500">
+          {row.target_profile}
+        </span>
+      </div>
+      <p className="mt-0.5 text-xs text-neutral-400">
+        Saved {new Date(row.created_at).toLocaleDateString()}
+      </p>
+
+      <div className="mt-4 flex items-center gap-4">
+        <div className="h-28 w-28 shrink-0">
+          <ResponsiveContainer width="100%" height="100%">
+            <PieChart>
+              <Pie
+                data={chartData}
+                dataKey="weight"
+                nameKey="symbol"
+                innerRadius={28}
+                outerRadius={52}
+                paddingAngle={1}
+              >
+                {chartData.map((h, i) => (
+                  <Cell
+                    key={h.symbol + i}
+                    fill={
+                      h.symbol === "CASH"
+                        ? "#A9B2BD"
+                        : HOLDING_PALETTE[i % HOLDING_PALETTE.length]
+                    }
+                  />
+                ))}
+              </Pie>
+              <Tooltip formatter={(value) => `${value}%`} />
+            </PieChart>
+          </ResponsiveContainer>
+        </div>
+        <p className="text-sm leading-6 text-neutral-600">
+          {row.holdings.map((h) => `${h.symbol} ${h.weight}%`).join(" · ")}
+        </p>
+      </div>
+
+      <div className="mt-4 flex items-center gap-2 border-t border-neutral-100 pt-4">
+        <Link
+          href={`/portfolios/build?id=${row.id}`}
+          className="rounded-full px-4 py-1.5 text-sm font-medium text-white"
+          style={{ backgroundColor: NAVY }}
+        >
+          Edit
+        </Link>
+        <button
+          type="button"
+          onClick={onDelete}
+          className="rounded-full border border-neutral-300 px-4 py-1.5 text-sm font-medium text-neutral-600 transition-colors hover:border-red-300 hover:text-red-600"
+        >
+          Delete
+        </button>
+      </div>
+    </div>
   );
 }
 
