@@ -31,6 +31,11 @@ const CALCULATORS = [
     title: "Debt Payoff",
     description: "Avalanche vs. snowball — payoff time, interest, and order.",
   },
+  {
+    href: "/tools/retirement",
+    title: "Retirement Projector",
+    description: "Compound growth by age, with today's-dollars adjustment.",
+  },
 ];
 
 const PORTFOLIO_TOOLS = [
