@@ -135,7 +135,7 @@ function ToolCard({
   return (
     <Link
       href={href}
-      className="group rounded-xl border border-neutral-200 bg-white p-5 shadow-sm transition-colors hover:border-[#002E5D]"
+      className="group rounded-xl border border-neutral-200 bg-white p-5 shadow-sm transition hover:-translate-y-0.5 hover:border-[#1B4332] hover:shadow-md"
     >
       <h3
         className="font-semibold group-hover:underline group-hover:underline-offset-4"

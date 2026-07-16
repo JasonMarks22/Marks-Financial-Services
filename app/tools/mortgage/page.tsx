@@ -20,13 +20,13 @@ import { saveMortgageScenario } from "@/lib/scenarios/mortgageScenarios";
 
 // BYU navy is the main accent; the rest are lighter blues/greys for the
 // secondary cost bands.
-const NAVY = "#002E5D";
+const ACCENT = "#1B4332";
 const COMPONENT_COLORS: Record<string, string> = {
-  "Principal & Interest": NAVY,
-  "Property Tax": "#3E6491",
-  Insurance: "#7FA8D0",
-  PMI: "#B0864B",
-  HOA: "#A9B2BD",
+  "Principal & Interest": ACCENT,
+  "Property Tax": "#2D6A4F",
+  Insurance: "#40916C",
+  PMI: "#74C0DC",
+  HOA: "#A8D0DB",
 };
 
 const usd = new Intl.NumberFormat("en-US", {
@@ -214,7 +214,7 @@ function MortgageCalculator() {
                     {donutData.map((entry) => (
                       <Cell
                         key={entry.name}
-                        fill={COMPONENT_COLORS[entry.name] ?? NAVY}
+                        fill={COMPONENT_COLORS[entry.name] ?? ACCENT}
                       />
                     ))}
                   </Pie>
@@ -389,7 +389,7 @@ function CostRow({
       <span className="flex items-center gap-2">
         <span
           className="inline-block h-3 w-3 rounded-sm"
-          style={{ backgroundColor: COMPONENT_COLORS[label] ?? NAVY }}
+          style={{ backgroundColor: COMPONENT_COLORS[label] ?? ACCENT }}
         />
         <span className="text-neutral-700">{label}</span>
         {note && (

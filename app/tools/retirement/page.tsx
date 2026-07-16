@@ -19,9 +19,9 @@ import {
 } from "recharts";
 import { projectRetirement } from "@/lib/finance/retirement";
 
-const NAVY = "#002E5D";
-const GROWTH_BLUE = "#7FA8D0";
-const REAL_GOLD = "#B0864B";
+const ACCENT = "#1B4332";
+const GROWTH_BLUE = "#40916C";
+const REAL_GREEN = "#2D6A4F";
 
 const usd = new Intl.NumberFormat("en-US", {
   style: "currency",
@@ -101,7 +101,7 @@ export default function RetirementPage() {
                 type="checkbox"
                 checked={inflationOn}
                 onChange={(e) => setInflationOn(e.target.checked)}
-                className="h-4 w-4 accent-[#002E5D]"
+                className="h-4 w-4 accent-[#1B4332]"
               />
               Show in today&rsquo;s dollars
             </label>
@@ -156,7 +156,7 @@ export default function RetirementPage() {
                     </p>
                     <p
                       className="mt-1 text-4xl font-semibold"
-                      style={{ color: REAL_GOLD }}
+                      style={{ color: REAL_GREEN }}
                     >
                       {usd.format(result.realFinalBalance)}
                     </p>
@@ -197,16 +197,16 @@ export default function RetirementPage() {
                     data={chartData}
                     margin={{ top: 10, right: 10, left: 0, bottom: 0 }}
                   >
-                    <CartesianGrid strokeDasharray="3 3" stroke="#e5e5e5" />
+                    <CartesianGrid strokeDasharray="3 3" stroke="#dce4dd" />
                     <XAxis
                       dataKey="age"
-                      stroke="#9ca3af"
+                      stroke="#6b7a6f"
                       tick={{ fontSize: 11 }}
                       tickFormatter={(a) => `${a}`}
                       interval="preserveStartEnd"
                     />
                     <YAxis
-                      stroke="#9ca3af"
+                      stroke="#6b7a6f"
                       tick={{ fontSize: 11 }}
                       tickFormatter={(v) => usd.format(Number(v))}
                       width={90}
@@ -235,8 +235,8 @@ export default function RetirementPage() {
                       type="monotone"
                       dataKey="contributions"
                       stackId="1"
-                      stroke={NAVY}
-                      fill={NAVY}
+                      stroke={ACCENT}
+                      fill={ACCENT}
                       fillOpacity={0.85}
                     />
                     <Area
@@ -251,7 +251,7 @@ export default function RetirementPage() {
                       <Line
                         type="monotone"
                         dataKey="realBalance"
-                        stroke={REAL_GOLD}
+                        stroke={REAL_GREEN}
                         strokeWidth={2}
                         strokeDasharray="6 4"
                         dot={false}

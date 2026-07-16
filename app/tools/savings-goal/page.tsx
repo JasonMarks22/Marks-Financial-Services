@@ -17,8 +17,8 @@ import { SaveAffordance } from "@/components/SaveAffordance";
 import { saveSavingsGoalScenario } from "@/lib/scenarios/savingsGoalScenarios";
 
 // BYU navy is the main accent; the interest band uses a lighter blue.
-const NAVY = "#002E5D";
-const INTEREST_BLUE = "#7FA8D0";
+const ACCENT = "#1B4332";
+const INTEREST_BLUE = "#40916C";
 
 const usd = new Intl.NumberFormat("en-US", {
   style: "currency",
@@ -176,16 +176,16 @@ function SavingsGoalCalculator() {
                 data={chartData}
                 margin={{ top: 10, right: 10, left: 0, bottom: 0 }}
               >
-                <CartesianGrid strokeDasharray="3 3" stroke="#e5e5e5" />
+                <CartesianGrid strokeDasharray="3 3" stroke="#dce4dd" />
                 <XAxis
                   dataKey="month"
-                  stroke="#9ca3af"
+                  stroke="#6b7a6f"
                   tick={{ fontSize: 12 }}
                   tickFormatter={(m) => `${Math.round(Number(m) / 12)}y`}
                   interval="preserveStartEnd"
                 />
                 <YAxis
-                  stroke="#9ca3af"
+                  stroke="#6b7a6f"
                   tick={{ fontSize: 12 }}
                   tickFormatter={(v) => usd.format(Number(v))}
                   width={70}
@@ -203,8 +203,8 @@ function SavingsGoalCalculator() {
                   type="monotone"
                   dataKey="contributions"
                   stackId="1"
-                  stroke={NAVY}
-                  fill={NAVY}
+                  stroke={ACCENT}
+                  fill={ACCENT}
                   fillOpacity={0.85}
                   name="contributions"
                 />
@@ -220,7 +220,7 @@ function SavingsGoalCalculator() {
                 {goalValue > 0 && (
                   <ReferenceLine
                     y={goalValue}
-                    stroke={NAVY}
+                    stroke={ACCENT}
                     strokeDasharray="6 4"
                     label={{
                       value: `Goal ${usd.format(goalValue)}`,
@@ -234,7 +234,7 @@ function SavingsGoalCalculator() {
             </ResponsiveContainer>
           </div>
           <div className="mt-3 flex justify-center gap-6 text-xs text-neutral-600">
-            <LegendSwatch color={NAVY} label="Contributions" />
+            <LegendSwatch color={ACCENT} label="Contributions" />
             <LegendSwatch color={INTEREST_BLUE} label="Interest earned" />
           </div>
         </div>

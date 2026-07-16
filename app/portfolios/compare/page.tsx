@@ -35,10 +35,10 @@ import {
 } from "@/lib/portfolios/userPortfolios";
 import type { BacktestResult } from "@/lib/portfolios/backtest";
 
-const NAVY = "#002E5D";
-const LINE_COLORS = ["#002E5D", "#B0864B", "#3E6491", "#7FA8D0", "#C6A15B", "#5E7EAB"];
-const SPLIT_COLORS = { Stocks: NAVY, Bonds: "#7FA8D0", Cash: "#A9B2BD" } as const;
-const HOLDING_PALETTE = ["#002E5D", "#1F4B76", "#3E6491", "#5E7EAB", "#7FA8D0", "#C6A15B", "#8DA3BC", "#B0864B"];
+const ACCENT = "#1B4332";
+const LINE_COLORS = ["#1B4332", "#2D6A4F", "#40916C", "#74C0DC", "#8FAF9B", "#5FA97F"];
+const SPLIT_COLORS = { Stocks: ACCENT, Bonds: "#40916C", Cash: "#A8D0DB" } as const;
+const HOLDING_PALETTE = ["#1B4332", "#2D6A4F", "#40916C", "#5FA97F", "#74C0DC", "#8FAF9B", "#96B8AA", "#537E68"];
 
 const BACKTEST_RANGES = ["1y", "3y", "5y"] as const;
 type BacktestRange = (typeof BACKTEST_RANGES)[number];
@@ -269,7 +269,7 @@ export default function PortfolioComparePage() {
                   onClick={runBacktests}
                   disabled={running}
                   className="rounded-full px-5 py-2 text-sm font-medium text-white disabled:opacity-50"
-                  style={{ backgroundColor: NAVY }}
+                  style={{ backgroundColor: ACCENT }}
                 >
                   {running ? "Running…" : "Run backtest"}
                 </button>
@@ -307,16 +307,16 @@ export default function PortfolioComparePage() {
                       data={chartData}
                       margin={{ top: 10, right: 10, left: 0, bottom: 0 }}
                     >
-                      <CartesianGrid strokeDasharray="3 3" stroke="#e5e5e5" />
+                      <CartesianGrid strokeDasharray="3 3" stroke="#dce4dd" />
                       <XAxis
                         dataKey="date"
-                        stroke="#9ca3af"
+                        stroke="#6b7a6f"
                         tick={{ fontSize: 11 }}
                         interval="preserveStartEnd"
                         minTickGap={50}
                       />
                       <YAxis
-                        stroke="#9ca3af"
+                        stroke="#6b7a6f"
                         tick={{ fontSize: 11 }}
                         tickFormatter={(v) => usd.format(Number(v))}
                         width={80}
@@ -452,7 +452,7 @@ function PortfolioPills({
                   ? "text-white"
                   : "border-neutral-300 text-neutral-700 hover:border-neutral-500"
               }`}
-              style={active ? { backgroundColor: NAVY, borderColor: NAVY } : undefined}
+              style={active ? { backgroundColor: ACCENT, borderColor: ACCENT } : undefined}
             >
               {p.name}
             </button>
@@ -508,7 +508,7 @@ function ComparisonCard({ portfolio }: { portfolio: SelectablePortfolio }) {
                     portfolio.split
                       ? SPLIT_COLORS[d.name as keyof typeof SPLIT_COLORS]
                       : d.name === "CASH"
-                        ? "#A9B2BD"
+                        ? "#A8D0DB"
                         : HOLDING_PALETTE[i % HOLDING_PALETTE.length]
                   }
                 />

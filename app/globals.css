@@ -1,22 +1,45 @@
 @import "tailwindcss";
 
+/* ============================================================================
+   DESIGN TOKENS — the single source of truth for the app's visual system.
+
+   Color roles (never use raw hexes in pages for these roles; use the vars or
+   the re-tinted utility classes below):
+     --accent        #1b4332  primary: buttons, links, active nav, headings,
+                              first chart series, key emphasis
+     secondary       #2d6a4f  hovers, secondary buttons, second chart series
+     tertiary        #40916c  chart bands, highlights, tags
+     light accents   #74c0dc / #a8d0db  fills, badges, chart bands ONLY —
+                              never text, never primary buttons
+     --background    canvas: light desaturated grey-green (not white)
+     --card-bg       panels: slightly LIGHTER than canvas so cards lift
+     --card-border   subtle grey-green definition for panels
+
+   Typography: Geist Sans app-wide; financial figures use tabular numerals
+   (all tables get them automatically below). Body text is near-black on
+   light surfaces; muted text uses desaturated grey-greens with WCAG-safe
+   contrast on both canvas and cards.
+   ========================================================================= */
+
 :root {
-  --background: #f4f4f5;
-  --foreground: #171717;
-  /* BYU navy accent; swapped for a lighter blue in dark mode so headings stay readable. */
-  --accent: #002e5d;
-  --card-bg: #ffffff;
-  --card-accent-bg: #f2f6fb;
-  --card-border: #e5e5e5;
+  /* Canvas: light desaturated grey-green page background. */
+  --background: #eef2ef;
+  --foreground: #1a1f1b;
+  /* Primary accent: dark green (headings, links, buttons, primary series). */
+  --accent: #1b4332;
+  /* Cards sit slightly LIGHTER than the canvas so they read as raised. */
+  --card-bg: #f6f8f6;
+  --card-accent-bg: #eaf3ee;
+  --card-border: #d9e2db;
 }
 
 /* Dark theme — toggled by adding the `dark` class to <html> (see ThemeToggle). */
 .dark {
   --background: #0f1115;
   --foreground: #e6e8eb;
-  --accent: #8fb3da;
+  --accent: #83c5a3;
   --card-bg: #171b22;
-  --card-accent-bg: #16273c;
+  --card-accent-bg: #16271f;
   --card-border: #2e3540;
 }
 
@@ -30,13 +53,69 @@
 body {
   background: var(--background);
   color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  /* Geist Sans (loaded in the root layout) with robust fallbacks. */
+  font-family: var(--font-geist-sans), ui-sans-serif, system-ui, -apple-system,
+    "Segoe UI", sans-serif;
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
 }
 
-/* ---- Dark-mode re-skin of the light utility classes used across the app. ----
-   Pages are written with light-theme Tailwind classes; these overrides restyle
-   them when <html> has the `dark` class, so individual pages don't need
-   dark: variants everywhere. */
+/* Financial data: lining, equal-width figures so columns of numbers align.
+   Applied to every table automatically; use class "tabular-nums" elsewhere. */
+table {
+  font-variant-numeric: tabular-nums;
+}
+
+/* Accessible, consistent keyboard focus everywhere. */
+:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+  border-radius: 4px;
+}
+
+/* Subtle brand touch on text selection. */
+::selection {
+  background: #cfe3d7;
+}
+
+/* Gentle, uniform interaction polish — quick enough to feel instant. */
+a,
+button {
+  transition:
+    color 0.15s ease,
+    background-color 0.15s ease,
+    border-color 0.15s ease,
+    box-shadow 0.15s ease,
+    transform 0.15s ease;
+}
+
+/* ---- Light-theme re-tint of the utility classes used across the app. ----
+   Pages are written with neutral Tailwind classes (bg-white cards on a
+   bg-zinc-100 canvas, neutral borders/text). These unlayered overrides map
+   those roles onto the green/blue palette in one place: canvas = soft
+   grey-green, cards = slightly lighter surface, borders and muted text =
+   desaturated grey-greens. Body text stays near-black for contrast. */
+.bg-zinc-100 { background-color: var(--background); }
+.bg-white { background-color: var(--card-bg); }
+.bg-neutral-50 { background-color: #edf2ee; }
+.bg-neutral-100 { background-color: #e2eae4; }
+.hover\:bg-neutral-50:hover { background-color: #e9efe9; }
+.bg-blue-50 { background-color: #e7f2f6; }
+
+.text-neutral-900, .text-zinc-900 { color: #1a1f1b; }
+.text-neutral-800 { color: #27302a; }
+.text-neutral-700 { color: #3a453d; }
+.text-neutral-600, .text-zinc-600 { color: #52615a; }
+.text-neutral-500 { color: #6b7a6f; }
+.text-neutral-400 { color: #8a988e; }
+
+.border-neutral-100 { border-color: #e3eae4; }
+.border-neutral-200 { border-color: #d9e2db; }
+.border-neutral-300 { border-color: #c3d0c6; }
+.hover\:border-neutral-500:hover { border-color: #7f9084; }
+.divide-neutral-100 > :not([hidden]) ~ :not([hidden]) { border-color: #e3eae4; }
+
+/* ---- Dark-mode re-skin (unchanged roles, dark values). ---- */
 .dark .bg-zinc-100 { background-color: #0f1115; }
 .dark .bg-white { background-color: #171b22; }
 .dark .bg-neutral-50 { background-color: #1e242e; }

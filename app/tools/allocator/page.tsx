@@ -18,12 +18,12 @@ import { SaveAffordance } from "@/components/SaveAffordance";
 import { saveAllocatorScenario } from "@/lib/scenarios/allocatorScenarios";
 
 // BYU navy is the main accent; secondary destinations use lighter blues/greys.
-const NAVY = "#002E5D";
+const ACCENT = "#1B4332";
 const DEST_COLORS: Record<AllocationKey, string> = {
-  checking: "#3E6491",
-  debt: "#C6A15B",
-  hysa: "#7FA8D0",
-  investments: NAVY,
+  checking: "#2D6A4F",
+  debt: "#74C0DC",
+  hysa: "#40916C",
+  investments: ACCENT,
 };
 
 const usdCents = new Intl.NumberFormat("en-US", {
@@ -115,7 +115,7 @@ function AllocatorCalculator() {
               type="checkbox"
               checked={hasDebt}
               onChange={(e) => setHasDebt(e.target.checked)}
-              className="h-4 w-4 accent-[#002E5D]"
+              className="h-4 w-4 accent-[#1B4332]"
             />
             <span className="text-sm font-medium text-neutral-700">
               I have high-interest debt (e.g. credit cards)

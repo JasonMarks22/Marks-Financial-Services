@@ -18,7 +18,7 @@ import { usePathname } from "next/navigation";
 import { useAuth } from "@/lib/auth/AuthContext";
 import { LogoutButton } from "@/components/LogoutButton";
 
-const NAVY = "#002E5D";
+const ACCENT = "#1B4332";
 
 interface NavItem {
   href: string;
@@ -86,7 +86,7 @@ export function NavBar() {
   return (
     <nav
       ref={navRef}
-      className="sticky top-0 z-40 border-b border-neutral-200 bg-white"
+      className="sticky top-0 z-40 border-b border-neutral-200 bg-white shadow-sm"
       onKeyDown={(e) => {
         if (e.key === "Escape") closeMenus();
       }}
@@ -135,7 +135,7 @@ export function NavBar() {
                     <span
                       aria-hidden
                       className="absolute inset-x-3 -bottom-0.5 h-0.5 rounded-full"
-                      style={{ backgroundColor: NAVY }}
+                      style={{ backgroundColor: ACCENT }}
                     />
                   )}
                 </button>
@@ -203,7 +203,7 @@ export function NavBar() {
               <Link
                 href="/signup"
                 className="rounded-full px-4 py-1.5 text-sm font-medium text-white transition-colors hover:opacity-90"
-                style={{ backgroundColor: NAVY }}
+                style={{ backgroundColor: ACCENT }}
               >
                 Sign up
               </Link>
@@ -282,7 +282,7 @@ export function NavBar() {
                   href="/signup"
                   onClick={closeMenus}
                   className="flex-1 rounded-full px-4 py-2 text-center text-sm font-medium text-white"
-                  style={{ backgroundColor: NAVY }}
+                  style={{ backgroundColor: ACCENT }}
                 >
                   Sign up
                 </Link>

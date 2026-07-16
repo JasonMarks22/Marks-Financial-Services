@@ -29,7 +29,7 @@ import {
   type MatchRating,
 } from "@/lib/portfolios/gradePortfolio";
 
-const NAVY = "#002E5D";
+const ACCENT = "#1B4332";
 
 const RATING_STYLES: Record<MatchRating, string> = {
   "Strong match": "border-emerald-200 bg-emerald-50 text-emerald-700",
@@ -228,7 +228,7 @@ function PortfolioBuilder() {
                 type="button"
                 onClick={() => addRow()}
                 className="rounded-lg px-3 py-1.5 text-sm font-medium text-white"
-                style={{ backgroundColor: NAVY }}
+                style={{ backgroundColor: ACCENT }}
               >
                 + Add holding
               </button>
@@ -312,19 +312,19 @@ function PortfolioBuilder() {
                   <div
                     style={{
                       width: `${liveGrade.split.stocks}%`,
-                      backgroundColor: NAVY,
+                      backgroundColor: ACCENT,
                     }}
                   />
                   <div
                     style={{
                       width: `${liveGrade.split.bonds}%`,
-                      backgroundColor: "#7FA8D0",
+                      backgroundColor: "#40916C",
                     }}
                   />
                   <div
                     style={{
                       width: `${liveGrade.split.cash}%`,
-                      backgroundColor: "#A9B2BD",
+                      backgroundColor: "#A8D0DB",
                     }}
                   />
                 </div>
@@ -363,7 +363,7 @@ function PortfolioBuilder() {
               onClick={handleSave}
               disabled={!canSave}
               className="rounded-full px-8 py-3 text-base font-medium text-white shadow-sm disabled:opacity-40"
-              style={{ backgroundColor: NAVY }}
+              style={{ backgroundColor: ACCENT }}
             >
               {busy
                 ? "Saving…"

@@ -40,23 +40,23 @@ const RATING_STYLES: Record<MatchRating, string> = {
 const MATCH_DISCLAIMER =
   "This match rating is an educational estimate based on your portfolio's stock/bond/cash mix compared to common profile definitions. It is not investment advice or an authoritative assessment. Method and profile definitions are illustrative.";
 
-const NAVY = "#002E5D";
+const ACCENT = "#1B4332";
 const SPLIT_COLORS = {
-  Stocks: NAVY,
-  Bonds: "#7FA8D0",
-  Cash: "#A9B2BD",
+  Stocks: ACCENT,
+  Bonds: "#40916C",
+  Cash: "#A8D0DB",
 } as const;
 
 // Ramp for user-portfolio holdings donuts; CASH always renders grey.
 const HOLDING_PALETTE = [
-  "#002E5D",
-  "#1F4B76",
-  "#3E6491",
-  "#5E7EAB",
-  "#7FA8D0",
-  "#C6A15B",
-  "#8DA3BC",
-  "#B0864B",
+  "#1B4332",
+  "#2D6A4F",
+  "#40916C",
+  "#5FA97F",
+  "#74C0DC",
+  "#8FAF9B",
+  "#96B8AA",
+  "#537E68",
 ];
 
 export default function PortfoliosPage() {
@@ -146,14 +146,14 @@ function MyPortfoliosSection() {
           <Link
             href="/portfolios/compare"
             className="rounded-full border px-5 py-2 text-sm font-medium"
-            style={{ borderColor: NAVY, color: "var(--accent)" }}
+            style={{ borderColor: ACCENT, color: "var(--accent)" }}
           >
             Compare &amp; backtest
           </Link>
           <Link
             href="/portfolios/build"
             className="rounded-full px-5 py-2 text-sm font-medium text-white shadow-sm"
-            style={{ backgroundColor: NAVY }}
+            style={{ backgroundColor: ACCENT }}
           >
             + Build a new portfolio
           </Link>
@@ -251,7 +251,7 @@ function UserPortfolioCard({
                     key={h.symbol + i}
                     fill={
                       h.symbol === "CASH"
-                        ? "#A9B2BD"
+                        ? "#A8D0DB"
                         : HOLDING_PALETTE[i % HOLDING_PALETTE.length]
                     }
                   />
@@ -273,7 +273,7 @@ function UserPortfolioCard({
         <Link
           href={`/portfolios/build?id=${row.id}`}
           className="rounded-full px-4 py-1.5 text-sm font-medium text-white"
-          style={{ backgroundColor: NAVY }}
+          style={{ backgroundColor: ACCENT }}
         >
           Edit
         </Link>
@@ -316,9 +316,9 @@ function ProfileMatchPanel({ grade }: { grade: GradeResult | null }) {
 
       {/* Actual split as one stacked bar */}
       <div className="mt-2 flex h-3 w-full overflow-hidden rounded-full bg-neutral-100">
-        <div style={{ width: `${grade.split.stocks}%`, backgroundColor: NAVY }} />
-        <div style={{ width: `${grade.split.bonds}%`, backgroundColor: "#7FA8D0" }} />
-        <div style={{ width: `${grade.split.cash}%`, backgroundColor: "#A9B2BD" }} />
+        <div style={{ width: `${grade.split.stocks}%`, backgroundColor: ACCENT }} />
+        <div style={{ width: `${grade.split.bonds}%`, backgroundColor: "#40916C" }} />
+        <div style={{ width: `${grade.split.cash}%`, backgroundColor: "#A8D0DB" }} />
       </div>
       <p className="mt-1 text-xs text-neutral-500">
         Stocks {Math.round(grade.split.stocks)}% · Bonds{" "}
@@ -416,7 +416,7 @@ function PortfolioCard({ portfolio }: { portfolio: ModelPortfolio }) {
                   className="absolute left-0 top-0 h-2 rounded-full"
                   style={{
                     width: `${h.weight}%`,
-                    backgroundColor: h.symbol === "CASH" ? "#A9B2BD" : NAVY,
+                    backgroundColor: h.symbol === "CASH" ? "#A8D0DB" : ACCENT,
                   }}
                 />
               </span>

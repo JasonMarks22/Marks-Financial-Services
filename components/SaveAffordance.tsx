@@ -15,7 +15,7 @@ import { useState, type FormEvent } from "react";
 import Link from "next/link";
 import { useAuth } from "@/lib/auth/AuthContext";
 
-const NAVY = "#002E5D";
+const ACCENT = "#1B4332";
 
 interface SaveAffordanceProps {
   /** When provided, the button performs a real save via this handler. */
@@ -41,7 +41,7 @@ export function SaveAffordance({ onSave }: SaveAffordanceProps) {
       <p className="mt-3 text-center text-xs text-neutral-400">
         <Link
           href="/login"
-          className="font-medium text-neutral-500 underline decoration-neutral-300 underline-offset-2 hover:text-[#002E5D]"
+          className="font-medium text-neutral-500 underline decoration-neutral-300 underline-offset-2 hover:text-[#1B4332]"
         >
           Log in
         </Link>{" "}
@@ -113,7 +113,7 @@ export function SaveAffordance({ onSave }: SaveAffordanceProps) {
             type="submit"
             disabled={busy || !name.trim()}
             className="rounded-full px-4 py-1.5 text-xs font-medium text-white transition-colors disabled:opacity-50"
-            style={{ backgroundColor: NAVY }}
+            style={{ backgroundColor: ACCENT }}
           >
             {busy ? "Saving…" : "Save"}
           </button>

@@ -35,7 +35,7 @@ import {
   type BudgetScenarioRow,
 } from "@/lib/scenarios/budgetScenarios";
 
-const NAVY = "#002E5D";
+const ACCENT = "#1B4332";
 
 const usd = new Intl.NumberFormat("en-US", {
   style: "currency",
@@ -179,7 +179,7 @@ export default function ScenariosPage() {
             <Link
               href="/login"
               className="mt-4 inline-block rounded-full px-6 py-2.5 text-sm font-medium text-white"
-              style={{ backgroundColor: NAVY }}
+              style={{ backgroundColor: ACCENT }}
             >
               Log in to see yours
             </Link>
@@ -226,7 +226,7 @@ export default function ScenariosPage() {
                         <Link
                           href={mortgageLoadHref(row)}
                           className="rounded-full px-4 py-1.5 text-sm font-medium text-white"
-                          style={{ backgroundColor: NAVY }}
+                          style={{ backgroundColor: ACCENT }}
                         >
                           Load
                         </Link>
@@ -288,7 +288,7 @@ export default function ScenariosPage() {
                         <Link
                           href={savingsGoalLoadHref(row)}
                           className="rounded-full px-4 py-1.5 text-sm font-medium text-white"
-                          style={{ backgroundColor: NAVY }}
+                          style={{ backgroundColor: ACCENT }}
                         >
                           Load
                         </Link>
@@ -352,7 +352,7 @@ export default function ScenariosPage() {
                         <Link
                           href={allocatorLoadHref(row)}
                           className="rounded-full px-4 py-1.5 text-sm font-medium text-white"
-                          style={{ backgroundColor: NAVY }}
+                          style={{ backgroundColor: ACCENT }}
                         >
                           Load
                         </Link>
@@ -423,7 +423,7 @@ export default function ScenariosPage() {
                           <Link
                             href={`/tools/budget?scenario=${row.id}`}
                             className="rounded-full px-4 py-1.5 text-sm font-medium text-white"
-                            style={{ backgroundColor: NAVY }}
+                            style={{ backgroundColor: ACCENT }}
                           >
                             Load
                           </Link>

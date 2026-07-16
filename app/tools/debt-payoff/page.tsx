@@ -21,8 +21,8 @@ import {
   type StrategyResult,
 } from "@/lib/finance/debtPayoff";
 
-const NAVY = "#002E5D";
-const GOLD = "#B0864B";
+const ACCENT = "#1B4332";
+const GOLD = "#2D6A4F";
 
 const usd = new Intl.NumberFormat("en-US", {
   style: "currency",
@@ -133,7 +133,7 @@ export default function DebtPayoffPage() {
               type="button"
               onClick={addRow}
               className="rounded-lg px-3 py-1.5 text-sm font-medium text-white"
-              style={{ backgroundColor: NAVY }}
+              style={{ backgroundColor: ACCENT }}
             >
               + Add debt
             </button>
@@ -280,17 +280,17 @@ export default function DebtPayoffPage() {
                     data={chartData}
                     margin={{ top: 10, right: 10, left: 0, bottom: 0 }}
                   >
-                    <CartesianGrid strokeDasharray="3 3" stroke="#e5e5e5" />
+                    <CartesianGrid strokeDasharray="3 3" stroke="#dce4dd" />
                     <XAxis
                       dataKey="month"
-                      stroke="#9ca3af"
+                      stroke="#6b7a6f"
                       tick={{ fontSize: 11 }}
                       tickFormatter={(m) => monthsLabel(Number(m))}
                       interval="preserveStartEnd"
                       minTickGap={50}
                     />
                     <YAxis
-                      stroke="#9ca3af"
+                      stroke="#6b7a6f"
                       tick={{ fontSize: 11 }}
                       tickFormatter={(v) => usd.format(Number(v))}
                       width={80}
@@ -310,7 +310,7 @@ export default function DebtPayoffPage() {
                     <Line
                       type="monotone"
                       dataKey="avalanche"
-                      stroke={NAVY}
+                      stroke={ACCENT}
                       strokeWidth={2}
                       dot={false}
                       connectNulls
@@ -353,7 +353,7 @@ function StrategyCard({
   return (
     <div
       className="rounded-xl border bg-white p-6 shadow-sm"
-      style={{ borderColor: accent ? NAVY : "#e5e5e5" }}
+      style={{ borderColor: accent ? ACCENT : "#dce4dd" }}
     >
       <h3 className="text-lg font-semibold" style={{ color: "var(--accent)" }}>
         {title}

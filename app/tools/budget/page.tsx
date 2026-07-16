@@ -23,16 +23,16 @@ import {
 } from "@/lib/scenarios/budgetScenarios";
 
 // BYU navy is the main accent; a graded blue/grey ramp colors the categories.
-const NAVY = "#002E5D";
+const ACCENT = "#1B4332";
 const CATEGORY_PALETTE = [
-  "#002E5D",
-  "#1F4B76",
-  "#3E6491",
-  "#5E7EAB",
-  "#7FA8D0",
-  "#A9B2BD",
-  "#C6A15B",
-  "#8DA3BC",
+  "#1B4332",
+  "#2D6A4F",
+  "#40916C",
+  "#5FA97F",
+  "#74C0DC",
+  "#A8D0DB",
+  "#8FAF9B",
+  "#96B8AA",
 ];
 
 const BUCKET_LABELS: Record<Bucket, string> = {
@@ -229,7 +229,7 @@ function BudgetCalculator() {
               type="button"
               onClick={addRow}
               className="rounded-lg px-3 py-1.5 text-sm font-medium text-white"
-              style={{ backgroundColor: NAVY }}
+              style={{ backgroundColor: ACCENT }}
             >
               + Add category
             </button>
@@ -394,7 +394,7 @@ function BudgetCalculator() {
                       className="h-3 rounded-full"
                       style={{
                         width: `${Math.min(100, b.percentOfIncome)}%`,
-                        backgroundColor: NAVY,
+                        backgroundColor: ACCENT,
                       }}
                     />
                     <div

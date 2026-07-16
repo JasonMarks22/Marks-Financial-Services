@@ -28,8 +28,8 @@ import type {
 } from "@/lib/marketData/types";
 import { HISTORY_RANGES } from "@/lib/marketData/types";
 
-const NAVY = "#002E5D";
-const GOLD = "#B0864B";
+const ACCENT = "#1B4332";
+const GOLD = "#2D6A4F";
 
 const TYPE_LABELS: Record<string, string> = {
   EQUITY: "Stock",
@@ -187,16 +187,16 @@ export default function ComparePage() {
                       data={chartData}
                       margin={{ top: 10, right: 10, left: 0, bottom: 0 }}
                     >
-                      <CartesianGrid strokeDasharray="3 3" stroke="#e5e5e5" />
+                      <CartesianGrid strokeDasharray="3 3" stroke="#dce4dd" />
                       <XAxis
                         dataKey="date"
-                        stroke="#9ca3af"
+                        stroke="#6b7a6f"
                         tick={{ fontSize: 11 }}
                         interval="preserveStartEnd"
                         minTickGap={60}
                       />
                       <YAxis
-                        stroke="#9ca3af"
+                        stroke="#6b7a6f"
                         tick={{ fontSize: 11 }}
                         tickFormatter={(v) => `${Number(v).toFixed(0)}%`}
                         width={55}
@@ -212,7 +212,7 @@ export default function ComparePage() {
                         type="monotone"
                         dataKey="a"
                         name={a.symbol}
-                        stroke={NAVY}
+                        stroke={ACCENT}
                         strokeWidth={2}
                         dot={false}
                         connectNulls

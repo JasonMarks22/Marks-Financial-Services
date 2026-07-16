@@ -10,7 +10,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { supabase } from "@/lib/supabase/client";
 
-const NAVY = "#002E5D";
+const ACCENT = "#1B4332";
 
 export default function SignupPage() {
   const router = useRouter();
@@ -113,7 +113,7 @@ export default function SignupPage() {
             type="submit"
             disabled={busy}
             className="w-full rounded-full px-6 py-3 text-base font-medium text-white shadow-sm transition-colors disabled:opacity-50"
-            style={{ backgroundColor: NAVY }}
+            style={{ backgroundColor: ACCENT }}
           >
             {busy ? "Creating account…" : "Sign up"}
           </button>
