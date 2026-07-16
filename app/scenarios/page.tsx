@@ -24,6 +24,11 @@ import {
   getSavingsGoalScenarios,
   type SavingsGoalScenarioRow,
 } from "@/lib/scenarios/savingsGoalScenarios";
+import {
+  deleteAllocatorScenario,
+  getAllocatorScenarios,
+  type AllocatorScenarioRow,
+} from "@/lib/scenarios/allocatorScenarios";
 
 const NAVY = "#002E5D";
 
@@ -59,11 +64,24 @@ function savingsGoalLoadHref(row: SavingsGoalScenarioRow): string {
   return `/tools/savings-goal?${params.toString()}`;
 }
 
+/** Build the allocator URL that pre-fills this scenario's inputs. */
+function allocatorLoadHref(row: AllocatorScenarioRow): string {
+  const params = new URLSearchParams({
+    leftover: String(row.monthly_leftover),
+    emergencyFund: String(row.current_emergency_fund),
+    essentials: String(row.monthly_essential_expenses),
+    checkingBuffer: String(row.current_checking_buffer),
+    hasDebt: row.has_high_interest_debt ? "1" : "0",
+  });
+  return `/tools/allocator?${params.toString()}`;
+}
+
 export default function ScenariosPage() {
   const { user, loading } = useAuth();
 
   const [rows, setRows] = useState<MortgageScenarioRow[] | null>(null);
   const [sgRows, setSgRows] = useState<SavingsGoalScenarioRow[] | null>(null);
+  const [allocRows, setAllocRows] = useState<AllocatorScenarioRow[] | null>(null);
   const [error, setError] = useState<string | null>(null);
 
   // Fetch the user's scenarios (both calculator types) once we know who they
@@ -72,14 +90,17 @@ export default function ScenariosPage() {
   useEffect(() => {
     if (!user) return;
     let cancelled = false;
-    Promise.all([getMortgageScenarios(), getSavingsGoalScenarios()]).then(
-      ([mortgage, savingsGoal]) => {
-        if (cancelled) return;
-        setRows(mortgage.data);
-        setSgRows(savingsGoal.data);
-        setError(mortgage.error ?? savingsGoal.error);
-      },
-    );
+    Promise.all([
+      getMortgageScenarios(),
+      getSavingsGoalScenarios(),
+      getAllocatorScenarios(),
+    ]).then(([mortgage, savingsGoal, allocator]) => {
+      if (cancelled) return;
+      setRows(mortgage.data);
+      setSgRows(savingsGoal.data);
+      setAllocRows(allocator.data);
+      setError(mortgage.error ?? savingsGoal.error ?? allocator.error);
+    });
     return () => {
       cancelled = true;
     };
@@ -102,6 +123,18 @@ export default function ScenariosPage() {
       setError(`Couldn't delete: ${error}`);
     } else {
       setSgRows((prev) => (prev ? prev.filter((r) => r.id !== row.id) : prev));
+    }
+  }
+
+  async function handleDeleteAllocator(row: AllocatorScenarioRow) {
+    if (!window.confirm(`Delete “${row.name}”? This can't be undone.`)) return;
+    const { error } = await deleteAllocatorScenario(row.id);
+    if (error) {
+      setError(`Couldn't delete: ${error}`);
+    } else {
+      setAllocRows((prev) =>
+        prev ? prev.filter((r) => r.id !== row.id) : prev,
+      );
     }
   }
 
@@ -264,6 +297,70 @@ export default function ScenariosPage() {
                     style={{ color: NAVY }}
                   >
                     savings goal calculator
+                  </Link>{" "}
+                  and hit “Save scenario”.
+                </p>
+              )}
+            </section>
+
+            {/* ---- Allocator scenarios ---- */}
+            <section className="mt-10">
+              <h2 className="text-lg font-semibold" style={{ color: NAVY }}>
+                Savings allocator
+              </h2>
+
+              {allocRows === null && !error ? (
+                <p className="mt-4 text-sm text-neutral-400">Loading…</p>
+              ) : allocRows && allocRows.length > 0 ? (
+                <ul className="mt-4 space-y-3">
+                  {allocRows.map((row) => (
+                    <li
+                      key={row.id}
+                      className="flex flex-col gap-3 rounded-xl border border-neutral-200 bg-white p-4 shadow-sm sm:flex-row sm:items-center sm:justify-between"
+                    >
+                      <div>
+                        <p className="font-medium text-neutral-900">
+                          {row.name}
+                        </p>
+                        <p className="mt-0.5 text-sm text-neutral-600">
+                          {usd.format(row.monthly_leftover)}/mo leftover ·{" "}
+                          {usd.format(row.current_emergency_fund)} emergency
+                          fund · {usd.format(row.monthly_essential_expenses)}
+                          /mo essentials
+                          {row.has_high_interest_debt && " · has high-interest debt"}
+                        </p>
+                        <p className="mt-0.5 text-xs text-neutral-400">
+                          Saved {new Date(row.created_at).toLocaleDateString()}
+                        </p>
+                      </div>
+                      <div className="flex shrink-0 items-center gap-2">
+                        <Link
+                          href={allocatorLoadHref(row)}
+                          className="rounded-full px-4 py-1.5 text-sm font-medium text-white"
+                          style={{ backgroundColor: NAVY }}
+                        >
+                          Load
+                        </Link>
+                        <button
+                          type="button"
+                          onClick={() => handleDeleteAllocator(row)}
+                          className="rounded-full border border-neutral-300 px-4 py-1.5 text-sm font-medium text-neutral-600 transition-colors hover:border-red-300 hover:text-red-600"
+                        >
+                          Delete
+                        </button>
+                      </div>
+                    </li>
+                  ))}
+                </ul>
+              ) : (
+                <p className="mt-4 rounded-xl border border-dashed border-neutral-200 p-6 text-center text-sm text-neutral-500">
+                  No saved allocator scenarios yet. Run the{" "}
+                  <Link
+                    href="/tools/allocator"
+                    className="font-medium underline underline-offset-2"
+                    style={{ color: NAVY }}
+                  >
+                    savings allocator
                   </Link>{" "}
                   and hit “Save scenario”.
                 </p>

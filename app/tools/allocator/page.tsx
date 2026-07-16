@@ -1,7 +1,8 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { Suspense, useMemo, useState } from "react";
 import Link from "next/link";
+import { useSearchParams } from "next/navigation";
 import {
   Cell,
   Legend,
@@ -15,6 +16,7 @@ import {
   allocateSavings,
 } from "@/lib/finance/allocator";
 import { SaveAffordance } from "@/components/SaveAffordance";
+import { saveAllocatorScenario } from "@/lib/scenarios/allocatorScenarios";
 
 // BYU navy is the main accent; secondary destinations use lighter blues/greys.
 const NAVY = "#002E5D";
@@ -36,12 +38,29 @@ function toNumber(value: string): number {
   return Number.isFinite(n) && n > 0 ? n : 0;
 }
 
+// useSearchParams requires a Suspense boundary, so the page itself is a thin
+// wrapper around the actual calculator.
 export default function AllocatorPage() {
-  const [leftover, setLeftover] = useState("800");
-  const [emergencyFund, setEmergencyFund] = useState("2000");
-  const [essentials, setEssentials] = useState("2500");
-  const [checkingBuffer, setCheckingBuffer] = useState("1500");
-  const [hasDebt, setHasDebt] = useState(false);
+  return (
+    <Suspense fallback={null}>
+      <AllocatorCalculator />
+    </Suspense>
+  );
+}
+
+function AllocatorCalculator() {
+  // A "Load" from the saved-scenarios page passes inputs as URL query params;
+  // when present they pre-fill the calculator, otherwise use the defaults.
+  // The debt flag travels as "1"/"0".
+  const searchParams = useSearchParams();
+  const fromQuery = (key: string, fallback: string) =>
+    searchParams.get(key) ?? fallback;
+
+  const [leftover, setLeftover] = useState(() => fromQuery("leftover", "800"));
+  const [emergencyFund, setEmergencyFund] = useState(() => fromQuery("emergencyFund", "2000"));
+  const [essentials, setEssentials] = useState(() => fromQuery("essentials", "2500"));
+  const [checkingBuffer, setCheckingBuffer] = useState(() => fromQuery("checkingBuffer", "1500"));
+  const [hasDebt, setHasDebt] = useState(() => fromQuery("hasDebt", "0") === "1");
 
   const result = useMemo(
     () =>
@@ -59,6 +78,18 @@ export default function AllocatorPage() {
     () => result.allocations.filter((a) => a.amount > 0.005),
     [result],
   );
+
+  // Persist the current inputs as a named scenario (used by SaveAffordance;
+  // only reachable when logged in).
+  async function handleSave(name: string) {
+    return saveAllocatorScenario(name, {
+      monthly_leftover: toNumber(leftover),
+      current_emergency_fund: toNumber(emergencyFund),
+      monthly_essential_expenses: toNumber(essentials),
+      current_checking_buffer: toNumber(checkingBuffer),
+      has_high_interest_debt: hasDebt,
+    });
+  }
 
   return (
     <main className="flex flex-1 flex-col items-center bg-white px-6 py-16 text-neutral-900">
@@ -163,7 +194,7 @@ export default function AllocatorPage() {
               ))}
             </ul>
           </div>
-          <SaveAffordance />
+          <SaveAffordance onSave={handleSave} />
         </div>
 
         {/* The "why" — reasoning for each destination */}
