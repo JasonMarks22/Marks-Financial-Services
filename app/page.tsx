@@ -26,6 +26,11 @@ const CALCULATORS = [
     title: "Savings Allocator",
     description: "A common approach to splitting leftover money — with reasons.",
   },
+  {
+    href: "/tools/debt-payoff",
+    title: "Debt Payoff",
+    description: "Avalanche vs. snowball — payoff time, interest, and order.",
+  },
 ];
 
 const PORTFOLIO_TOOLS = [
