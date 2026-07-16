@@ -45,6 +45,12 @@ export default function Home() {
         >
           Compare Two Securities →
         </Link>
+        <Link
+          href="/portfolios"
+          className="inline-block rounded-full bg-[#002E5D] px-6 py-3 text-base font-medium text-white shadow-sm transition-colors hover:bg-[#00224a]"
+        >
+          Explore Model Portfolios →
+        </Link>
       </div>
     </main>
   );
