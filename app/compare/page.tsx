@@ -124,7 +124,7 @@ export default function ComparePage() {
 
   return (
     <main className="flex flex-1 flex-col items-center bg-zinc-100 px-6 py-16 text-neutral-900">
-      <div className="w-full max-w-4xl">
+      <div className="w-full max-w-6xl">
         <h1
           className="mt-4 text-3xl font-semibold tracking-tight sm:text-4xl"
           style={{ color: "var(--accent)" }}

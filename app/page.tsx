@@ -55,7 +55,7 @@ export default function Home() {
   return (
     <main className="flex flex-1 flex-col items-center bg-zinc-100 px-6 pb-20 text-neutral-900">
       {/* Hero */}
-      <section className="w-full max-w-4xl pt-20 text-center sm:pt-28">
+      <section className="w-full max-w-6xl pt-20 text-center sm:pt-28">
         <h1
           className="text-4xl font-semibold tracking-tight sm:text-5xl"
           style={{ color: "var(--accent)" }}
@@ -73,7 +73,7 @@ export default function Home() {
       </section>
 
       {/* Calculators */}
-      <section className="mt-16 w-full max-w-4xl">
+      <section className="mt-16 w-full max-w-6xl">
         <h2
           className="text-2xl font-semibold tracking-tight"
           style={{ color: "var(--accent)" }}
@@ -88,7 +88,7 @@ export default function Home() {
       </section>
 
       {/* Portfolio tools */}
-      <section className="mt-14 w-full max-w-4xl">
+      <section className="mt-14 w-full max-w-6xl">
         <h2
           className="text-2xl font-semibold tracking-tight"
           style={{ color: "var(--accent)" }}
@@ -103,7 +103,7 @@ export default function Home() {
       </section>
 
       {/* Accounts note */}
-      <section className="mt-14 w-full max-w-4xl rounded-xl border border-neutral-200 bg-white p-6 text-center shadow-sm">
+      <section className="mt-14 w-full max-w-6xl rounded-xl border border-neutral-200 bg-white p-6 text-center shadow-sm">
         <p className="text-sm leading-6 text-neutral-600">
           Every tool is free to use — no account needed. Create a free account
           to save your scenarios and portfolios and pick them up anytime.

@@ -93,19 +93,21 @@ export function NavBar() {
         if (!e.currentTarget.contains(e.relatedTarget as Node)) closeMenus();
       }}
     >
-      <div className="mx-auto flex h-14 max-w-6xl items-center justify-between gap-4 px-4 sm:px-6">
-        {/* Brand */}
-        <Link
-          href="/"
-          onClick={closeMenus}
-          className="shrink-0 text-sm font-semibold tracking-tight sm:text-base"
-          style={{ color: "var(--accent)" }}
-        >
-          Marks Financial Services
-        </Link>
+      {/* Full-bleed bar: brand + menus clustered hard left, auth hard right. */}
+      <div className="flex h-14 w-full items-center justify-between gap-4 px-6 sm:px-8">
+        {/* Left cluster: brand, then the dropdown menus right beside it */}
+        <div className="flex min-w-0 items-center gap-3 sm:gap-5">
+          <Link
+            href="/"
+            onClick={closeMenus}
+            className="shrink-0 text-sm font-semibold tracking-tight sm:text-base"
+            style={{ color: "var(--accent)" }}
+          >
+            Marks Financial Services
+          </Link>
 
-        {/* Desktop dropdowns */}
-        <div className="hidden items-center gap-1 md:flex">
+          {/* Desktop dropdowns */}
+          <div className="hidden items-center gap-1 md:flex">
           {GROUPS.map((group) => {
             const active = isGroupActive(group);
             const open = openGroup === group.label;
@@ -164,10 +166,11 @@ export function NavBar() {
               </div>
             );
           })}
+          </div>
         </div>
 
-        {/* Right: auth area (desktop) */}
-        <div className="hidden items-center gap-3 md:flex">
+        {/* Right cluster: auth area (desktop) + hamburger, pushed hard right */}
+        <div className="hidden shrink-0 items-center gap-3 md:flex">
           {loading ? (
             <div className="h-8 w-24" />
           ) : user ? (
@@ -220,7 +223,7 @@ export function NavBar() {
 
       {/* Mobile menu: same grouped links + auth */}
       {mobileOpen && (
-        <div className="border-t border-neutral-100 bg-white px-4 pb-4 md:hidden">
+        <div className="border-t border-neutral-100 bg-white px-6 pb-4 md:hidden">
           {GROUPS.map((group) => (
             <div key={group.label} className="mt-3">
               <p className="text-xs font-semibold uppercase tracking-wide text-neutral-400">
