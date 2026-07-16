@@ -14,26 +14,91 @@
 
 export type AssetClass = "stock" | "bond" | "cash";
 
+/** One entry in the asset-class map. */
+export interface AssetClassInfo {
+  /** Broad class — the ONLY field the grade/profile-match math uses. */
+  class: AssetClass;
+  /** Finer label, additive metadata for future similar-fund comparisons. */
+  subCategory: string;
+}
+
 /**
- * Transparent asset-class map for the funds this app uses.
+ * Transparent asset-class map for symbols the app recognizes.
  *
  * INTENTIONALLY EXPLICIT: only symbols listed here are classified. Extend
- * this map as new funds are added to the app; anything missing lands in the
- * "unclassified" bucket rather than being guessed at.
+ * this map over time as new funds/stocks come up; anything missing lands in
+ * the "unclassified" bucket rather than being guessed at.
+ *
+ * The grade calculation rolls everything up to the broad `class` field — a
+ * holding tagged "US large growth" simply counts as stocks. `subCategory`
+ * exists for future features (e.g. comparing similar funds) and has no
+ * effect on grading.
+ *
+ * NOTE on individual stocks: their subCategories are rough approximations —
+ * a single company is not diversified the way a fund is — and the grade only
+ * uses their broad "stock" class, never these finer tags.
  */
-export const ASSET_CLASS_MAP: Record<string, AssetClass> = {
-  // Stock funds
-  VTI: "stock",
-  VXUS: "stock",
-  VUG: "stock",
-  SCHD: "stock",
-  VYM: "stock",
-  // Bond funds
-  BND: "bond",
-  BNDX: "bond",
-  BSV: "bond",
-  // Cash pseudo-holding
-  CASH: "cash",
+export const ASSET_CLASS_MAP: Record<string, AssetClassInfo> = {
+  // ---- Stock funds ----
+  VTI: { class: "stock", subCategory: "US large blend" },
+  VOO: { class: "stock", subCategory: "US large blend" },
+  SPY: { class: "stock", subCategory: "US large blend" },
+  IVV: { class: "stock", subCategory: "US large blend" },
+  VUG: { class: "stock", subCategory: "US large growth" },
+  QQQ: { class: "stock", subCategory: "US large growth" },
+  VTV: { class: "stock", subCategory: "US large value" },
+  VB: { class: "stock", subCategory: "US small cap" },
+  IJR: { class: "stock", subCategory: "US small cap" },
+  VXUS: { class: "stock", subCategory: "International developed" },
+  VEA: { class: "stock", subCategory: "International developed" },
+  IEFA: { class: "stock", subCategory: "International developed" },
+  VWO: { class: "stock", subCategory: "Emerging markets" },
+  IEMG: { class: "stock", subCategory: "Emerging markets" },
+  VNQ: { class: "stock", subCategory: "Real estate" },
+  VGT: { class: "stock", subCategory: "Technology sector" },
+  XLK: { class: "stock", subCategory: "Technology sector" },
+  XLE: { class: "stock", subCategory: "Energy sector" },
+  XLF: { class: "stock", subCategory: "Financials sector" },
+  XLV: { class: "stock", subCategory: "Healthcare sector" },
+  SCHD: { class: "stock", subCategory: "US dividend" },
+  VYM: { class: "stock", subCategory: "US dividend" },
+  DVY: { class: "stock", subCategory: "US dividend" },
+
+  // ---- Bond funds ----
+  BND: { class: "bond", subCategory: "US aggregate bond" },
+  AGG: { class: "bond", subCategory: "US aggregate bond" },
+  BNDX: { class: "bond", subCategory: "International bond" },
+  BSV: { class: "bond", subCategory: "Short-term bond" },
+  SHY: { class: "bond", subCategory: "Short-term bond" },
+  TLT: { class: "bond", subCategory: "Long-term Treasury" },
+  TIP: { class: "bond", subCategory: "Inflation-protected" },
+  VCIT: { class: "bond", subCategory: "Corporate bond" },
+  LQD: { class: "bond", subCategory: "Corporate bond" },
+  HYG: { class: "bond", subCategory: "High-yield bond" },
+  JNK: { class: "bond", subCategory: "High-yield bond" },
+  MUB: { class: "bond", subCategory: "Municipal bond" },
+
+  // ---- Cash pseudo-holding ----
+  CASH: { class: "cash", subCategory: "Cash" },
+
+  // ---- Individual stocks (approximate tags; see NOTE above) ----
+  AAPL: { class: "stock", subCategory: "US large growth" },
+  MSFT: { class: "stock", subCategory: "US large growth" },
+  NVDA: { class: "stock", subCategory: "US large growth" },
+  GOOGL: { class: "stock", subCategory: "US large growth" },
+  AMZN: { class: "stock", subCategory: "US large growth" },
+  META: { class: "stock", subCategory: "US large growth" },
+  TSLA: { class: "stock", subCategory: "US large growth" },
+  "BRK.B": { class: "stock", subCategory: "US large value" },
+  // Yahoo (and our search) spell Berkshire's B shares "BRK-B" — same entry.
+  "BRK-B": { class: "stock", subCategory: "US large value" },
+  JNJ: { class: "stock", subCategory: "US large value" },
+  PG: { class: "stock", subCategory: "US large value" },
+  KO: { class: "stock", subCategory: "US large value" },
+  JPM: { class: "stock", subCategory: "Financials" },
+  BAC: { class: "stock", subCategory: "Financials" },
+  XOM: { class: "stock", subCategory: "Energy" },
+  CVX: { class: "stock", subCategory: "Energy" },
 };
 
 export interface HoldingInput {
@@ -64,9 +129,10 @@ export function classifyHoldings(holdings: HoldingInput[]): ClassifiedSplit {
   let unclassifiedWeight = 0;
 
   for (const h of holdings) {
-    const assetClass = ASSET_CLASS_MAP[h.symbol.toUpperCase()];
-    if (assetClass) {
-      totals[assetClass] += h.weight;
+    const info = ASSET_CLASS_MAP[h.symbol.toUpperCase()];
+    if (info) {
+      // Grading only ever uses the broad class — sub-categories roll up.
+      totals[info.class] += h.weight;
     } else {
       unclassifiedSymbols.push(h.symbol.toUpperCase());
       unclassifiedWeight += h.weight;
