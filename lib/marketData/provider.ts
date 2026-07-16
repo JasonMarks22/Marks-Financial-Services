@@ -19,7 +19,13 @@
  */
 
 import YahooFinance from "yahoo-finance2";
-import type { HistoryRange, PriceHistory, Quote } from "./types";
+import type {
+  HistoryRange,
+  PriceHistory,
+  Quote,
+  SearchResult,
+  SecurityDetail,
+} from "./types";
 
 // yahoo-finance2 v4 exports a class; one shared instance for all requests.
 const yahooFinance = new YahooFinance();
@@ -97,4 +103,153 @@ export async function getPriceHistory(
   }
 
   return { symbol: symbol.toUpperCase(), points };
+}
+
+/** Convert a 0–1 fraction (how Yahoo reports yields/fees) to a percent, or null. */
+function fractionToPercent(value: number | undefined | null): number | null {
+  return typeof value === "number" && Number.isFinite(value)
+    ? value * 100
+    : null;
+}
+
+function numOrNull(value: number | undefined | null): number | null {
+  return typeof value === "number" && Number.isFinite(value) ? value : null;
+}
+
+/**
+ * Fetch rich detail for one security and translate it into our
+ * SecurityDetail type.
+ *
+ * Sources (all Yahoo, all server-side):
+ *   - quote()        → price/change/currency/type — always required; if this
+ *                      is missing, the symbol is treated as invalid.
+ *   - quoteSummary() → the optional extras. Field coverage varies a lot:
+ *       summaryDetail          → P/E, dividend yield, 52-week range, market cap
+ *       assetProfile           → sector (STOCKS ONLY)
+ *       fundProfile            → expense ratio, category (FUNDS/ETFs ONLY)
+ *       financialData /
+ *       defaultKeyStatistics   → requested for completeness of coverage
+ *
+ * Anything Yahoo doesn't return comes back as null — never guessed. If the
+ * whole quoteSummary call fails (some tickers reject certain modules), we
+ * still return the basic quote fields with all extras null.
+ */
+export async function getSecurityDetail(symbol: string): Promise<SecurityDetail> {
+  let rawQuote;
+  try {
+    rawQuote = await yahooFinance.quote(symbol);
+  } catch (err) {
+    throw new Error(`Detail lookup failed for "${symbol}": ${errText(err)}`);
+  }
+
+  if (!rawQuote || rawQuote.regularMarketPrice === undefined) {
+    throw new Error(`No security found for "${symbol}" — is the ticker valid?`);
+  }
+
+  // Extras are best-effort: coverage varies by security type, and Yahoo can
+  // reject module combinations for some tickers. Failure here just means the
+  // optional fields stay null. (With validateResult:false the library types
+  // the result loosely, so we describe just the fields we read.)
+  interface RawQuoteSummary {
+    summaryDetail?: {
+      trailingPE?: number;
+      dividendYield?: number;
+      yield?: number;
+      marketCap?: number;
+      fiftyTwoWeekHigh?: number;
+      fiftyTwoWeekLow?: number;
+    };
+    assetProfile?: { sector?: string };
+    fundProfile?: {
+      categoryName?: string | null;
+      feesExpensesInvestment?: { annualReportExpenseRatio?: number };
+    };
+  }
+
+  let summary: RawQuoteSummary | null = null;
+  try {
+    summary = (await yahooFinance.quoteSummary(
+      symbol,
+      {
+        modules: [
+          "summaryDetail",
+          "financialData",
+          "defaultKeyStatistics",
+          "assetProfile",
+          "fundProfile",
+        ],
+      },
+      { validateResult: false },
+    )) as RawQuoteSummary;
+  } catch {
+    summary = null;
+  }
+
+  const summaryDetail = summary?.summaryDetail;
+  const assetProfile = summary?.assetProfile;
+  const fundProfile = summary?.fundProfile;
+
+  return {
+    symbol: rawQuote.symbol ?? symbol.toUpperCase(),
+    name:
+      rawQuote.longName ??
+      rawQuote.shortName ??
+      rawQuote.symbol ??
+      symbol.toUpperCase(),
+    type: rawQuote.quoteType ?? "UNKNOWN",
+    price: rawQuote.regularMarketPrice,
+    change: rawQuote.regularMarketChange ?? 0,
+    changePercent: rawQuote.regularMarketChangePercent ?? 0,
+    currency: rawQuote.currency ?? "USD",
+    marketCap: numOrNull(rawQuote.marketCap ?? summaryDetail?.marketCap),
+    peRatio: numOrNull(summaryDetail?.trailingPE ?? rawQuote.trailingPE),
+    // summaryDetail.dividendYield covers stocks; `yield` covers funds/ETFs.
+    dividendYield: fractionToPercent(
+      summaryDetail?.dividendYield ?? summaryDetail?.yield,
+    ),
+    // Stock-only: sector comes from the company profile.
+    sector: assetProfile?.sector ?? null,
+    // Fund/ETF-only: fees live in the fund profile; often missing even for
+    // real funds — the UI must handle null.
+    expenseRatio: fractionToPercent(
+      fundProfile?.feesExpensesInvestment?.annualReportExpenseRatio,
+    ),
+    category: fundProfile?.categoryName ?? null,
+    fiftyTwoWeekHigh: numOrNull(
+      rawQuote.fiftyTwoWeekHigh ?? summaryDetail?.fiftyTwoWeekHigh,
+    ),
+    fiftyTwoWeekLow: numOrNull(
+      rawQuote.fiftyTwoWeekLow ?? summaryDetail?.fiftyTwoWeekLow,
+    ),
+  };
+}
+
+/** Shape of one entry in Yahoo's search results (fields we care about). */
+interface RawSearchQuote {
+  symbol?: string;
+  longname?: string;
+  shortname?: string;
+  quoteType?: string;
+}
+
+/**
+ * Search securities by name or ticker fragment. Returns an empty array for no
+ * matches (that's a normal outcome, not an error).
+ */
+export async function searchSecurities(query: string): Promise<SearchResult[]> {
+  let raw;
+  try {
+    raw = await yahooFinance.search(query, { quotesCount: 8, newsCount: 0 });
+  } catch (err) {
+    throw new Error(`Search failed for "${query}": ${errText(err)}`);
+  }
+
+  const quotes = (raw?.quotes ?? []) as RawSearchQuote[];
+  return quotes
+    .filter((q) => typeof q.symbol === "string" && q.symbol.length > 0)
+    .map((q) => ({
+      symbol: q.symbol as string,
+      name: q.longname ?? q.shortname ?? (q.symbol as string),
+      type: (q.quoteType ?? "UNKNOWN").toUpperCase(),
+    }));
 }

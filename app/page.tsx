@@ -39,6 +39,12 @@ export default function Home() {
         >
           Try the Savings Allocator →
         </Link>
+        <Link
+          href="/compare"
+          className="inline-block rounded-full bg-[#002E5D] px-6 py-3 text-base font-medium text-white shadow-sm transition-colors hover:bg-[#00224a]"
+        >
+          Compare Two Securities →
+        </Link>
       </div>
     </main>
   );
