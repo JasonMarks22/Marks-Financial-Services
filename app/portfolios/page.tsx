@@ -135,13 +135,22 @@ function MyPortfoliosSection() {
         >
           My portfolios
         </h2>
-        <Link
-          href="/portfolios/build"
-          className="rounded-full px-5 py-2 text-sm font-medium text-white shadow-sm"
-          style={{ backgroundColor: NAVY }}
-        >
-          + Build a new portfolio
-        </Link>
+        <div className="flex gap-2">
+          <Link
+            href="/portfolios/compare"
+            className="rounded-full border px-5 py-2 text-sm font-medium"
+            style={{ borderColor: NAVY, color: "var(--accent)" }}
+          >
+            Compare &amp; backtest
+          </Link>
+          <Link
+            href="/portfolios/build"
+            className="rounded-full px-5 py-2 text-sm font-medium text-white shadow-sm"
+            style={{ backgroundColor: NAVY }}
+          >
+            + Build a new portfolio
+          </Link>
+        </div>
       </div>
 
       {loading ? null : !user ? (

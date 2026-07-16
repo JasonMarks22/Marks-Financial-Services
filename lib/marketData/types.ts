@@ -36,9 +36,16 @@ export interface PriceHistory {
 }
 
 /** Supported look-back windows for price history. */
-export type HistoryRange = "1mo" | "3mo" | "6mo" | "1y" | "5y";
+export type HistoryRange = "1mo" | "3mo" | "6mo" | "1y" | "3y" | "5y";
 
-export const HISTORY_RANGES: HistoryRange[] = ["1mo", "3mo", "6mo", "1y", "5y"];
+export const HISTORY_RANGES: HistoryRange[] = [
+  "1mo",
+  "3mo",
+  "6mo",
+  "1y",
+  "3y",
+  "5y",
+];
 
 /**
  * Rich detail for one security (stock, ETF, or mutual fund).

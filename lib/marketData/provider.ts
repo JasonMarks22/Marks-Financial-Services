@@ -22,6 +22,7 @@ import YahooFinance from "yahoo-finance2";
 import type {
   HistoryRange,
   PriceHistory,
+  PricePoint,
   Quote,
   SearchResult,
   SecurityDetail,
@@ -36,6 +37,7 @@ const RANGE_DAYS: Record<HistoryRange, number> = {
   "3mo": 92,
   "6mo": 183,
   "1y": 366,
+  "3y": 1096,
   "5y": 1827,
 };
 
@@ -252,4 +254,69 @@ export async function searchSecurities(query: string): Promise<SearchResult[]> {
       name: q.longname ?? q.shortname ?? (q.symbol as string),
       type: (q.quoteType ?? "UNKNOWN").toUpperCase(),
     }));
+}
+
+/** Result of one symbol's fetch inside a batch history request. */
+export interface SymbolHistoryResult {
+  symbol: string;
+  /** True when usable data was fetched (or the symbol is CASH). */
+  ok: boolean;
+  /** True for the special "CASH" pseudo-symbol (no fetch, flat value). */
+  isCash: boolean;
+  /** Daily/weekly closes; empty when ok is false or for CASH. */
+  points: PricePoint[];
+  /** Earliest date actually available within the range; null if none/CASH. */
+  earliestDate: string | null;
+  /** Why the fetch failed; null when ok. */
+  error: string | null;
+}
+
+/**
+ * Fetch price history for several symbols at once (used by backtesting).
+ *
+ * One bad symbol never sinks the batch: each entry reports its own ok/error,
+ * and callers decide how loudly to surface failures. "CASH" is treated as a
+ * special pseudo-symbol — no fetch happens; it represents a flat cash
+ * allocation and comes back ok with no points.
+ */
+export async function getHistoriesForSymbols(
+  symbols: string[],
+  range: HistoryRange,
+): Promise<SymbolHistoryResult[]> {
+  const unique = [...new Set(symbols.map((s) => s.toUpperCase()))];
+
+  return Promise.all(
+    unique.map(async (symbol): Promise<SymbolHistoryResult> => {
+      if (symbol === "CASH") {
+        return {
+          symbol,
+          ok: true,
+          isCash: true,
+          points: [],
+          earliestDate: null,
+          error: null,
+        };
+      }
+      try {
+        const history = await getPriceHistory(symbol, range);
+        return {
+          symbol,
+          ok: true,
+          isCash: false,
+          points: history.points,
+          earliestDate: history.points[0]?.date ?? null,
+          error: null,
+        };
+      } catch (err) {
+        return {
+          symbol,
+          ok: false,
+          isCash: false,
+          points: [],
+          earliestDate: null,
+          error: errText(err),
+        };
+      }
+    }),
+  );
 }
