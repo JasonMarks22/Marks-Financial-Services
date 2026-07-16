@@ -169,13 +169,6 @@ export default function PortfolioComparePage() {
   return (
     <main className="flex flex-1 flex-col items-center bg-zinc-100 px-6 py-16 text-neutral-900">
       <div className="w-full max-w-5xl">
-        <Link
-          href="/portfolios"
-          className="text-sm font-medium text-neutral-500 hover:text-neutral-800"
-        >
-          ← Back to portfolios
-        </Link>
-
         <h1
           className="mt-4 text-3xl font-semibold tracking-tight sm:text-4xl"
           style={{ color: "var(--accent)" }}

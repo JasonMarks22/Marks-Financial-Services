@@ -129,11 +129,6 @@ export default function SignupPage() {
             Log in
           </Link>
         </p>
-        <p className="mt-2 text-center text-sm">
-          <Link href="/" className="text-neutral-400 hover:text-neutral-600">
-            ← Back to home
-          </Link>
-        </p>
       </div>
     </main>
   );

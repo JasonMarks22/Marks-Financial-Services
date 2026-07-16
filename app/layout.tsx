@@ -2,6 +2,8 @@ import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import { AuthProvider } from "@/lib/auth/AuthContext";
 import { ThemeToggle } from "@/components/ThemeToggle";
+import { NavBar } from "@/components/NavBar";
+import { Footer } from "@/components/Footer";
 import "./globals.css";
 
 const geistSans = Geist({
@@ -37,8 +39,13 @@ export default function RootLayout({
             __html: `try{if(localStorage.getItem("theme")==="dark")document.documentElement.classList.add("dark")}catch(e){}`,
           }}
         />
-        {/* AuthProvider makes the current login state available to every page. */}
-        <AuthProvider>{children}</AuthProvider>
+        {/* AuthProvider makes the current login state available to every page,
+            including the shared NavBar. */}
+        <AuthProvider>
+          <NavBar />
+          {children}
+          <Footer />
+        </AuthProvider>
         <ThemeToggle />
       </body>
     </html>
