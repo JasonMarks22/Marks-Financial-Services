@@ -3,7 +3,7 @@ import { AuthNav } from "@/components/AuthNav";
 
 export default function Home() {
   return (
-    <main className="relative flex flex-1 flex-col items-center justify-center bg-green-100 px-6 text-center">
+    <main className="relative flex flex-1 flex-col items-center justify-center bg-zinc-100 px-6 text-center">
       {/* Auth links (log in / sign up, or email + log out) in the top corner. */}
       <div className="absolute right-6 top-6">
         <AuthNav />

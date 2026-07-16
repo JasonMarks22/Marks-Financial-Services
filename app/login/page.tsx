@@ -47,11 +47,11 @@ export default function LoginPage() {
   }
 
   return (
-    <main className="flex flex-1 flex-col items-center justify-center bg-white px-6 py-16 text-neutral-900">
+    <main className="flex flex-1 flex-col items-center justify-center bg-zinc-100 px-6 py-16 text-neutral-900">
       <div className="w-full max-w-sm">
         <h1
           className="text-center text-3xl font-semibold tracking-tight"
-          style={{ color: NAVY }}
+          style={{ color: "var(--accent)" }}
         >
           Welcome back
         </h1>
@@ -110,7 +110,7 @@ export default function LoginPage() {
           <Link
             href="/signup"
             className="font-medium underline underline-offset-2"
-            style={{ color: NAVY }}
+            style={{ color: "var(--accent)" }}
           >
             Create an account
           </Link>

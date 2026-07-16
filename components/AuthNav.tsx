@@ -44,7 +44,7 @@ export function AuthNav() {
       <Link
         href="/scenarios"
         className="text-sm font-medium underline-offset-2 hover:underline"
-        style={{ color: NAVY }}
+        style={{ color: "var(--accent)" }}
       >
         My scenarios
       </Link>

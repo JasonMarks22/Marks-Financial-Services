@@ -1,8 +1,23 @@
 @import "tailwindcss";
 
 :root {
-  --background: #ffffff;
+  --background: #f4f4f5;
   --foreground: #171717;
+  /* BYU navy accent; swapped for a lighter blue in dark mode so headings stay readable. */
+  --accent: #002e5d;
+  --card-bg: #ffffff;
+  --card-accent-bg: #f2f6fb;
+  --card-border: #e5e5e5;
+}
+
+/* Dark theme — toggled by adding the `dark` class to <html> (see ThemeToggle). */
+.dark {
+  --background: #0f1115;
+  --foreground: #e6e8eb;
+  --accent: #8fb3da;
+  --card-bg: #171b22;
+  --card-accent-bg: #16273c;
+  --card-border: #2e3540;
 }
 
 @theme inline {
@@ -17,3 +32,28 @@ body {
   color: var(--foreground);
   font-family: Arial, Helvetica, sans-serif;
 }
+
+/* ---- Dark-mode re-skin of the light utility classes used across the app. ----
+   Pages are written with light-theme Tailwind classes; these overrides restyle
+   them when <html> has the `dark` class, so individual pages don't need
+   dark: variants everywhere. */
+.dark .bg-zinc-100 { background-color: #0f1115; }
+.dark .bg-white { background-color: #171b22; }
+.dark .bg-neutral-50 { background-color: #1e242e; }
+.dark .bg-neutral-100 { background-color: #262d38; }
+.dark .hover\:bg-neutral-50:hover { background-color: #222834; }
+.dark .bg-red-50 { background-color: #3b151a; }
+.dark .bg-blue-50 { background-color: #16273c; }
+
+.dark .text-neutral-900, .dark .text-zinc-900 { color: #f2f4f6; }
+.dark .text-neutral-800 { color: #e4e7eb; }
+.dark .text-neutral-700 { color: #ced3da; }
+.dark .text-neutral-600, .dark .text-zinc-600 { color: #aab2bc; }
+.dark .text-neutral-500 { color: #8d96a2; }
+.dark .text-neutral-400 { color: #737d89; }
+.dark .text-red-600 { color: #f08a8a; }
+
+.dark .border-neutral-100 { border-color: #262c36; }
+.dark .border-neutral-200 { border-color: #2e3540; }
+.dark .border-neutral-300 { border-color: #3b434f; }
+.dark .hover\:border-neutral-500:hover { border-color: #5b6674; }

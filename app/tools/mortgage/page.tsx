@@ -151,7 +151,7 @@ function MortgageCalculator() {
   );
 
   return (
-    <main className="flex flex-1 flex-col items-center bg-white px-6 py-16 text-neutral-900">
+    <main className="flex flex-1 flex-col items-center bg-zinc-100 px-6 py-16 text-neutral-900">
       <div className="w-full max-w-3xl">
         <Link
           href="/"
@@ -162,7 +162,7 @@ function MortgageCalculator() {
 
         <h1
           className="mt-4 text-3xl font-semibold tracking-tight sm:text-4xl"
-          style={{ color: NAVY }}
+          style={{ color: "var(--accent)" }}
         >
           Mortgage Calculator
         </h1>
@@ -195,7 +195,7 @@ function MortgageCalculator() {
             <p className="text-sm font-medium uppercase tracking-wide text-neutral-500">
               Total monthly cost
             </p>
-            <p className="mt-1 text-4xl font-semibold" style={{ color: NAVY }}>
+            <p className="mt-1 text-4xl font-semibold" style={{ color: "var(--accent)" }}>
               {usdCents.format(breakdown.totalMonthly)}
             </p>
             <p className="mt-1 text-sm text-neutral-600">
@@ -262,7 +262,7 @@ function MortgageCalculator() {
         {/* Extra-payment comparison */}
         {extraNum > 0 && breakdown.loanAmount > 0 && (
           <div className="mt-8 rounded-xl border border-neutral-200 bg-white p-6 shadow-sm">
-            <h2 className="text-lg font-semibold" style={{ color: NAVY }}>
+            <h2 className="text-lg font-semibold" style={{ color: "var(--accent)" }}>
               Paying {usd.format(extraNum)} extra per month
             </h2>
             <div className="mt-4 grid grid-cols-1 gap-4 sm:grid-cols-2">
@@ -280,11 +280,11 @@ function MortgageCalculator() {
             </div>
             <p className="mt-4 text-center text-sm text-neutral-700">
               You&rsquo;d pay off{" "}
-              <strong style={{ color: NAVY }}>
+              <strong style={{ color: "var(--accent)" }}>
                 {monthsToYearsLabel(comparison.monthsSaved)}
               </strong>{" "}
               sooner and save{" "}
-              <strong style={{ color: NAVY }}>
+              <strong style={{ color: "var(--accent)" }}>
                 {usd.format(comparison.interestSaved)}
               </strong>{" "}
               in interest.
@@ -295,7 +295,7 @@ function MortgageCalculator() {
         {/* Amortization schedule */}
         <div className="mt-8 rounded-xl border border-neutral-200 bg-white p-6 shadow-sm">
           <div className="flex items-center justify-between">
-            <h2 className="text-lg font-semibold" style={{ color: NAVY }}>
+            <h2 className="text-lg font-semibold" style={{ color: "var(--accent)" }}>
               Amortization schedule
             </h2>
             <button
@@ -428,12 +428,12 @@ function ScenarioCard({
     <div
       className="rounded-lg border p-4"
       style={{
-        borderColor: accent ? NAVY : "#e5e5e5",
-        backgroundColor: accent ? "#F2F6FB" : "white",
+        borderColor: accent ? "var(--accent)" : "var(--card-border)",
+        backgroundColor: accent ? "var(--card-accent-bg)" : "var(--card-bg)",
       }}
     >
       <p className="text-sm font-medium text-neutral-600">{title}</p>
-      <p className="mt-1 text-xl font-semibold" style={{ color: NAVY }}>
+      <p className="mt-1 text-xl font-semibold" style={{ color: "var(--accent)" }}>
         {monthsToYearsLabel(payoff)}
       </p>
       <p className="mt-1 text-sm text-neutral-600">

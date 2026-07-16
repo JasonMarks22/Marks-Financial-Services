@@ -92,7 +92,7 @@ function AllocatorCalculator() {
   }
 
   return (
-    <main className="flex flex-1 flex-col items-center bg-white px-6 py-16 text-neutral-900">
+    <main className="flex flex-1 flex-col items-center bg-zinc-100 px-6 py-16 text-neutral-900">
       <div className="w-full max-w-3xl">
         <Link
           href="/"
@@ -103,7 +103,7 @@ function AllocatorCalculator() {
 
         <h1
           className="mt-4 text-3xl font-semibold tracking-tight sm:text-4xl"
-          style={{ color: NAVY }}
+          style={{ color: "var(--accent)" }}
         >
           Savings Allocator
         </h1>
@@ -133,7 +133,7 @@ function AllocatorCalculator() {
 
         {/* Recommended split: cards + chart */}
         <div className="mt-8 rounded-xl border border-neutral-200 bg-white p-6 shadow-sm">
-          <h2 className="text-lg font-semibold" style={{ color: NAVY }}>
+          <h2 className="text-lg font-semibold" style={{ color: "var(--accent)" }}>
             Recommended monthly split
           </h2>
           <p className="mt-1 text-sm text-neutral-500">
@@ -199,7 +199,7 @@ function AllocatorCalculator() {
 
         {/* The "why" — reasoning for each destination */}
         <div className="mt-8 rounded-xl border border-neutral-200 bg-white p-6 shadow-sm">
-          <h2 className="text-lg font-semibold" style={{ color: NAVY }}>
+          <h2 className="text-lg font-semibold" style={{ color: "var(--accent)" }}>
             Why this split?
           </h2>
           <div className="mt-4 space-y-4">
@@ -211,7 +211,7 @@ function AllocatorCalculator() {
               >
                 <div className="flex items-baseline justify-between">
                   <span className="font-medium text-neutral-800">{a.label}</span>
-                  <span className="text-sm font-semibold" style={{ color: NAVY }}>
+                  <span className="text-sm font-semibold" style={{ color: "var(--accent)" }}>
                     {usdCents.format(a.amount)} · {a.percent.toFixed(0)}%
                   </span>
                 </div>

@@ -58,7 +58,7 @@ export function SaveAffordance({ onSave }: SaveAffordanceProps) {
         <button
           type="button"
           className="rounded-full border px-4 py-1.5 text-xs font-medium transition-colors hover:bg-neutral-50"
-          style={{ borderColor: NAVY, color: NAVY }}
+          style={{ borderColor: "var(--accent)", color: "var(--accent)" }}
         >
           Save scenario
         </button>
@@ -95,7 +95,7 @@ export function SaveAffordance({ onSave }: SaveAffordanceProps) {
             setMessage(null);
           }}
           className="rounded-full border px-4 py-1.5 text-xs font-medium transition-colors hover:bg-neutral-50"
-          style={{ borderColor: NAVY, color: NAVY }}
+          style={{ borderColor: "var(--accent)", color: "var(--accent)" }}
         >
           Save scenario
         </button>

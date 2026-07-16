@@ -161,7 +161,7 @@ export default function ScenariosPage() {
   }
 
   return (
-    <main className="flex flex-1 flex-col items-center bg-white px-6 py-16 text-neutral-900">
+    <main className="flex flex-1 flex-col items-center bg-zinc-100 px-6 py-16 text-neutral-900">
       <div className="w-full max-w-3xl">
         <Link
           href="/"
@@ -172,7 +172,7 @@ export default function ScenariosPage() {
 
         <h1
           className="mt-4 text-3xl font-semibold tracking-tight sm:text-4xl"
-          style={{ color: NAVY }}
+          style={{ color: "var(--accent)" }}
         >
           My saved scenarios
         </h1>
@@ -201,7 +201,7 @@ export default function ScenariosPage() {
 
             {/* ---- Mortgage scenarios (more calculator types can follow) ---- */}
             <section className="mt-8">
-              <h2 className="text-lg font-semibold" style={{ color: NAVY }}>
+              <h2 className="text-lg font-semibold" style={{ color: "var(--accent)" }}>
                 Mortgage calculator
               </h2>
 
@@ -254,7 +254,7 @@ export default function ScenariosPage() {
                   <Link
                     href="/tools/mortgage"
                     className="font-medium underline underline-offset-2"
-                    style={{ color: NAVY }}
+                    style={{ color: "var(--accent)" }}
                   >
                     mortgage calculator
                   </Link>{" "}
@@ -265,7 +265,7 @@ export default function ScenariosPage() {
 
             {/* ---- Savings-goal scenarios ---- */}
             <section className="mt-10">
-              <h2 className="text-lg font-semibold" style={{ color: NAVY }}>
+              <h2 className="text-lg font-semibold" style={{ color: "var(--accent)" }}>
                 Savings goal calculator
               </h2>
 
@@ -316,7 +316,7 @@ export default function ScenariosPage() {
                   <Link
                     href="/tools/savings-goal"
                     className="font-medium underline underline-offset-2"
-                    style={{ color: NAVY }}
+                    style={{ color: "var(--accent)" }}
                   >
                     savings goal calculator
                   </Link>{" "}
@@ -327,7 +327,7 @@ export default function ScenariosPage() {
 
             {/* ---- Allocator scenarios ---- */}
             <section className="mt-10">
-              <h2 className="text-lg font-semibold" style={{ color: NAVY }}>
+              <h2 className="text-lg font-semibold" style={{ color: "var(--accent)" }}>
                 Savings allocator
               </h2>
 
@@ -380,7 +380,7 @@ export default function ScenariosPage() {
                   <Link
                     href="/tools/allocator"
                     className="font-medium underline underline-offset-2"
-                    style={{ color: NAVY }}
+                    style={{ color: "var(--accent)" }}
                   >
                     savings allocator
                   </Link>{" "}
@@ -391,7 +391,7 @@ export default function ScenariosPage() {
 
             {/* ---- Budget scenarios ---- */}
             <section className="mt-10">
-              <h2 className="text-lg font-semibold" style={{ color: NAVY }}>
+              <h2 className="text-lg font-semibold" style={{ color: "var(--accent)" }}>
                 Budget calculator
               </h2>
 
@@ -452,7 +452,7 @@ export default function ScenariosPage() {
                   <Link
                     href="/tools/budget"
                     className="font-medium underline underline-offset-2"
-                    style={{ color: NAVY }}
+                    style={{ color: "var(--accent)" }}
                   >
                     budget calculator
                   </Link>{" "}

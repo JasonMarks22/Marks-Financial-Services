@@ -181,7 +181,7 @@ function BudgetCalculator() {
   }
 
   return (
-    <main className="flex flex-1 flex-col items-center bg-white px-6 py-16 text-neutral-900">
+    <main className="flex flex-1 flex-col items-center bg-zinc-100 px-6 py-16 text-neutral-900">
       <div className="w-full max-w-3xl">
         <Link
           href="/"
@@ -192,7 +192,7 @@ function BudgetCalculator() {
 
         <h1
           className="mt-4 text-3xl font-semibold tracking-tight sm:text-4xl"
-          style={{ color: NAVY }}
+          style={{ color: "var(--accent)" }}
         >
           Budget Calculator
         </h1>
@@ -230,7 +230,7 @@ function BudgetCalculator() {
         {/* Editable category list */}
         <div className="mt-8 rounded-xl border border-neutral-200 bg-white p-6 shadow-sm">
           <div className="flex items-center justify-between">
-            <h2 className="text-lg font-semibold" style={{ color: NAVY }}>
+            <h2 className="text-lg font-semibold" style={{ color: "var(--accent)" }}>
               Spending categories
             </h2>
             <button
@@ -311,7 +311,7 @@ function BudgetCalculator() {
           <p className="text-sm font-medium uppercase tracking-wide text-neutral-500">
             Total spending
           </p>
-          <p className="mt-1 text-3xl font-semibold" style={{ color: NAVY }}>
+          <p className="mt-1 text-3xl font-semibold" style={{ color: "var(--accent)" }}>
             {usdCents.format(result.totalSpending)}
           </p>
 
@@ -323,7 +323,7 @@ function BudgetCalculator() {
           ) : (
             <p className="mt-3 text-lg font-medium text-neutral-700">
               Left to allocate:{" "}
-              <strong style={{ color: NAVY }}>
+              <strong style={{ color: "var(--accent)" }}>
                 {usdCents.format(result.leftover)}
               </strong>
             </p>
@@ -333,7 +333,7 @@ function BudgetCalculator() {
 
         {/* Spending breakdown chart */}
         <div className="mt-8 rounded-xl border border-neutral-200 bg-white p-6 shadow-sm">
-          <h2 className="mb-2 text-lg font-semibold" style={{ color: NAVY }}>
+          <h2 className="mb-2 text-lg font-semibold" style={{ color: "var(--accent)" }}>
             Spending by category
           </h2>
           {chartData.length > 0 ? (
@@ -369,7 +369,7 @@ function BudgetCalculator() {
 
         {/* 50/30/20 comparison */}
         <div className="mt-8 rounded-xl border border-neutral-200 bg-white p-6 shadow-sm">
-          <h2 className="text-lg font-semibold" style={{ color: NAVY }}>
+          <h2 className="text-lg font-semibold" style={{ color: "var(--accent)" }}>
             Needs / Wants / Savings vs. 50/30/20
           </h2>
           <p className="mt-1 text-sm text-neutral-500">

@@ -96,7 +96,7 @@ function SavingsGoalCalculator() {
   }
 
   return (
-    <main className="flex flex-1 flex-col items-center bg-white px-6 py-16 text-neutral-900">
+    <main className="flex flex-1 flex-col items-center bg-zinc-100 px-6 py-16 text-neutral-900">
       <div className="w-full max-w-2xl">
         <Link
           href="/"
@@ -107,7 +107,7 @@ function SavingsGoalCalculator() {
 
         <h1
           className="mt-4 text-3xl font-semibold tracking-tight sm:text-4xl"
-          style={{ color: NAVY }}
+          style={{ color: "var(--accent)" }}
         >
           Savings Goal Calculator
         </h1>
@@ -141,11 +141,11 @@ function SavingsGoalCalculator() {
         {/* Result */}
         <div className="mt-8 rounded-xl border border-neutral-200 bg-white p-6 text-center shadow-sm">
           {result.alreadyOnTrack ? (
-            <p className="text-2xl font-semibold" style={{ color: NAVY }}>
+            <p className="text-2xl font-semibold" style={{ color: "var(--accent)" }}>
               You&rsquo;re already on track — no monthly contribution needed.
             </p>
           ) : (
-            <p className="text-2xl font-semibold sm:text-3xl" style={{ color: NAVY }}>
+            <p className="text-2xl font-semibold sm:text-3xl" style={{ color: "var(--accent)" }}>
               Save {usdCents.format(result.monthlyContribution)} per month to
               reach your goal.
             </p>
@@ -233,7 +233,7 @@ function SavingsGoalCalculator() {
                     label={{
                       value: `Goal ${usd.format(goalValue)}`,
                       position: "insideTopRight",
-                      fill: NAVY,
+                      fill: "var(--accent)",
                       fontSize: 12,
                     }}
                   />
