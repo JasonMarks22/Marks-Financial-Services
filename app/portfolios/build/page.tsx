@@ -12,7 +12,7 @@
  * all provider calls stay server-side.
  */
 
-import { Suspense, useEffect, useState } from "react";
+import { Suspense, useEffect, useMemo, useState } from "react";
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 import { useAuth } from "@/lib/auth/AuthContext";
@@ -23,8 +23,22 @@ import {
   updateUserPortfolio,
 } from "@/lib/portfolios/userPortfolios";
 import type { SearchResult } from "@/lib/marketData/types";
+import {
+  gradePortfolio,
+  type GradeResult,
+  type MatchRating,
+} from "@/lib/portfolios/gradePortfolio";
 
 const NAVY = "#002E5D";
+
+const RATING_STYLES: Record<MatchRating, string> = {
+  "Strong match": "border-emerald-200 bg-emerald-50 text-emerald-700",
+  "Moderate match": "border-amber-200 bg-amber-50 text-amber-800",
+  "Weak match": "border-red-200 bg-red-50 text-red-600",
+};
+
+const MATCH_DISCLAIMER =
+  "This match rating is an educational estimate based on your portfolio's stock/bond/cash mix compared to common profile definitions. It is not investment advice or an authoritative assessment. Method and profile definitions are illustrative.";
 
 // The 7 model-portfolio names double as the target-profile options.
 const PROFILE_OPTIONS = MODEL_PORTFOLIOS.map((p) => p.name);
@@ -102,6 +116,18 @@ function PortfolioBuilder() {
       cancelled = true;
     };
   }, [editId, user]);
+
+  // Live profile-match rating: re-grades on every holdings/profile change.
+  const liveGrade: GradeResult | null = useMemo(() => {
+    const holdings = rows
+      .filter((r) => r.symbol && toNumber(r.weight) > 0)
+      .map((r) => ({ symbol: r.symbol as string, weight: toNumber(r.weight) }));
+    return holdings.length > 0 ? gradePortfolio(profile, holdings) : null;
+  }, [rows, profile]);
+
+  const hasWeightedHoldings = rows.some(
+    (r) => r.symbol && toNumber(r.weight) > 0,
+  );
 
   const total = rows.reduce((sum, r) => sum + toNumber(r.weight), 0);
   const totalIs100 = Math.abs(total - 100) < 0.01;
@@ -259,6 +285,82 @@ function PortfolioBuilder() {
             )}
           </div>
         </div>
+
+        {/* Live profile match */}
+        {hasWeightedHoldings && (
+          <div className="mt-6 rounded-xl border border-neutral-200 bg-white p-6 shadow-sm">
+            <h2
+              className="text-lg font-semibold"
+              style={{ color: "var(--accent)" }}
+            >
+              Profile match
+            </h2>
+            {liveGrade ? (
+              <>
+                <div className="mt-3 flex flex-wrap items-center gap-2">
+                  <span
+                    className={`rounded-full border px-3 py-0.5 text-xs font-semibold ${RATING_STYLES[liveGrade.rating]}`}
+                  >
+                    {liveGrade.rating}
+                  </span>
+                  <span className="text-xs text-neutral-500">
+                    Target:{" "}
+                    <strong className="text-neutral-700">
+                      {liveGrade.statedProfile}
+                    </strong>
+                    {" · "}Currently reads as:{" "}
+                    <strong className="text-neutral-700">
+                      {liveGrade.actualProfile}
+                    </strong>
+                  </span>
+                </div>
+
+                <div className="mt-3 flex h-3 w-full overflow-hidden rounded-full bg-neutral-100">
+                  <div
+                    style={{
+                      width: `${liveGrade.split.stocks}%`,
+                      backgroundColor: NAVY,
+                    }}
+                  />
+                  <div
+                    style={{
+                      width: `${liveGrade.split.bonds}%`,
+                      backgroundColor: "#7FA8D0",
+                    }}
+                  />
+                  <div
+                    style={{
+                      width: `${liveGrade.split.cash}%`,
+                      backgroundColor: "#A9B2BD",
+                    }}
+                  />
+                </div>
+                <p className="mt-1 text-xs text-neutral-500">
+                  Stocks {Math.round(liveGrade.split.stocks)}% · Bonds{" "}
+                  {Math.round(liveGrade.split.bonds)}% · Cash{" "}
+                  {Math.round(liveGrade.split.cash)}%
+                </p>
+
+                <p className="mt-3 text-sm leading-6 text-neutral-600">
+                  {liveGrade.analysis}
+                </p>
+                {liveGrade.unclassifiedNote && (
+                  <p className="mt-1 text-xs text-amber-800">
+                    {liveGrade.unclassifiedNote}
+                  </p>
+                )}
+              </>
+            ) : (
+              <p className="mt-3 text-sm text-neutral-500">
+                None of the current holdings are in the app&rsquo;s asset-class
+                map yet, so no rating can be shown.
+              </p>
+            )}
+            <p className="mt-3 text-xs leading-5 text-neutral-400">
+              {MATCH_DISCLAIMER}
+            </p>
+          </div>
+        )}
 
         {/* Save */}
         <div className="mt-6 flex flex-col items-center gap-2">

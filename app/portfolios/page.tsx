@@ -25,6 +25,20 @@ import {
   getUserPortfolios,
   type UserPortfolioRow,
 } from "@/lib/portfolios/userPortfolios";
+import {
+  gradePortfolio,
+  type GradeResult,
+  type MatchRating,
+} from "@/lib/portfolios/gradePortfolio";
+
+const RATING_STYLES: Record<MatchRating, string> = {
+  "Strong match": "border-emerald-200 bg-emerald-50 text-emerald-700",
+  "Moderate match": "border-amber-200 bg-amber-50 text-amber-800",
+  "Weak match": "border-red-200 bg-red-50 text-red-600",
+};
+
+const MATCH_DISCLAIMER =
+  "This match rating is an educational estimate based on your portfolio's stock/bond/cash mix compared to common profile definitions. It is not investment advice or an authoritative assessment. Method and profile definitions are illustrative.";
 
 const NAVY = "#002E5D";
 const SPLIT_COLORS = {
@@ -259,6 +273,9 @@ function UserPortfolioCard({
         </p>
       </div>
 
+      {/* Profile match — how the actual mix compares to the stated target */}
+      <ProfileMatchPanel grade={gradePortfolio(row.target_profile, row.holdings)} />
+
       <div className="mt-4 flex items-center gap-2 border-t border-neutral-100 pt-4">
         <Link
           href={`/portfolios/build?id=${row.id}`}
@@ -275,6 +292,53 @@ function UserPortfolioCard({
           Delete
         </button>
       </div>
+    </div>
+  );
+}
+
+function ProfileMatchPanel({ grade }: { grade: GradeResult | null }) {
+  if (!grade) {
+    return (
+      <p className="mt-4 border-t border-neutral-100 pt-4 text-xs text-neutral-400">
+        No profile-match rating available — none of these holdings are in the
+        app&rsquo;s asset-class map yet.
+      </p>
+    );
+  }
+
+  return (
+    <div className="mt-4 border-t border-neutral-100 pt-4">
+      <div className="flex flex-wrap items-center gap-2">
+        <span
+          className={`rounded-full border px-3 py-0.5 text-xs font-semibold ${RATING_STYLES[grade.rating]}`}
+        >
+          {grade.rating}
+        </span>
+        <span className="text-xs text-neutral-500">
+          Stated: <strong className="text-neutral-700">{grade.statedProfile}</strong>
+          {" · "}Reads as:{" "}
+          <strong className="text-neutral-700">{grade.actualProfile}</strong>
+        </span>
+      </div>
+
+      {/* Actual split as one stacked bar */}
+      <div className="mt-2 flex h-3 w-full overflow-hidden rounded-full bg-neutral-100">
+        <div style={{ width: `${grade.split.stocks}%`, backgroundColor: NAVY }} />
+        <div style={{ width: `${grade.split.bonds}%`, backgroundColor: "#7FA8D0" }} />
+        <div style={{ width: `${grade.split.cash}%`, backgroundColor: "#A9B2BD" }} />
+      </div>
+      <p className="mt-1 text-xs text-neutral-500">
+        Stocks {Math.round(grade.split.stocks)}% · Bonds{" "}
+        {Math.round(grade.split.bonds)}% · Cash {Math.round(grade.split.cash)}%
+      </p>
+
+      <p className="mt-2 text-sm leading-6 text-neutral-600">{grade.analysis}</p>
+      {grade.unclassifiedNote && (
+        <p className="mt-1 text-xs text-amber-800">{grade.unclassifiedNote}</p>
+      )}
+      <p className="mt-2 text-xs leading-5 text-neutral-400">
+        {MATCH_DISCLAIMER}
+      </p>
     </div>
   );
 }
