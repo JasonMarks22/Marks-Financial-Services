@@ -257,8 +257,8 @@ export function NavBar() {
           ) : user ? (
             <>
               <span
-                title="Notifications — coming soon"
-                aria-label="Notifications — coming soon"
+                title="Notifications (coming soon)"
+                aria-label="Notifications (coming soon)"
                 className="flex h-9 w-9 cursor-default items-center justify-center rounded-full text-neutral-400"
               >
                 <BellIcon className="h-[18px] w-[18px]" />

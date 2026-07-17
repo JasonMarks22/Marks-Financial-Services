@@ -98,7 +98,7 @@ function AllocatorCalculator() {
           Savings Allocator
         </h1>
         <p className="mt-2 text-neutral-600">
-          A common approach to splitting leftover money each month — with the
+          A common approach to splitting leftover money each month, with the
           reasoning behind every suggestion.
         </p>
 

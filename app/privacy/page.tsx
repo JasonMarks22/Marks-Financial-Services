@@ -14,7 +14,7 @@ export default function PrivacyPage() {
     >
       <ul className="list-disc space-y-2 pl-5 text-sm leading-6 text-muted">
         <li>
-          Calculators run in your browser — inputs are not stored unless you
+          Calculators run in your browser. Inputs are not stored unless you
           choose to save a scenario to your account.
         </li>
         <li>

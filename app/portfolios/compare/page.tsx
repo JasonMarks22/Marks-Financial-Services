@@ -174,7 +174,7 @@ export default function PortfolioComparePage() {
           Compare &amp; Backtest Portfolios
         </h1>
         <p className="mt-2 text-neutral-600">
-          Select two or more portfolios to compare — yours and the models — then
+          Select two or more portfolios to compare (yours and the models), then
           simulate how {usd.format(START_AMOUNT)} would have grown.
         </p>
 
@@ -194,7 +194,7 @@ export default function PortfolioComparePage() {
               />
             ) : (
               <p className="mt-3 text-sm text-neutral-500">
-                You have no saved portfolios yet —{" "}
+                You have no saved portfolios yet.{" "}
                 <Link
                   href="/portfolios/build"
                   className="font-medium underline underline-offset-2"
@@ -214,7 +214,7 @@ export default function PortfolioComparePage() {
               >
                 Log in
               </Link>{" "}
-              to include your own portfolios — the models below work either way.
+              to include your own portfolios. The models below work either way.
             </p>
           )}
 
@@ -235,7 +235,7 @@ export default function PortfolioComparePage() {
           </div>
         ) : selected.length === 1 ? (
           <p className="mt-6 text-sm text-neutral-500">
-            Select at least one more portfolio to compare side by side — or run
+            Select at least one more portfolio to compare side by side, or run
             the backtest on this one alone below.
           </p>
         ) : null}

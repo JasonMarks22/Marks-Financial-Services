@@ -78,7 +78,7 @@ export default function MonteCarloPage() {
         </h1>
         <p className="mt-2 text-neutral-600">
           Instead of one fixed return, this runs {result.ok ? result.simulations.toLocaleString("en-US") : "1,000"}{" "}
-          possible futures and shows the range of outcomes — so you can see the
+          possible futures and shows the range of outcomes, so you can see the
           uncertainty, not just a single number.
         </p>
 
@@ -246,7 +246,7 @@ export default function MonteCarloPage() {
                 This is a simplified model: it assumes returns are normally
                 distributed and independent month to month, and it ignores
                 taxes, fees, and withdrawal timing. Real markets behave
-                differently. It illustrates variability for learning — it is not
+                differently. It illustrates variability for learning. It is not
                 a prediction of your actual results.
               </Disclaimer>
             </div>

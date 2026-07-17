@@ -493,10 +493,10 @@ function ComparisonTable({ a, b }: { a: SecurityDetail; b: SecurityDetail }) {
           <tr className="border-b border-neutral-200 text-left text-neutral-600">
             <th className="py-2 pr-4 font-medium">Metric</th>
             <th className="py-2 pr-4 font-medium">
-              {a.symbol} — {a.name}
+              {a.symbol}: {a.name}
             </th>
             <th className="py-2 font-medium">
-              {b.symbol} — {b.name}
+              {b.symbol}: {b.name}
             </th>
           </tr>
         </thead>

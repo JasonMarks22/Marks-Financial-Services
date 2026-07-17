@@ -289,7 +289,7 @@ function BudgetCalculator() {
 
             {rows.length === 0 && (
               <p className="py-4 text-center text-sm text-neutral-400">
-                No categories yet — add one to get started.
+                No categories yet. Add one to get started.
               </p>
             )}
           </div>

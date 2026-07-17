@@ -23,7 +23,7 @@ export function CtaSection() {
               Ready to build a better financial future?
             </h2>
             <p className="mx-auto mt-4 max-w-xl text-base leading-8 text-white/80">
-              Start with any tool — free, no account needed. Create a free
+              Start with any tool for free, no account needed. Create a free
               account whenever you want to save your work.
             </p>
             <div className="mt-8 flex flex-wrap items-center justify-center gap-3">

@@ -14,7 +14,7 @@ export function Disclaimer({
 }) {
   return (
     <p className={`text-xs leading-5 text-muted ${className}`}>
-      For educational purposes only — not financial or investment advice. Past
+      For educational purposes only. Not financial or investment advice. Past
       performance does not guarantee future results.
       {children && <> {children}</>}
     </p>

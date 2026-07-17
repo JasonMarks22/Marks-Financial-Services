@@ -22,7 +22,7 @@ export const metadata: Metadata = {
     template: "%s | Marks Investment Analytics",
   },
   description:
-    "Professional-grade investment calculators, portfolio analysis, backtesting, and planning tools — all in one place. Educational tools, not financial advice.",
+    "Professional-grade investment calculators, portfolio analysis, backtesting, and planning tools, all in one place. Educational tools, not financial advice.",
 };
 
 export default function RootLayout({

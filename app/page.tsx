@@ -8,7 +8,6 @@ import { HomeSearch } from "@/components/home/HomeSearch";
 import { FeatureGrid } from "@/components/home/FeatureGrid";
 import { DashboardShowcase } from "@/components/home/DashboardShowcase";
 import { WhyPlatform } from "@/components/home/WhyPlatform";
-import { StatsSection } from "@/components/home/StatsSection";
 import { MarketInsights } from "@/components/home/MarketInsights";
 import { CtaSection } from "@/components/home/CtaSection";
 
@@ -37,7 +36,7 @@ export default function Home() {
               </h1>
               <p className="mt-6 max-w-xl text-lg leading-8 text-muted">
                 Professional-grade calculators, portfolio analysis, historical
-                research, and planning — all in one place. Built to help you
+                research, and planning, all in one place. Built to help you
                 learn as you go.
               </p>
               <div className="mt-8 flex flex-wrap items-center gap-3">
@@ -49,7 +48,7 @@ export default function Home() {
                 </Button>
               </div>
               <p className="mt-5 text-sm text-muted">
-                Free to use — no account needed. Educational tools, not
+                Free to use. No account needed. Educational tools, not
                 financial advice.
               </p>
             </div>
@@ -83,7 +82,7 @@ export default function Home() {
       <Section
         eyebrow="Everything you need"
         title="One platform, every planning tool"
-        subtitle="From everyday calculators to portfolio analysis and backtesting. Tools not yet built are clearly marked — nothing here pretends to work before it does."
+        subtitle="From everyday calculators to portfolio analysis and backtesting. Tools not yet built are clearly marked. Nothing here pretends to work before it does."
         center
       >
         <FeatureGrid />
@@ -100,7 +99,7 @@ export default function Home() {
               Analytics that read like a real product
             </h2>
             <p className="mt-4 text-lg leading-8 text-muted">
-              Charts, performance, allocation, and risk metrics — the same
+              Charts, performance, allocation, and risk metrics: the same
               building blocks the tools use. Scroll to explore.
             </p>
           </div>
@@ -116,7 +115,7 @@ export default function Home() {
       <Section
         eyebrow="Why use this platform"
         title="A clearer path than a spreadsheet"
-        subtitle="Purpose-built for investing questions, with live data and explained methods — not blank cells or one-off calculators."
+        subtitle="Purpose-built for investing questions, with live data and explained methods, not blank cells or one-off calculators."
         center
       >
         <Reveal>
@@ -126,18 +125,11 @@ export default function Home() {
         </Reveal>
       </Section>
 
-      {/* ── Stats ────────────────────────────────────────────────────── */}
-      <section className="bg-card py-16 sm:py-20">
-        <Container>
-          <StatsSection />
-        </Container>
-      </section>
-
       {/* ── Market insights ──────────────────────────────────────────── */}
       <Section
         eyebrow="Market insights"
         title="Stay close to the market"
-        subtitle="A preview of the market dashboards we're building. Every card below shows sample data for illustration — live data lands in a later phase."
+        subtitle="A preview of the market dashboards we're building. Every card below shows sample data for illustration. Live data lands in a later phase."
         center
       >
         <MarketInsights />

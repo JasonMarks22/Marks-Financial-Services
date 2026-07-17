@@ -12,7 +12,7 @@ export default function MarketAnalysisPage() {
   return (
     <ComingSoonPage
       title="Market Analysis"
-      description="Live market dashboards — trending securities, index performance, and economic events — are planned for a future release."
+      description="Live market dashboards (trending securities, index performance, and economic events) are planned for a future release."
     >
       <p className="text-sm leading-6 text-muted">
         In the meantime, two tools already use real market data:
@@ -26,7 +26,7 @@ export default function MarketAnalysisPage() {
             Compare Securities
           </Link>{" "}
           <span className="text-muted">
-            — any two stocks, ETFs, or funds side by side, with live quotes
+            covers any two stocks, ETFs, or funds side by side, with live quotes
             and price history.
           </span>
         </li>
@@ -38,7 +38,7 @@ export default function MarketAnalysisPage() {
             Compare &amp; Backtest
           </Link>{" "}
           <span className="text-muted">
-            — simulate how $10,000 would have grown across portfolios using
+            simulates how $10,000 would have grown across portfolios using
             historical prices.
           </span>
         </li>

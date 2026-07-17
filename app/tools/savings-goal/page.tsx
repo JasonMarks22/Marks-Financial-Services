@@ -132,7 +132,7 @@ function SavingsGoalCalculator() {
         <div className="mt-8 rounded-xl border border-neutral-200 bg-white p-6 text-center shadow-sm">
           {result.alreadyOnTrack ? (
             <p className="text-2xl font-semibold" style={{ color: "var(--accent)" }}>
-              You&rsquo;re already on track — no monthly contribution needed.
+              You&rsquo;re already on track. No monthly contribution needed.
             </p>
           ) : (
             <p className="text-2xl font-semibold sm:text-3xl" style={{ color: "var(--accent)" }}>

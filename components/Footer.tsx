@@ -60,7 +60,7 @@ export function Footer() {
             </Link>
             <p className="mt-4 max-w-xs text-sm leading-6 text-muted">
               Calculators, portfolio analysis, historical research, and
-              planning tools — built for learning.
+              planning tools, built for learning.
             </p>
             <p className="mt-3 text-sm font-medium text-neutral-700">
               Educational tools, not financial advice.

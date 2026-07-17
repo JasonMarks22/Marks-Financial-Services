@@ -12,7 +12,7 @@ export const metadata: Metadata = {
 };
 
 const INCLUDED = [
-  "All six calculators — savings, mortgage, budget, allocator, debt payoff, retirement",
+  "All six calculators: savings, mortgage, budget, allocator, debt payoff, retirement",
   "Compare any two securities with live market data",
   "Model portfolios, portfolio builder, and historical backtesting",
   "Free account to save scenarios and portfolios (optional)",
@@ -28,7 +28,7 @@ export default function PricingPage() {
             Free while in beta
           </h1>
           <p className="mt-4 text-lg leading-8 text-muted">
-            Every tool is free to use — no account needed. Create a free
+            Every tool is free to use. No account needed. Create a free
             account to save your scenarios and portfolios and pick them up
             anytime.
           </p>
@@ -52,7 +52,7 @@ export default function PricingPage() {
           </ul>
           <p className="mt-6 text-xs leading-5 text-muted">
             *Free for everything that exists today. If paid plans are ever
-            introduced, they&apos;ll apply to new premium features — this page
+            introduced, they&apos;ll apply to new premium features, and this page
             will say so clearly first.
           </p>
           <div className="mt-8">

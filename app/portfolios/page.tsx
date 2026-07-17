@@ -67,7 +67,7 @@ export default function PortfoliosPage() {
           Model Portfolios
         </h1>
         <p className="mt-2 text-neutral-600">
-          Seven common risk profiles, from most conservative to most aggressive.
+          A range of common risk profiles, from most conservative to most aggressive.
         </p>
 
         {/* Prominent disclaimer */}
@@ -166,7 +166,7 @@ function MyPortfoliosSection() {
           >
             Log in
           </Link>{" "}
-          to see your saved portfolios — or head straight to the{" "}
+          to see your saved portfolios, or head straight to the{" "}
           <Link
             href="/portfolios/build"
             className="font-medium underline underline-offset-2"
@@ -198,7 +198,7 @@ function MyPortfoliosSection() {
           ) : (
             !error && (
               <p className="mt-4 rounded-xl border border-dashed border-neutral-300 bg-white p-6 text-center text-sm text-neutral-500">
-                No portfolios yet — build your first one.
+                No portfolios yet. Build your first one.
               </p>
             )
           )}
@@ -290,7 +290,7 @@ function ProfileMatchPanel({ grade }: { grade: GradeResult | null }) {
   if (!grade) {
     return (
       <p className="mt-4 border-t border-neutral-100 pt-4 text-xs text-neutral-400">
-        No profile-match rating available — none of these holdings are in the
+        No profile-match rating available. None of these holdings are in the
         app&rsquo;s asset-class map yet.
       </p>
     );

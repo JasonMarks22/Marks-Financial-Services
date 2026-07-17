@@ -177,7 +177,7 @@ function PortfolioBuilder() {
           {editId ? "Edit Portfolio" : "Build a Portfolio"}
         </h1>
         <p className="mt-2 text-neutral-600">
-          Pick your holdings and weights — the total must reach exactly 100%.
+          Pick your holdings and weights. The total must reach exactly 100%.
         </p>
 
         {/* Name + profile */}
@@ -253,7 +253,7 @@ function PortfolioBuilder() {
             ))}
             {rows.length === 0 && (
               <p className="py-3 text-center text-sm text-neutral-400">
-                No holdings yet — add one to get started.
+                No holdings yet. Add one to get started.
               </p>
             )}
           </div>
@@ -270,8 +270,8 @@ function PortfolioBuilder() {
             {!totalIs100 && (
               <p className="mt-1 text-xs text-red-600">
                 {total > 100
-                  ? `${(total - 100).toFixed(1)}% over — reduce weights to reach exactly 100%.`
-                  : `${(100 - total).toFixed(1)}% under — allocate the rest to reach exactly 100%.`}
+                  ? `${(total - 100).toFixed(1)}% over. Reduce weights to reach exactly 100%.`
+                  : `${(100 - total).toFixed(1)}% under. Allocate the rest to reach exactly 100%.`}
               </p>
             )}
           </div>
@@ -378,7 +378,7 @@ function PortfolioBuilder() {
               >
                 Log in
               </Link>{" "}
-              to save this portfolio — you can keep building meanwhile.
+              to save this portfolio. You can keep building meanwhile.
             </p>
           )}
           {user && !canSave && !busy && (

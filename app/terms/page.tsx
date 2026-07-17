@@ -14,7 +14,7 @@ export default function TermsPage() {
     >
       <ul className="list-disc space-y-2 pl-5 text-sm leading-6 text-muted">
         <li>
-          Everything on this site is for educational purposes only — it is not
+          Everything on this site is for educational purposes only. It is not
           financial, investment, tax, or legal advice.
         </li>
         <li>

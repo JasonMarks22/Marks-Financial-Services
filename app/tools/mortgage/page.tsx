@@ -233,8 +233,8 @@ function MortgageCalculator() {
                 value={breakdown.pmi}
                 note={
                   breakdown.pmi > 0
-                    ? `${downPercent.toFixed(1)}% down — under 20%`
-                    : "$0 — at/above 20% down"
+                    ? `${downPercent.toFixed(1)}% down, under 20%`
+                    : "$0, at/above 20% down"
                 }
                 highlight
               />
