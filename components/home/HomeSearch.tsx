@@ -126,12 +126,20 @@ export function HomeSearch() {
   function goToSecurity(symbol: string) {
     setOpen(false);
     setQuery("");
-    router.push(`/compare?a=${encodeURIComponent(symbol)}`);
+    router.push(`/stock/${encodeURIComponent(symbol.trim().toUpperCase())}`);
   }
 
   function handlePopular(chip: (typeof POPULAR)[number]) {
     if (chip.type === "tool") goToTool(chip.href);
     else goToSecurity(chip.label);
+  }
+
+  // Submitting the search (Enter / the search button) treats the typed text as
+  // a ticker symbol and opens its detail page.
+  function handleSubmit(e: React.FormEvent) {
+    e.preventDefault();
+    if (q.length < 1) return;
+    goToSecurity(q);
   }
 
   const hasResults = toolMatches.length > 0 || tickerResults.length > 0;
@@ -140,8 +148,14 @@ export function HomeSearch() {
 
   return (
     <div ref={boxRef} className="relative mx-auto w-full max-w-2xl">
-      <div className="relative">
-        <SearchIcon className="pointer-events-none absolute left-5 top-1/2 h-5 w-5 -translate-y-1/2 text-muted" />
+      <form onSubmit={handleSubmit} role="search" className="relative">
+        <button
+          type="submit"
+          aria-label="Search"
+          className="absolute left-4 top-1/2 flex h-8 w-8 -translate-y-1/2 items-center justify-center rounded-full text-muted hover:text-link"
+        >
+          <SearchIcon className="h-5 w-5" />
+        </button>
         <input
           type="text"
           role="combobox"
@@ -157,7 +171,7 @@ export function HomeSearch() {
           placeholder="Search Stocks, ETFs, Calculators..."
           className="w-full rounded-full border border-edge bg-card py-4 pl-14 pr-5 text-base text-ink shadow-soft outline-none transition focus:border-accent focus:shadow-lifted"
         />
-      </div>
+      </form>
 
       {open && (hasResults || showNoMatch || searching) && (
         <div
