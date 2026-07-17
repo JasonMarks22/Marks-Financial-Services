@@ -180,12 +180,9 @@ function BudgetCalculator() {
   }
 
   return (
-    <main className="flex flex-1 flex-col items-center bg-zinc-100 px-6 py-16 text-neutral-900">
+    <main className="flex flex-1 flex-col items-center bg-surface px-6 py-14 text-ink sm:py-16">
       <div className="w-full max-w-6xl">
-        <h1
-          className="mt-4 text-3xl font-semibold tracking-tight sm:text-4xl"
-          style={{ color: "var(--accent)" }}
-        >
+        <h1 className="mt-4 text-3xl font-bold tracking-tight text-ink sm:text-4xl lg:text-[2.5rem]">
           Budget Calculator
         </h1>
         <p className="mt-2 text-neutral-600">

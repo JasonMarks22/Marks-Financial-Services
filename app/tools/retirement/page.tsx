@@ -18,6 +18,7 @@ import {
   YAxis,
 } from "recharts";
 import { projectRetirement } from "@/lib/finance/retirement";
+import { Disclaimer } from "@/components/ui/Disclaimer";
 
 const ACCENT = "#1B4332";
 const GROWTH_BLUE = "#40916C";
@@ -75,12 +76,9 @@ export default function RetirementPage() {
   }, [result]);
 
   return (
-    <main className="flex flex-1 flex-col items-center bg-zinc-100 px-6 py-16 text-neutral-900">
+    <main className="flex flex-1 flex-col items-center bg-surface px-6 py-14 text-ink sm:py-16">
       <div className="w-full max-w-6xl">
-        <h1
-          className="mt-4 text-3xl font-semibold tracking-tight sm:text-4xl"
-          style={{ color: "var(--accent)" }}
-        >
+        <h1 className="mt-4 text-3xl font-bold tracking-tight text-ink sm:text-4xl lg:text-[2.5rem]">
           Retirement Projector
         </h1>
         <p className="mt-2 text-neutral-600">
@@ -264,12 +262,11 @@ export default function RetirementPage() {
           </>
         )}
 
-        <p className="mt-8 text-xs leading-5 text-neutral-500">
-          For educational purposes only — not financial advice. Projections are
-          estimates based on a constant assumed return and inflation rate;
-          actual results will vary. Inflation-adjusted figures express future
-          value in today&rsquo;s dollars.
-        </p>
+        <Disclaimer className="mt-8">
+          Projections are estimates based on a constant assumed return and
+          inflation rate; actual results will vary. Inflation-adjusted figures
+          express future value in today&rsquo;s dollars.
+        </Disclaimer>
       </div>
     </main>
   );

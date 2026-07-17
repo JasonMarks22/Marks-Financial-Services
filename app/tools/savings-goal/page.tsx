@@ -14,6 +14,7 @@ import {
 } from "recharts";
 import { calculateSavingsGoal } from "@/lib/finance/savingsGoal";
 import { SaveAffordance } from "@/components/SaveAffordance";
+import { Disclaimer } from "@/components/ui/Disclaimer";
 import { saveSavingsGoalScenario } from "@/lib/scenarios/savingsGoalScenarios";
 
 // BYU navy is the main accent; the interest band uses a lighter blue.
@@ -95,12 +96,9 @@ function SavingsGoalCalculator() {
   }
 
   return (
-    <main className="flex flex-1 flex-col items-center bg-zinc-100 px-6 py-16 text-neutral-900">
+    <main className="flex flex-1 flex-col items-center bg-surface px-6 py-14 text-ink sm:py-16">
       <div className="w-full max-w-6xl">
-        <h1
-          className="mt-4 text-3xl font-semibold tracking-tight sm:text-4xl"
-          style={{ color: "var(--accent)" }}
-        >
+        <h1 className="mt-4 text-3xl font-bold tracking-tight text-ink sm:text-4xl lg:text-[2.5rem]">
           Savings Goal Calculator
         </h1>
         <p className="mt-2 text-neutral-600">
@@ -158,10 +156,9 @@ function SavingsGoalCalculator() {
             </span>
           </div>
 
-          <p className="mt-4 text-xs leading-5 text-neutral-500">
-            Estimate for educational purposes only — not financial advice.
+          <Disclaimer className="mt-4">
             Assumes a constant return; actual results will vary.
-          </p>
+          </Disclaimer>
           <SaveAffordance onSave={handleSave} />
         </div>
 

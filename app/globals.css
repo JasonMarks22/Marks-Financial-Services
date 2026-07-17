@@ -168,6 +168,17 @@ button {
 .hover\:border-neutral-500:hover { border-color: #94a3b8; }
 .divide-neutral-100 > :not([hidden]) ~ :not([hidden]) { border-color: #edf1f5; }
 
+/* ---- Stage B: unify existing pages with the shared Card primitive. ----
+   The tool/portfolio pages were written with rounded-xl cards and the small
+   Tailwind shadows. Nudge those roles to the design-system 16px radius and
+   soft shadows in one place, so every card across the app matches the new
+   components without duplicating styles per page. (Inputs/chips use
+   rounded-lg and are unaffected.) */
+.rounded-xl { border-radius: 1rem; }
+.shadow-sm { box-shadow: var(--shadow-soft); }
+.shadow-md { box-shadow: var(--shadow-lifted); }
+.hover\:shadow-md:hover { box-shadow: var(--shadow-lifted); }
+
 /* ---- Dark-mode re-skin (unchanged roles, dark values). ---- */
 .dark .bg-zinc-100 { background-color: #0f1115; }
 .dark .bg-white { background-color: #171b22; }

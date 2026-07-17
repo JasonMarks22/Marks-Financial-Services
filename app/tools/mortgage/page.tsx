@@ -16,6 +16,7 @@ import {
   monthlyCostBreakdown,
 } from "@/lib/finance/mortgage";
 import { SaveAffordance } from "@/components/SaveAffordance";
+import { Disclaimer } from "@/components/ui/Disclaimer";
 import { saveMortgageScenario } from "@/lib/scenarios/mortgageScenarios";
 
 // BYU navy is the main accent; the rest are lighter blues/greys for the
@@ -150,12 +151,9 @@ function MortgageCalculator() {
   );
 
   return (
-    <main className="flex flex-1 flex-col items-center bg-zinc-100 px-6 py-16 text-neutral-900">
+    <main className="flex flex-1 flex-col items-center bg-surface px-6 py-14 text-ink sm:py-16">
       <div className="w-full max-w-6xl">
-        <h1
-          className="mt-4 text-3xl font-semibold tracking-tight sm:text-4xl"
-          style={{ color: "var(--accent)" }}
-        >
+        <h1 className="mt-4 text-3xl font-bold tracking-tight text-ink sm:text-4xl lg:text-[2.5rem]">
           Mortgage Calculator
         </h1>
         <p className="mt-2 text-neutral-600">
@@ -244,10 +242,9 @@ function MortgageCalculator() {
             </ul>
           </div>
 
-          <p className="mt-6 text-xs leading-5 text-neutral-500">
-            Estimate for educational purposes only — not financial advice. Actual
-            costs vary by lender, location, taxes, and insurance.
-          </p>
+          <Disclaimer className="mt-6">
+            Actual costs vary by lender, location, taxes, and insurance.
+          </Disclaimer>
           <SaveAffordance onSave={handleSave} />
         </div>
 

@@ -47,12 +47,9 @@ export default function LoginPage() {
   }
 
   return (
-    <main className="flex flex-1 flex-col items-center justify-center bg-zinc-100 px-6 py-16 text-neutral-900">
+    <main className="flex flex-1 flex-col items-center justify-center bg-surface px-6 py-16 text-ink">
       <div className="w-full max-w-sm">
-        <h1
-          className="text-center text-3xl font-semibold tracking-tight"
-          style={{ color: "var(--accent)" }}
-        >
+        <h1 className="text-center text-3xl font-bold tracking-tight text-ink">
           Welcome back
         </h1>
         <p className="mt-2 text-center text-sm text-neutral-500">

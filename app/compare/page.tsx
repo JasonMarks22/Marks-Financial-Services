@@ -28,6 +28,7 @@ import type {
   SecurityDetail,
 } from "@/lib/marketData/types";
 import { HISTORY_RANGES } from "@/lib/marketData/types";
+import { Disclaimer } from "@/components/ui/Disclaimer";
 
 const ACCENT = "#1B4332";
 const GOLD = "#2D6A4F";
@@ -159,12 +160,9 @@ function CompareTool() {
   }, [histories]);
 
   return (
-    <main className="flex flex-1 flex-col items-center bg-zinc-100 px-6 py-16 text-neutral-900">
+    <main className="flex flex-1 flex-col items-center bg-surface px-6 py-14 text-ink sm:py-16">
       <div className="w-full max-w-6xl">
-        <h1
-          className="mt-4 text-3xl font-semibold tracking-tight sm:text-4xl"
-          style={{ color: "var(--accent)" }}
-        >
+        <h1 className="mt-4 text-3xl font-bold tracking-tight text-ink sm:text-4xl lg:text-[2.5rem]">
           Compare Two Securities
         </h1>
         <p className="mt-2 text-neutral-600">
@@ -270,10 +268,9 @@ function CompareTool() {
           </>
         )}
 
-        <p className="mt-8 text-xs leading-5 text-neutral-500">
+        <Disclaimer className="mt-8">
           Market data provided by Yahoo Finance; may be delayed or incomplete.
-          For educational purposes only — not investment advice.
-        </p>
+        </Disclaimer>
       </div>
     </main>
   );

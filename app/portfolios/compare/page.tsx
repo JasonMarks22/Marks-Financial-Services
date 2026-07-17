@@ -34,6 +34,7 @@ import {
   type UserPortfolioRow,
 } from "@/lib/portfolios/userPortfolios";
 import type { BacktestResult } from "@/lib/portfolios/backtest";
+import { Disclaimer } from "@/components/ui/Disclaimer";
 
 const ACCENT = "#1B4332";
 const LINE_COLORS = ["#1B4332", "#2D6A4F", "#40916C", "#74C0DC", "#8FAF9B", "#5FA97F"];
@@ -167,12 +168,9 @@ export default function PortfolioComparePage() {
   );
 
   return (
-    <main className="flex flex-1 flex-col items-center bg-zinc-100 px-6 py-16 text-neutral-900">
+    <main className="flex flex-1 flex-col items-center bg-surface px-6 py-14 text-ink sm:py-16">
       <div className="w-full max-w-6xl">
-        <h1
-          className="mt-4 text-3xl font-semibold tracking-tight sm:text-4xl"
-          style={{ color: "var(--accent)" }}
-        >
+        <h1 className="mt-4 text-3xl font-bold tracking-tight text-ink sm:text-4xl lg:text-[2.5rem]">
           Compare &amp; Backtest Portfolios
         </h1>
         <p className="mt-2 text-neutral-600">
@@ -408,13 +406,12 @@ export default function PortfolioComparePage() {
           </div>
         )}
 
-        <p className="mt-8 text-xs leading-5 text-neutral-500">
-          Backtested results are hypothetical ESTIMATES based on historical data
+        <Disclaimer className="mt-8">
+          Backtested results are hypothetical estimates based on historical data
           from Yahoo Finance, which may be delayed or incomplete. Assumes
           periodic rebalancing to target weights, cash held flat, and excludes
-          fees and taxes. Past performance does not guarantee future results.
-          For educational purposes only — not investment advice.
-        </p>
+          fees and taxes.
+        </Disclaimer>
       </div>
     </main>
   );
