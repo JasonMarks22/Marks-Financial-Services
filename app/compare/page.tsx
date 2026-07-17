@@ -1,12 +1,18 @@
 "use client";
 
 /**
- * Compare two securities (stocks / ETFs / funds) side by side.
+ * Securities lookup and comparison.
+ *
+ * Build up a list of securities (stocks / ETFs / funds) and the view adapts:
+ *   - 0 selected: a lookup prompt (search + popular tickers).
+ *   - 1 selected: the full <SecurityDetail> deep-dive for that one security.
+ *   - 2+ selected: a normalized performance chart (one line each) plus a
+ *     side-by-side comparison table (one column each).
  *
  * All market data flows through the app's server-side API routes
- * (/api/search, /api/security, /api/history) — the browser never talks to the
+ * (/api/search, /api/security, /api/history); the browser never talks to the
  * provider directly. Fields the provider doesn't supply arrive as null and
- * render as "Not available"; nothing is ever fabricated.
+ * render as "Not available" — nothing is ever fabricated.
  */
 
 import { Suspense, useEffect, useMemo, useRef, useState } from "react";
@@ -25,13 +31,18 @@ import type {
   HistoryRange,
   PriceHistory,
   SearchResult,
-  SecurityDetail,
+  SecurityDetail as SecurityDetailData,
 } from "@/lib/marketData/types";
 import { HISTORY_RANGES } from "@/lib/marketData/types";
+import { SecurityDetail } from "@/components/SecurityDetail";
 import { Disclaimer } from "@/components/ui/Disclaimer";
 
-const ACCENT = "#1B4332";
-const GOLD = "#2D6A4F";
+const MAX_SECURITIES = 5;
+
+// Distinct line colors for up to five series (first is the brand green).
+const SERIES_COLORS = ["#1B4332", "#2563EB", "#C2410C", "#7C3AED", "#0D9488"];
+
+const POPULAR = ["VOO", "SPY", "AAPL", "SCHD", "QQQ", "VTI"];
 
 const TYPE_LABELS: Record<string, string> = {
   EQUITY: "Stock",
@@ -51,7 +62,7 @@ function fmtPrice(value: number, currency: string): string {
   }
 }
 
-/** 2,340,000,000,000 → "$2.34T" etc. */
+/** 2,340,000,000,000 -> "$2.34T" etc. */
 function fmtMarketCap(value: number): string {
   const abs = Math.abs(value);
   if (abs >= 1e12) return `$${(value / 1e12).toFixed(2)}T`;
@@ -60,8 +71,7 @@ function fmtMarketCap(value: number): string {
   return `$${Math.round(value).toLocaleString("en-US")}`;
 }
 
-// useSearchParams requires a Suspense boundary, so the page is a thin wrapper
-// around the actual comparison tool.
+// useSearchParams requires a Suspense boundary, so the page is a thin wrapper.
 export default function ComparePage() {
   return (
     <Suspense fallback={null}>
@@ -71,139 +81,283 @@ export default function ComparePage() {
 }
 
 function CompareTool() {
-  const [a, setA] = useState<SecurityDetail | null>(null);
-  const [b, setB] = useState<SecurityDetail | null>(null);
+  const [securities, setSecurities] = useState<SecurityDetailData[]>([]);
   const [range, setRange] = useState<HistoryRange>("1y");
+  const [histories, setHistories] = useState<Record<string, PriceHistory>>({});
+  const [historyError, setHistoryError] = useState<string | null>(null);
+  const [addError, setAddError] = useState<string | null>(null);
 
-  // Optional deep link: /compare?a=SYMBOL (and optionally &b=SYMBOL) pre-loads
-  // securities via the same /api/security route the pickers use. This only
-  // pre-fills the selection; all comparison logic below is unchanged.
   const searchParams = useSearchParams();
+
+  // Deep link: /compare?symbols=VOO,SPY,AAPL (legacy ?a=&b= still supported).
   const prefilled = useRef(false);
   useEffect(() => {
     if (prefilled.current) return;
     prefilled.current = true;
-    const load = async (symbol: string, set: (d: SecurityDetail) => void) => {
-      try {
-        const res = await fetch(
-          `/api/security?symbol=${encodeURIComponent(symbol)}`,
-        );
-        const json = await res.json();
-        if (res.ok) set(json);
-      } catch {
-        /* Ignore a failed prefill — the user can still pick manually. */
+
+    const fromSymbols = searchParams.get("symbols");
+    const legacy = [searchParams.get("a"), searchParams.get("b")]
+      .filter((s): s is string => Boolean(s))
+      .join(",");
+    const raw = fromSymbols ?? legacy;
+    const wanted = [
+      ...new Set(
+        raw
+          .split(",")
+          .map((s) => s.trim().toUpperCase())
+          .filter(Boolean),
+      ),
+    ].slice(0, MAX_SECURITIES);
+    if (wanted.length === 0) return;
+
+    (async () => {
+      const loaded: SecurityDetailData[] = [];
+      for (const symbol of wanted) {
+        try {
+          const res = await fetch(
+            `/api/security?symbol=${encodeURIComponent(symbol)}`,
+          );
+          const json = await res.json();
+          if (res.ok) loaded.push(json);
+        } catch {
+          /* Skip a failed prefill; the user can still add it manually. */
+        }
       }
-    };
-    const aParam = searchParams.get("a")?.trim();
-    const bParam = searchParams.get("b")?.trim();
-    if (aParam) load(aParam, setA);
-    if (bParam) load(bParam, setB);
+      if (loaded.length > 0) setSecurities(loaded);
+    })();
   }, [searchParams]);
-  const [histories, setHistories] = useState<{
-    a: PriceHistory;
-    b: PriceHistory;
-  } | null>(null);
-  const [historyError, setHistoryError] = useState<string | null>(null);
 
-  const symbolA = a?.symbol;
-  const symbolB = b?.symbol;
-
-  // Fetch both histories whenever both securities are chosen (or the range
-  // changes). All state updates happen in async callbacks.
+  // Keep the URL in sync with the current selection (shareable links). Skip the
+  // first run so it never clobbers the deep-link before it loads.
+  const syncedOnce = useRef(false);
   useEffect(() => {
-    if (!symbolA || !symbolB) return;
+    if (!syncedOnce.current) {
+      syncedOnce.current = true;
+      return;
+    }
+    const url = new URL(window.location.href);
+    const syms = securities.map((s) => s.symbol);
+    if (syms.length > 0) url.searchParams.set("symbols", syms.join(","));
+    else url.searchParams.delete("symbols");
+    url.searchParams.delete("a");
+    url.searchParams.delete("b");
+    window.history.replaceState(null, "", url.toString());
+  }, [securities]);
+
+  // Fetch price history for every selected symbol (only needed for the 2+
+  // comparison chart). All state changes happen inside the async callback.
+  useEffect(() => {
+    const symbols = securities.map((s) => s.symbol);
     let cancelled = false;
-
-    Promise.all([
-      fetch(`/api/history?symbol=${encodeURIComponent(symbolA)}&range=${range}`),
-      fetch(`/api/history?symbol=${encodeURIComponent(symbolB)}&range=${range}`),
-    ])
-      .then(async ([resA, resB]) => {
-        const jsonA = await resA.json();
-        const jsonB = await resB.json();
+    (async () => {
+      if (symbols.length < 2) {
+        if (!cancelled) {
+          setHistories({});
+          setHistoryError(null);
+        }
+        return;
+      }
+      try {
+        const results = await Promise.all(
+          symbols.map(async (symbol) => {
+            const res = await fetch(
+              `/api/history?symbol=${encodeURIComponent(symbol)}&range=${range}`,
+            );
+            const json = await res.json();
+            return { symbol, ok: res.ok, json };
+          }),
+        );
         if (cancelled) return;
-        if (!resA.ok) throw new Error(jsonA.error ?? `History failed for ${symbolA}.`);
-        if (!resB.ok) throw new Error(jsonB.error ?? `History failed for ${symbolB}.`);
-        setHistories({ a: jsonA, b: jsonB });
-        setHistoryError(null);
-      })
-      .catch((err) => {
-        if (cancelled) return;
-        setHistories(null);
-        setHistoryError(err instanceof Error ? err.message : "History fetch failed.");
-      });
-
+        const map: Record<string, PriceHistory> = {};
+        const failed: string[] = [];
+        for (const r of results) {
+          if (r.ok) map[r.symbol] = r.json;
+          else failed.push(r.symbol);
+        }
+        setHistories(map);
+        setHistoryError(
+          failed.length > 0
+            ? `Price history unavailable for: ${failed.join(", ")}.`
+            : null,
+        );
+      } catch {
+        if (!cancelled) {
+          setHistories({});
+          setHistoryError("Couldn't load price history. Try again.");
+        }
+      }
+    })();
     return () => {
       cancelled = true;
     };
-  }, [symbolA, symbolB, range]);
+  }, [securities, range]);
 
-  // Merge the two series into one chart dataset, each normalized to % change
-  // from its own first close so different price scales compare fairly.
+  async function addSymbol(symbol: string) {
+    const sym = symbol.trim().toUpperCase();
+    setAddError(null);
+    if (!sym) return;
+    if (securities.some((s) => s.symbol === sym)) return; // already added
+    if (securities.length >= MAX_SECURITIES) {
+      setAddError(`You can compare up to ${MAX_SECURITIES} at once.`);
+      return;
+    }
+    try {
+      const res = await fetch(`/api/security?symbol=${encodeURIComponent(sym)}`);
+      const json = await res.json();
+      if (!res.ok) {
+        setAddError(json.error ?? `Couldn't add ${sym}.`);
+        return;
+      }
+      // Guard against duplicate resolved symbols (e.g. search alias -> same tkr).
+      setSecurities((prev) =>
+        prev.some((s) => s.symbol === json.symbol) ? prev : [...prev, json],
+      );
+    } catch {
+      setAddError(`Couldn't add ${sym}.`);
+    }
+  }
+
+  function removeSymbol(symbol: string) {
+    setSecurities((prev) => prev.filter((s) => s.symbol !== symbol));
+    setAddError(null);
+  }
+
+  const colorFor = (symbol: string) => {
+    const i = securities.findIndex((s) => s.symbol === symbol);
+    return SERIES_COLORS[i % SERIES_COLORS.length];
+  };
+
+  // Merge each series' history into one dataset, normalized to % change from
+  // its own first close so different price scales compare fairly.
   const chartData = useMemo(() => {
-    if (!histories) return [];
-    const rows = new Map<string, { date: string; a?: number; b?: number }>();
+    const withData = securities
+      .map((s) => s.symbol)
+      .filter((sym) => (histories[sym]?.points?.length ?? 0) > 0);
+    if (withData.length < 2) return [];
 
-    const addSeries = (points: PriceHistory["points"], key: "a" | "b") => {
-      if (points.length === 0) return;
+    const rows = new Map<string, Record<string, number | string>>();
+    for (const sym of withData) {
+      const points = histories[sym].points;
       const first = points[0].close;
+      if (!first) continue;
       for (const p of points) {
         const row = rows.get(p.date) ?? { date: p.date };
-        row[key] = ((p.close - first) / first) * 100;
+        row[sym] = ((p.close - first) / first) * 100;
         rows.set(p.date, row);
       }
-    };
+    }
+    return [...rows.values()].sort((x, y) =>
+      String(x.date).localeCompare(String(y.date)),
+    );
+  }, [securities, histories]);
 
-    addSeries(histories.a.points, "a");
-    addSeries(histories.b.points, "b");
-    return [...rows.values()].sort((x, y) => x.date.localeCompare(y.date));
-  }, [histories]);
+  const atMax = securities.length >= MAX_SECURITIES;
 
   return (
     <main className="flex flex-1 flex-col items-center bg-surface px-6 py-14 text-ink sm:py-16">
       <div className="w-full max-w-6xl">
         <h1 className="mt-4 text-3xl font-bold tracking-tight text-ink sm:text-4xl lg:text-[2.5rem]">
-          Compare Two Securities
+          Look up &amp; compare securities
         </h1>
         <p className="mt-2 text-neutral-600">
-          Search any two stocks, ETFs, or funds and see them side by side.
+          Search any stock, ETF, or fund to see its details, or add several to
+          compare them side by side.
         </p>
 
-        {/* Pickers */}
-        <div className="mt-8 grid grid-cols-1 gap-5 sm:grid-cols-2">
-          <SecurityPicker label="Security A" selected={a} onSelect={setA} />
-          <SecurityPicker label="Security B" selected={b} onSelect={setB} />
+        {/* Add + current selection */}
+        <div className="mt-8 rounded-2xl border border-edge bg-card p-6 shadow-soft">
+          <div className="flex flex-col gap-4 sm:flex-row sm:items-start">
+            <div className="flex-1">
+              <AddSecurity onAdd={addSymbol} disabled={atMax} />
+              {addError && (
+                <p className="mt-2 text-xs text-red-600">{addError}</p>
+              )}
+              {atMax && (
+                <p className="mt-2 text-xs text-neutral-500">
+                  Maximum of {MAX_SECURITIES} reached. Remove one to add another.
+                </p>
+              )}
+            </div>
+            <select
+              value={range}
+              onChange={(e) => setRange(e.target.value as HistoryRange)}
+              aria-label="Chart range"
+              className="rounded-lg border border-neutral-300 bg-white px-3 py-2.5 text-sm text-neutral-900 outline-none focus:border-neutral-500"
+            >
+              {HISTORY_RANGES.map((r) => (
+                <option key={r} value={r}>
+                  {r}
+                </option>
+              ))}
+            </select>
+          </div>
+
+          {/* Selected chips */}
+          {securities.length > 0 && (
+            <div className="mt-4 flex flex-wrap gap-2">
+              {securities.map((s) => {
+                const up = s.change >= 0;
+                return (
+                  <span
+                    key={s.symbol}
+                    className="inline-flex items-center gap-2 rounded-full border border-edge bg-card-tint px-3 py-1.5 text-sm"
+                  >
+                    {securities.length >= 2 && (
+                      <span
+                        aria-hidden="true"
+                        className="h-2.5 w-2.5 rounded-full"
+                        style={{ backgroundColor: colorFor(s.symbol) }}
+                      />
+                    )}
+                    <span className="font-semibold text-ink">{s.symbol}</span>
+                    <span className="tabular-nums text-muted">
+                      {fmtPrice(s.price, s.currency)}
+                    </span>
+                    <span
+                      className={`text-xs font-medium tabular-nums ${
+                        up ? "text-link" : "text-red-600"
+                      }`}
+                    >
+                      {up ? "+" : ""}
+                      {s.changePercent.toFixed(2)}%
+                    </span>
+                    <button
+                      type="button"
+                      onClick={() => removeSymbol(s.symbol)}
+                      aria-label={`Remove ${s.symbol}`}
+                      className="ml-0.5 flex h-4 w-4 items-center justify-center rounded-full text-muted hover:bg-edge hover:text-ink"
+                    >
+                      ×
+                    </button>
+                  </span>
+                );
+              })}
+            </div>
+          )}
         </div>
 
-        {/* Side-by-side comparison */}
-        {a && b && (
+        {/* View adapts to how many are selected */}
+        {securities.length === 0 ? (
+          <EmptyState onAdd={addSymbol} />
+        ) : securities.length === 1 ? (
+          <div className="mt-8">
+            <SecurityDetail ticker={securities[0].symbol} showActions={false} />
+            <p className="mt-6 text-sm text-muted">
+              Add another security above to compare it against{" "}
+              <span className="font-semibold text-ink">
+                {securities[0].symbol}
+              </span>
+              .
+            </p>
+          </div>
+        ) : (
           <>
-            <ComparisonTable a={a} b={b} />
-
-            {/* Relative performance chart */}
-            <div className="mt-8 rounded-xl border border-neutral-200 bg-white p-6 shadow-sm">
-              <div className="flex flex-wrap items-center justify-between gap-3">
-                <h2
-                  className="text-lg font-semibold"
-                  style={{ color: "var(--accent)" }}
-                >
-                  Relative performance
-                </h2>
-                <select
-                  value={range}
-                  onChange={(e) => setRange(e.target.value as HistoryRange)}
-                  className="rounded-lg border border-neutral-300 bg-white px-2 py-1.5 text-sm text-neutral-900 outline-none focus:border-neutral-500"
-                >
-                  {HISTORY_RANGES.map((r) => (
-                    <option key={r} value={r}>
-                      {r}
-                    </option>
-                  ))}
-                </select>
-              </div>
-              <p className="mt-1 text-xs text-neutral-500">
+            {/* Performance chart */}
+            <div className="mt-8 rounded-2xl border border-edge bg-card p-6 shadow-soft">
+              <h2 className="text-lg font-bold text-ink">Relative performance</h2>
+              <p className="mt-1 text-xs text-muted">
                 Each line is % change from its own price at the start of the
-                range, so different price scales compare fairly.
+                range, so securities at different prices compare fairly.
               </p>
 
               {historyError ? (
@@ -211,7 +365,7 @@ function CompareTool() {
                   {historyError}
                 </p>
               ) : chartData.length === 0 ? (
-                <p className="mt-6 text-center text-sm text-neutral-400">
+                <p className="mt-6 text-center text-sm text-muted">
                   Loading history…
                 </p>
               ) : (
@@ -221,16 +375,16 @@ function CompareTool() {
                       data={chartData}
                       margin={{ top: 10, right: 10, left: 0, bottom: 0 }}
                     >
-                      <CartesianGrid strokeDasharray="3 3" stroke="#dce4dd" />
+                      <CartesianGrid strokeDasharray="3 3" stroke="var(--card-border)" />
                       <XAxis
                         dataKey="date"
-                        stroke="#6b7a6f"
+                        stroke="var(--muted)"
                         tick={{ fontSize: 11 }}
                         interval="preserveStartEnd"
                         minTickGap={60}
                       />
                       <YAxis
-                        stroke="#6b7a6f"
+                        stroke="var(--muted)"
                         tick={{ fontSize: 11 }}
                         tickFormatter={(v) => `${Number(v).toFixed(0)}%`}
                         width={55}
@@ -242,35 +396,36 @@ function CompareTool() {
                         ]}
                       />
                       <Legend />
-                      <Line
-                        type="monotone"
-                        dataKey="a"
-                        name={a.symbol}
-                        stroke={ACCENT}
-                        strokeWidth={2}
-                        dot={false}
-                        connectNulls
-                      />
-                      <Line
-                        type="monotone"
-                        dataKey="b"
-                        name={b.symbol}
-                        stroke={GOLD}
-                        strokeWidth={2}
-                        dot={false}
-                        connectNulls
-                      />
+                      {securities.map((s) => (
+                        <Line
+                          key={s.symbol}
+                          type="monotone"
+                          dataKey={s.symbol}
+                          name={s.symbol}
+                          stroke={colorFor(s.symbol)}
+                          strokeWidth={2}
+                          dot={false}
+                          connectNulls
+                        />
+                      ))}
                     </LineChart>
                   </ResponsiveContainer>
                 </div>
               )}
             </div>
+
+            {/* Comparison table */}
+            <ComparisonTable securities={securities} colorFor={colorFor} />
           </>
         )}
 
-        <Disclaimer className="mt-8">
-          Market data provided by Yahoo Finance; may be delayed or incomplete.
-        </Disclaimer>
+        {/* Data source + disclaimer */}
+        <div className="mt-8 space-y-2">
+          <p className="text-xs leading-5 text-muted">
+            Market data provided by Yahoo Finance; may be delayed or incomplete.
+          </p>
+          <Disclaimer />
+        </div>
       </div>
     </main>
   );
@@ -278,154 +433,139 @@ function CompareTool() {
 
 /* ------------------------------------------------------------------------ */
 
-function SecurityPicker({
-  label,
-  selected,
-  onSelect,
+function EmptyState({ onAdd }: { onAdd: (symbol: string) => void }) {
+  return (
+    <div className="mt-8 rounded-2xl border border-dashed border-edge bg-card p-10 text-center shadow-soft">
+      <p className="text-base font-semibold text-ink">
+        Search for a security to get started
+      </p>
+      <p className="mt-1 text-sm text-muted">
+        Look up one for a full breakdown, or add several to compare.
+      </p>
+      <div className="mt-5 flex flex-wrap items-center justify-center gap-2">
+        <span className="text-sm text-muted">Popular:</span>
+        {POPULAR.map((sym) => (
+          <button
+            key={sym}
+            type="button"
+            onClick={() => onAdd(sym)}
+            className="rounded-full border border-edge bg-card px-3 py-1 text-sm font-medium text-neutral-700 shadow-soft transition hover:-translate-y-px hover:border-accent hover:text-link"
+          >
+            {sym}
+          </button>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+/* ------------------------------------------------------------------------ */
+
+function AddSecurity({
+  onAdd,
+  disabled,
 }: {
-  label: string;
-  selected: SecurityDetail | null;
-  onSelect: (detail: SecurityDetail | null) => void;
+  onAdd: (symbol: string) => void;
+  disabled: boolean;
 }) {
   const [query, setQuery] = useState("");
   const [results, setResults] = useState<SearchResult[]>([]);
   const [searching, setSearching] = useState(false);
-  const [loadingDetail, setLoadingDetail] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const boxRef = useRef<HTMLDivElement | null>(null);
 
-  // Debounced search; every state update happens inside async callbacks.
+  const q = query.trim();
+
+  // Debounced search; all state changes happen inside the timer callback.
   useEffect(() => {
-    const q = query.trim();
-    if (q.length < 2) return;
-    const timer = setTimeout(() => {
-      setSearching(true);
-      fetch(`/api/search?q=${encodeURIComponent(q)}`)
-        .then(async (res) => {
-          const json = await res.json();
-          if (!res.ok) throw new Error(json.error ?? "Search failed.");
-          setResults(json);
-          setError(null);
-        })
-        .catch((err) => {
+    let cancelled = false;
+    const timer = setTimeout(
+      () => {
+        if (q.length < 2) {
           setResults([]);
-          setError(err instanceof Error ? err.message : "Search failed.");
-        })
-        .finally(() => setSearching(false));
-    }, 300);
-    return () => clearTimeout(timer);
-  }, [query]);
+          setSearching(false);
+          setError(null);
+          return;
+        }
+        setSearching(true);
+        fetch(`/api/search?q=${encodeURIComponent(q)}`)
+          .then(async (res) => {
+            const json = await res.json();
+            if (cancelled) return;
+            if (!res.ok) throw new Error(json.error ?? "Search failed");
+            setResults(Array.isArray(json) ? json.slice(0, 6) : []);
+            setError(null);
+          })
+          .catch(() => {
+            if (cancelled) return;
+            setResults([]);
+            setError("Search failed.");
+          })
+          .finally(() => !cancelled && setSearching(false));
+      },
+      q.length < 2 ? 0 : 300,
+    );
+    return () => {
+      cancelled = true;
+      clearTimeout(timer);
+    };
+  }, [q]);
 
-  function handleQueryChange(value: string) {
-    setQuery(value);
-    if (value.trim().length < 2) {
-      setResults([]);
-      setError(null);
+  // Close the dropdown on outside click.
+  useEffect(() => {
+    function onClick(e: MouseEvent) {
+      if (boxRef.current && !boxRef.current.contains(e.target as Node)) {
+        setResults([]);
+      }
     }
-  }
+    document.addEventListener("click", onClick);
+    return () => document.removeEventListener("click", onClick);
+  }, []);
 
-  async function pick(result: SearchResult) {
-    setResults([]);
+  function pick(symbol: string) {
+    onAdd(symbol);
     setQuery("");
-    setLoadingDetail(true);
+    setResults([]);
     setError(null);
-    try {
-      const res = await fetch(
-        `/api/security?symbol=${encodeURIComponent(result.symbol)}`,
-      );
-      const json = await res.json();
-      if (!res.ok) throw new Error(json.error ?? "Couldn't load details.");
-      onSelect(json);
-    } catch (err) {
-      setError(err instanceof Error ? err.message : "Couldn't load details.");
-    } finally {
-      setLoadingDetail(false);
-    }
   }
-
-  const up = (selected?.change ?? 0) >= 0;
 
   return (
-    <div className="rounded-xl border border-neutral-200 bg-white p-5 shadow-sm">
-      <p className="text-sm font-medium text-neutral-600">{label}</p>
-
-      {selected ? (
-        <div className="mt-3">
-          <div className="flex items-start justify-between gap-2">
-            <div>
-              <p className="font-semibold text-neutral-900">
-                {selected.name}{" "}
-                <span className="text-neutral-500">({selected.symbol})</span>
-              </p>
-              <p className="text-xs text-neutral-500">
-                {typeLabel(selected.type)}
-              </p>
-            </div>
-            <button
-              type="button"
-              onClick={() => onSelect(null)}
-              className="shrink-0 rounded-full border border-neutral-300 px-3 py-1 text-xs font-medium text-neutral-600 hover:border-neutral-500"
-            >
-              Change
-            </button>
-          </div>
-          <p
-            className="mt-2 text-2xl font-semibold"
-            style={{ color: "var(--accent)" }}
-          >
-            {fmtPrice(selected.price, selected.currency)}
-          </p>
-          <p
-            className={`text-sm font-medium ${
-              up ? "text-emerald-600" : "text-red-600"
-            }`}
-          >
-            {up ? "▲" : "▼"} {selected.change.toFixed(2)} (
-            {selected.changePercent.toFixed(2)}%)
-          </p>
-        </div>
-      ) : (
-        <div className="mt-3">
-          <input
-            type="text"
-            value={query}
-            onChange={(e) => handleQueryChange(e.target.value)}
-            placeholder="Search name or ticker…"
-            className="w-full rounded-lg border border-neutral-300 px-3 py-2 text-neutral-900 outline-none focus:border-neutral-500"
-          />
-          {(searching || loadingDetail) && (
-            <p className="mt-2 text-xs text-neutral-400">
-              {loadingDetail ? "Loading details…" : "Searching…"}
-            </p>
-          )}
-          {error && <p className="mt-2 text-xs text-red-600">{error}</p>}
-          {results.length > 0 && (
-            <ul className="mt-2 divide-y divide-neutral-100 rounded-lg border border-neutral-200">
-              {results.map((r) => (
-                <li key={r.symbol}>
-                  <button
-                    type="button"
-                    onClick={() => pick(r)}
-                    className="flex w-full items-center justify-between px-3 py-2 text-left text-sm hover:bg-neutral-50"
-                  >
-                    <span className="text-neutral-900">
-                      <strong>{r.symbol}</strong>{" "}
-                      <span className="text-neutral-500">{r.name}</span>
-                    </span>
-                    <span className="ml-2 shrink-0 text-xs text-neutral-400">
-                      {typeLabel(r.type)}
-                    </span>
-                  </button>
-                </li>
-              ))}
-            </ul>
-          )}
-          {!searching &&
-            !error &&
-            results.length === 0 &&
-            query.trim().length >= 2 && (
-              <p className="mt-2 text-xs text-neutral-400">No matches.</p>
-            )}
-        </div>
+    <div ref={boxRef} className="relative">
+      <input
+        type="text"
+        value={query}
+        disabled={disabled}
+        onChange={(e) => setQuery(e.target.value)}
+        placeholder={
+          disabled ? "Maximum reached" : "Add a stock, ETF, or fund…"
+        }
+        aria-label="Search for a security to add"
+        className="w-full rounded-lg border border-neutral-300 bg-white px-3 py-2.5 text-neutral-900 outline-none focus:border-neutral-500 disabled:cursor-not-allowed disabled:opacity-60"
+      />
+      {searching && (
+        <p className="mt-1 text-xs text-neutral-400">Searching…</p>
+      )}
+      {error && <p className="mt-1 text-xs text-red-600">{error}</p>}
+      {results.length > 0 && (
+        <ul className="absolute z-20 mt-1 w-full divide-y divide-neutral-100 overflow-hidden rounded-lg border border-edge bg-card shadow-lifted">
+          {results.map((r) => (
+            <li key={r.symbol}>
+              <button
+                type="button"
+                onClick={() => pick(r.symbol)}
+                className="flex w-full items-center justify-between gap-2 px-3 py-2 text-left text-sm hover:bg-card-tint"
+              >
+                <span className="truncate text-ink">
+                  <strong>{r.symbol}</strong>{" "}
+                  <span className="text-muted">{r.name}</span>
+                </span>
+                <span className="ml-2 shrink-0 text-xs text-muted">
+                  {typeLabel(r.type)}
+                </span>
+              </button>
+            </li>
+          ))}
+        </ul>
       )}
     </div>
   );
@@ -434,16 +574,27 @@ function SecurityPicker({
 /* ------------------------------------------------------------------------ */
 
 const NA = (
-  <span className="text-neutral-400" title="The data provider did not return this field">
+  <span
+    className="text-neutral-400"
+    title="The data provider did not return this field"
+  >
     Not available
   </span>
 );
 
-function ComparisonTable({ a, b }: { a: SecurityDetail; b: SecurityDetail }) {
-  // Each row renders per security; `null` results display as "Not available"
-  // (either the field doesn't apply to this security type, or the provider
-  // simply didn't return it).
-  const rows: { label: string; render: (d: SecurityDetail) => string | null }[] = [
+function ComparisonTable({
+  securities,
+  colorFor,
+}: {
+  securities: SecurityDetailData[];
+  colorFor: (symbol: string) => string;
+}) {
+  // Each row renders per security; null results show "Not available" (either
+  // the field doesn't apply to this security type, or the provider omitted it).
+  const rows: {
+    label: string;
+    render: (d: SecurityDetailData) => string | null;
+  }[] = [
     { label: "Type", render: (d) => typeLabel(d.type) },
     { label: "Price", render: (d) => fmtPrice(d.price, d.currency) },
     { label: "Day change", render: (d) => `${d.changePercent.toFixed(2)}%` },
@@ -484,38 +635,43 @@ function ComparisonTable({ a, b }: { a: SecurityDetail; b: SecurityDetail }) {
   ];
 
   return (
-    <div className="mt-8 overflow-x-auto rounded-xl border border-neutral-200 bg-white p-6 shadow-sm">
-      <h2 className="text-lg font-semibold" style={{ color: "var(--accent)" }}>
-        Side by side
-      </h2>
-      <table className="mt-4 w-full text-sm">
+    <div className="mt-8 overflow-x-auto rounded-2xl border border-edge bg-card p-6 shadow-soft">
+      <h2 className="text-lg font-bold text-ink">Side by side</h2>
+      <table className="mt-4 w-full min-w-[520px] text-sm">
         <thead>
-          <tr className="border-b border-neutral-200 text-left text-neutral-600">
+          <tr className="border-b border-edge text-left text-muted">
             <th className="py-2 pr-4 font-medium">Metric</th>
-            <th className="py-2 pr-4 font-medium">
-              {a.symbol}: {a.name}
-            </th>
-            <th className="py-2 font-medium">
-              {b.symbol}: {b.name}
-            </th>
+            {securities.map((s) => (
+              <th key={s.symbol} className="py-2 pr-4 font-medium">
+                <span className="flex items-center gap-2">
+                  <span
+                    aria-hidden="true"
+                    className="h-2.5 w-2.5 rounded-full"
+                    style={{ backgroundColor: colorFor(s.symbol) }}
+                  />
+                  <span className="font-semibold text-ink">{s.symbol}</span>
+                </span>
+                <span className="block max-w-[14rem] truncate text-xs font-normal text-muted">
+                  {s.name}
+                </span>
+              </th>
+            ))}
           </tr>
         </thead>
         <tbody>
-          {rows.map((row) => {
-            const va = row.render(a);
-            const vb = row.render(b);
-            return (
-              <tr key={row.label} className="border-b border-neutral-100">
-                <td className="py-2 pr-4 text-neutral-600">{row.label}</td>
-                <td className="py-2 pr-4 font-medium text-neutral-900">
-                  {va ?? NA}
+          {rows.map((row) => (
+            <tr key={row.label} className="border-b border-neutral-100">
+              <td className="py-2 pr-4 text-muted">{row.label}</td>
+              {securities.map((s) => (
+                <td
+                  key={s.symbol}
+                  className="py-2 pr-4 font-medium tabular-nums text-ink"
+                >
+                  {row.render(s) ?? NA}
                 </td>
-                <td className="py-2 font-medium text-neutral-900">
-                  {vb ?? NA}
-                </td>
-              </tr>
-            );
-          })}
+              ))}
+            </tr>
+          ))}
         </tbody>
       </table>
     </div>
