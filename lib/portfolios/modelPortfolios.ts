@@ -88,7 +88,7 @@ export const MODEL_PORTFOLIOS: ModelPortfolio[] = [
     name: "Balanced",
     profile: "Moderate",
     description:
-      "Suits investors who want an even keel — meaningful growth with a solid bond cushion.",
+      "Suits investors who want an even keel, with meaningful growth and a solid bond cushion.",
     targetSplit: { stocks: 50, bonds: 40, cash: 10 },
     holdings: [
       { symbol: "VTI", weight: 35 },
@@ -141,6 +141,122 @@ export const MODEL_PORTFOLIOS: ModelPortfolio[] = [
       { symbol: "VXUS", weight: 25 },
       { symbol: "VUG", weight: 10 },
       { symbol: "BND", weight: 15 },
+    ],
+    sourceNote: SOURCE_NOTE,
+  },
+
+  // ── Additional example set: same schema, a different low-cost index-ETF
+  //    palette (iShares/Schwab/Vanguard core funds) for variety. Every ticker
+  //    is one the market-data layer can fetch; each portfolio's holdings and
+  //    its target split each sum to 100 (checked by validateModelPortfolios).
+  {
+    id: "conservative-index",
+    name: "Conservative Index",
+    profile: "Conservative",
+    description:
+      "A bond-heavy index mix with a small global equity sleeve, for savers who prioritize stability over growth.",
+    targetSplit: { stocks: 20, bonds: 65, cash: 15 },
+    holdings: [
+      { symbol: "IVV", weight: 15 },
+      { symbol: "SCHF", weight: 5 },
+      { symbol: "AGG", weight: 45 },
+      { symbol: "VTIP", weight: 20 },
+      { symbol: "CASH", weight: 15 },
+    ],
+    sourceNote: SOURCE_NOTE,
+  },
+  {
+    id: "moderately-conservative-index",
+    name: "Moderately Conservative Index",
+    profile: "Moderately conservative",
+    description:
+      "Leans on bonds with a moderate stock allocation, for investors wanting modest growth with less bumpiness.",
+    targetSplit: { stocks: 40, bonds: 45, cash: 15 },
+    holdings: [
+      { symbol: "ITOT", weight: 25 },
+      { symbol: "IEFA", weight: 10 },
+      { symbol: "HDV", weight: 5 },
+      { symbol: "AGG", weight: 35 },
+      { symbol: "SHY", weight: 10 },
+      { symbol: "CASH", weight: 15 },
+    ],
+    sourceNote: SOURCE_NOTE,
+  },
+  {
+    id: "income-index",
+    name: "Income Index",
+    profile: "Income-focused",
+    description:
+      "Tilts toward dividend equity and bonds, for investors who mainly want regular income.",
+    targetSplit: { stocks: 30, bonds: 50, cash: 20 },
+    holdings: [
+      { symbol: "HDV", weight: 18 },
+      { symbol: "IVV", weight: 12 },
+      { symbol: "AGG", weight: 40 },
+      { symbol: "SHY", weight: 10 },
+      { symbol: "CASH", weight: 20 },
+    ],
+    sourceNote: SOURCE_NOTE,
+  },
+  {
+    id: "balanced-index",
+    name: "Balanced Index",
+    profile: "Moderate",
+    description:
+      "An even split of broad stocks and bonds, for investors who want steady growth with a solid cushion.",
+    targetSplit: { stocks: 50, bonds: 40, cash: 10 },
+    holdings: [
+      { symbol: "SCHB", weight: 35 },
+      { symbol: "SCHF", weight: 15 },
+      { symbol: "SCHZ", weight: 40 },
+      { symbol: "CASH", weight: 10 },
+    ],
+    sourceNote: SOURCE_NOTE,
+  },
+  {
+    id: "global-60-40-index",
+    name: "Global 60/40 Index",
+    profile: "Moderate",
+    description:
+      "A classic 60/40 built from global index funds, for long-horizon investors comfortable with market swings.",
+    targetSplit: { stocks: 60, bonds: 40, cash: 0 },
+    holdings: [
+      { symbol: "ITOT", weight: 36 },
+      { symbol: "IEFA", weight: 18 },
+      { symbol: "IEMG", weight: 6 },
+      { symbol: "AGG", weight: 40 },
+    ],
+    sourceNote: SOURCE_NOTE,
+  },
+  {
+    id: "growth-income-index",
+    name: "Growth with Income Index",
+    profile: "Moderately aggressive",
+    description:
+      "Growth-leaning with a dividend sleeve and some bonds, for investors who still want income and ballast.",
+    targetSplit: { stocks: 70, bonds: 25, cash: 5 },
+    holdings: [
+      { symbol: "VOO", weight: 40 },
+      { symbol: "VEA", weight: 15 },
+      { symbol: "HDV", weight: 15 },
+      { symbol: "AGG", weight: 25 },
+      { symbol: "CASH", weight: 5 },
+    ],
+    sourceNote: SOURCE_NOTE,
+  },
+  {
+    id: "aggressive-growth-index",
+    name: "Aggressive Growth Index",
+    profile: "Aggressive",
+    description:
+      "Almost all global equity with a thin bond slice, for long horizons and high risk tolerance.",
+    targetSplit: { stocks: 85, bonds: 15, cash: 0 },
+    holdings: [
+      { symbol: "IVV", weight: 45 },
+      { symbol: "IEFA", weight: 22 },
+      { symbol: "VWO", weight: 8 },
+      { symbol: "IJR", weight: 10 },
+      { symbol: "AGG", weight: 15 },
     ],
     sourceNote: SOURCE_NOTE,
   },
