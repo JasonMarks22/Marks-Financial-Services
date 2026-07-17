@@ -9,7 +9,8 @@
  * render as "Not available"; nothing is ever fabricated.
  */
 
-import { useEffect, useMemo, useState } from "react";
+import { Suspense, useEffect, useMemo, useRef, useState } from "react";
+import { useSearchParams } from "next/navigation";
 import {
   CartesianGrid,
   Legend,
@@ -58,10 +59,45 @@ function fmtMarketCap(value: number): string {
   return `$${Math.round(value).toLocaleString("en-US")}`;
 }
 
+// useSearchParams requires a Suspense boundary, so the page is a thin wrapper
+// around the actual comparison tool.
 export default function ComparePage() {
+  return (
+    <Suspense fallback={null}>
+      <CompareTool />
+    </Suspense>
+  );
+}
+
+function CompareTool() {
   const [a, setA] = useState<SecurityDetail | null>(null);
   const [b, setB] = useState<SecurityDetail | null>(null);
   const [range, setRange] = useState<HistoryRange>("1y");
+
+  // Optional deep link: /compare?a=SYMBOL (and optionally &b=SYMBOL) pre-loads
+  // securities via the same /api/security route the pickers use. This only
+  // pre-fills the selection; all comparison logic below is unchanged.
+  const searchParams = useSearchParams();
+  const prefilled = useRef(false);
+  useEffect(() => {
+    if (prefilled.current) return;
+    prefilled.current = true;
+    const load = async (symbol: string, set: (d: SecurityDetail) => void) => {
+      try {
+        const res = await fetch(
+          `/api/security?symbol=${encodeURIComponent(symbol)}`,
+        );
+        const json = await res.json();
+        if (res.ok) set(json);
+      } catch {
+        /* Ignore a failed prefill — the user can still pick manually. */
+      }
+    };
+    const aParam = searchParams.get("a")?.trim();
+    const bParam = searchParams.get("b")?.trim();
+    if (aParam) load(aParam, setA);
+    if (bParam) load(bParam, setB);
+  }, [searchParams]);
   const [histories, setHistories] = useState<{
     a: PriceHistory;
     b: PriceHistory;

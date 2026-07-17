@@ -1,149 +1,150 @@
-import Link from "next/link";
+import { Badge } from "@/components/ui/Badge";
+import { Button } from "@/components/ui/Button";
+import { Container } from "@/components/ui/Container";
+import { Reveal } from "@/components/ui/Reveal";
+import { Section } from "@/components/ui/Section";
+import { HeroDashboard } from "@/components/home/HeroDashboard";
+import { HomeSearch } from "@/components/home/HomeSearch";
+import { FeatureGrid } from "@/components/home/FeatureGrid";
+import { DashboardShowcase } from "@/components/home/DashboardShowcase";
+import { WhyPlatform } from "@/components/home/WhyPlatform";
+import { StatsSection } from "@/components/home/StatsSection";
+import { MarketInsights } from "@/components/home/MarketInsights";
+import { CtaSection } from "@/components/home/CtaSection";
 
 /**
- * Landing page. Top navigation lives in the shared NavBar (see layout), so
- * this page focuses on introducing the toolkit and routing people to tools.
+ * Landing page. Shared NavBar/Footer live in the root layout; this page is
+ * the marketing surface. Every non-live figure is clearly labeled as sample
+ * data, and no unbuilt tool is presented as working.
  */
-
-const CALCULATORS = [
-  {
-    href: "/tools/savings-goal",
-    title: "Savings Goal",
-    description: "See how much to set aside each month to reach a target.",
-  },
-  {
-    href: "/tools/mortgage",
-    title: "Mortgage",
-    description: "All-in monthly cost, amortization, and early-payoff savings.",
-  },
-  {
-    href: "/tools/budget",
-    title: "Budget",
-    description: "Your own categories, compared against the 50/30/20 guideline.",
-  },
-  {
-    href: "/tools/allocator",
-    title: "Savings Allocator",
-    description: "A common approach to splitting leftover money — with reasons.",
-  },
-  {
-    href: "/tools/debt-payoff",
-    title: "Debt Payoff",
-    description: "Avalanche vs. snowball — payoff time, interest, and order.",
-  },
-  {
-    href: "/tools/retirement",
-    title: "Retirement Projector",
-    description: "Compound growth by age, with today's-dollars adjustment.",
-  },
-];
-
-const PORTFOLIO_TOOLS = [
-  {
-    href: "/compare",
-    title: "Compare Securities",
-    description: "Any two stocks or funds, side by side with performance.",
-  },
-  {
-    href: "/portfolios",
-    title: "Model Portfolios",
-    description: "Seven educational examples across common risk profiles.",
-  },
-  {
-    href: "/portfolios/build",
-    title: "Build a Portfolio",
-    description: "Assemble your own mix with a live profile-match rating.",
-  },
-  {
-    href: "/portfolios/compare",
-    title: "Compare & Backtest",
-    description: "Simulate how $10,000 would have grown across portfolios.",
-  },
-];
 
 export default function Home() {
   return (
-    <main className="flex flex-1 flex-col items-center bg-zinc-100 px-6 pb-20 text-neutral-900">
-      {/* Hero */}
-      <section className="w-full max-w-6xl pt-20 text-center sm:pt-28">
-        <h1
-          className="text-4xl font-semibold tracking-tight sm:text-5xl"
-          style={{ color: "var(--accent)" }}
-        >
-          Marks Financial Services
-        </h1>
-        <p className="mx-auto mt-4 max-w-2xl text-lg leading-8 text-neutral-600">
-          Your all-in-one personal finance toolkit — calculators, portfolio
-          analysis, and more.
-        </p>
-        <p className="mx-auto mt-2 max-w-xl text-sm leading-6 text-neutral-500">
-          Plan savings, understand a mortgage, shape a budget, and explore
-          portfolios — all in one place, built for learning.
-        </p>
+    <main className="flex-1 bg-surface">
+      {/* ── Hero ─────────────────────────────────────────────────────── */}
+      <section className="relative overflow-hidden">
+        {/* Soft brand wash behind the hero (decorative). */}
+        <div
+          aria-hidden="true"
+          className="pointer-events-none absolute inset-0 -z-10 bg-gradient-to-b from-card-tint to-surface"
+        />
+        <Container className="grid grid-cols-1 items-center gap-12 py-16 sm:py-20 lg:grid-cols-2 lg:gap-16 lg:py-28">
+          <Reveal>
+            <div>
+              <Badge>Educational investment tools</Badge>
+              <h1 className="mt-5 text-4xl font-bold leading-[1.08] tracking-tight text-ink sm:text-5xl lg:text-6xl xl:text-[4.5rem]">
+                Analyze Investments With Confidence
+              </h1>
+              <p className="mt-6 max-w-xl text-lg leading-8 text-muted">
+                Professional-grade calculators, portfolio analysis, historical
+                research, and planning — all in one place. Built to help you
+                learn as you go.
+              </p>
+              <div className="mt-8 flex flex-wrap items-center gap-3">
+                <Button href="/signup" size="lg">
+                  Get Started
+                </Button>
+                <Button href="#showcase" size="lg" variant="secondary">
+                  Explore Demo
+                </Button>
+              </div>
+              <p className="mt-5 text-sm text-muted">
+                Free to use — no account needed. Educational tools, not
+                financial advice.
+              </p>
+            </div>
+          </Reveal>
+
+          <Reveal delay={0.12}>
+            <HeroDashboard />
+          </Reveal>
+        </Container>
       </section>
 
-      {/* Calculators */}
-      <section className="mt-16 w-full max-w-6xl">
-        <h2
-          className="text-2xl font-semibold tracking-tight"
-          style={{ color: "var(--accent)" }}
-        >
-          Calculators
-        </h2>
-        <div className="mt-5 grid grid-cols-1 gap-4 sm:grid-cols-2">
-          {CALCULATORS.map((tool) => (
-            <ToolCard key={tool.href} {...tool} />
-          ))}
-        </div>
+      {/* ── Search ───────────────────────────────────────────────────── */}
+      <section id="search" className="scroll-mt-24 border-y border-edge bg-card py-14 sm:py-16">
+        <Container>
+          <div className="mx-auto max-w-2xl text-center">
+            <h2 className="text-2xl font-bold tracking-tight text-ink sm:text-3xl">
+              Find a tool or a security
+            </h2>
+            <p className="mt-2 text-muted">
+              Search across every calculator and portfolio tool, plus live
+              stocks, ETFs, and funds.
+            </p>
+          </div>
+          <div className="mt-8">
+            <HomeSearch />
+          </div>
+        </Container>
       </section>
 
-      {/* Portfolio tools */}
-      <section className="mt-14 w-full max-w-6xl">
-        <h2
-          className="text-2xl font-semibold tracking-tight"
-          style={{ color: "var(--accent)" }}
-        >
-          Portfolio Tools
-        </h2>
-        <div className="mt-5 grid grid-cols-1 gap-4 sm:grid-cols-2">
-          {PORTFOLIO_TOOLS.map((tool) => (
-            <ToolCard key={tool.href} {...tool} />
-          ))}
-        </div>
-      </section>
-
-      {/* Accounts note */}
-      <section className="mt-14 w-full max-w-6xl rounded-xl border border-neutral-200 bg-white p-6 text-center shadow-sm">
-        <p className="text-sm leading-6 text-neutral-600">
-          Every tool is free to use — no account needed. Create a free account
-          to save your scenarios and portfolios and pick them up anytime.
-        </p>
-      </section>
-    </main>
-  );
-}
-
-function ToolCard({
-  href,
-  title,
-  description,
-}: {
-  href: string;
-  title: string;
-  description: string;
-}) {
-  return (
-    <Link
-      href={href}
-      className="group rounded-xl border border-neutral-200 bg-white p-5 shadow-sm transition hover:-translate-y-0.5 hover:border-[#1B4332] hover:shadow-md"
-    >
-      <h3
-        className="font-semibold group-hover:underline group-hover:underline-offset-4"
-        style={{ color: "var(--accent)" }}
+      {/* ── Feature grid ─────────────────────────────────────────────── */}
+      <Section
+        eyebrow="Everything you need"
+        title="One platform, every planning tool"
+        subtitle="From everyday calculators to portfolio analysis and backtesting. Tools not yet built are clearly marked — nothing here pretends to work before it does."
+        center
       >
-        {title} →
-      </h3>
-      <p className="mt-1 text-sm leading-6 text-neutral-600">{description}</p>
-    </Link>
+        <FeatureGrid />
+      </Section>
+
+      {/* ── Dashboard showcase ───────────────────────────────────────── */}
+      <section id="showcase" className="scroll-mt-24 bg-card py-16 sm:py-20 lg:py-24">
+        <Container>
+          <div className="mx-auto max-w-3xl text-center">
+            <p className="text-sm font-semibold uppercase tracking-widest text-link">
+              A closer look
+            </p>
+            <h2 className="mt-2 text-3xl font-bold tracking-tight text-ink sm:text-4xl">
+              Analytics that read like a real product
+            </h2>
+            <p className="mt-4 text-lg leading-8 text-muted">
+              Charts, performance, allocation, and risk metrics — the same
+              building blocks the tools use. Scroll to explore.
+            </p>
+          </div>
+        </Container>
+        <div className="mt-10">
+          <Container>
+            <DashboardShowcase />
+          </Container>
+        </div>
+      </section>
+
+      {/* ── Why this platform ────────────────────────────────────────── */}
+      <Section
+        eyebrow="Why use this platform"
+        title="A clearer path than a spreadsheet"
+        subtitle="Purpose-built for investing questions, with live data and explained methods — not blank cells or one-off calculators."
+        center
+      >
+        <Reveal>
+          <div className="mx-auto max-w-4xl rounded-2xl border border-edge bg-card p-4 shadow-soft sm:p-6">
+            <WhyPlatform />
+          </div>
+        </Reveal>
+      </Section>
+
+      {/* ── Stats ────────────────────────────────────────────────────── */}
+      <section className="bg-card py-16 sm:py-20">
+        <Container>
+          <StatsSection />
+        </Container>
+      </section>
+
+      {/* ── Market insights ──────────────────────────────────────────── */}
+      <Section
+        eyebrow="Market insights"
+        title="Stay close to the market"
+        subtitle="A preview of the market dashboards we're building. Every card below shows sample data for illustration — live data lands in a later phase."
+        center
+      >
+        <MarketInsights />
+      </Section>
+
+      {/* ── CTA ──────────────────────────────────────────────────────── */}
+      <CtaSection />
+    </main>
   );
 }

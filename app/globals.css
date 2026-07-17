@@ -3,34 +3,44 @@
 /* ============================================================================
    DESIGN TOKENS — the single source of truth for the app's visual system.
 
-   Color roles (never use raw hexes in pages for these roles; use the vars or
-   the re-tinted utility classes below):
-     --accent        #1b4332  primary: buttons, links, active nav, headings,
-                              first chart series, key emphasis
-     secondary       #2d6a4f  hovers, secondary buttons, second chart series
-     tertiary        #40916c  chart bands, highlights, tags
-     light accents   #74c0dc / #a8d0db  fills, badges, chart bands ONLY —
-                              never text, never primary buttons
-     --background    canvas: light desaturated grey-green (not white)
-     --card-bg       panels: slightly LIGHTER than canvas so cards lift
-     --card-border   subtle grey-green definition for panels
+   Brand palette (semantic roles — never hard-code these hexes in pages):
+     primary    #1B4332  brand green: primary buttons, wordmark, key emphasis
+     secondary  #2D6A4F  hovers, secondary emphasis, second chart series
+     accent     #40916C  highlights, chart bands, tags, icon tints
+     sky        #74C0DC  informational fills, badges, chart bands ONLY —
+     sky-light  #A8D0DB  never body text, never primary buttons
+     surface    #F8FAFC  page canvas
+     card       #FFFFFF  panels
+     ink        #0F172A  body text
+     muted      #64748B  secondary text
+     edge       #E2E8F0  borders
 
-   Typography: Geist Sans app-wide; financial figures use tabular numerals
-   (all tables get them automatically below). Body text is near-black on
-   light surfaces; muted text uses desaturated grey-greens with WCAG-safe
-   contrast on both canvas and cards.
+   Tailwind v4 exposes these via @theme as utilities: bg-primary, text-ink,
+   border-edge, bg-card, text-muted, shadow-soft, etc. Theme-aware roles go
+   through CSS variables so dark mode swaps them in one place.
+
+   Typography: Inter app-wide (loaded in the root layout); financial figures
+   use tabular numerals (all tables get them automatically below).
+
+   Spacing: 8px system — prefer Tailwind steps 2/4/6/8/10/12/16/20/24.
+   Shape: cards use 16px radius (rounded-2xl); soft shadows, no harsh borders.
    ========================================================================= */
 
 :root {
-  /* Canvas: light desaturated grey-green page background. */
-  --background: #eef2ef;
-  --foreground: #1a1f1b;
-  /* Primary accent: dark green (headings, links, buttons, primary series). */
+  --background: #f8fafc;
+  --foreground: #0f172a;
+  /* Brand greens. --accent is kept (legacy name) for text accents/links and
+     inline style={{ color: "var(--accent)" }} usages across existing pages. */
   --accent: #1b4332;
-  /* Cards sit slightly LIGHTER than the canvas so they read as raised. */
-  --card-bg: #f6f8f6;
-  --card-accent-bg: #eaf3ee;
-  --card-border: #d9e2db;
+  --brand: #1b4332;
+  --brand-2: #2d6a4f;
+  --brand-3: #40916c;
+  /* Adaptive ink for blue-tinted tiles/badges (readable in both themes). */
+  --blue-ink: #1e6e8c;
+  --muted: #64748b;
+  --card-bg: #ffffff;
+  --card-accent-bg: #edf5f0;
+  --card-border: #e2e8f0;
 }
 
 /* Dark theme — toggled by adding the `dark` class to <html> (see ThemeToggle). */
@@ -38,6 +48,11 @@
   --background: #0f1115;
   --foreground: #e6e8eb;
   --accent: #83c5a3;
+  --brand: #2d6a4f;
+  --brand-2: #40916c;
+  --brand-3: #52b788;
+  --blue-ink: #a8d0db;
+  --muted: #8d96a2;
   --card-bg: #171b22;
   --card-accent-bg: #16271f;
   --card-border: #2e3540;
@@ -46,15 +61,34 @@
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
+  --color-surface: var(--background);
+  --color-ink: var(--foreground);
+  --color-muted: var(--muted);
+  --color-card: var(--card-bg);
+  --color-card-tint: var(--card-accent-bg);
+  --color-edge: var(--card-border);
+  --color-primary: var(--brand);
+  --color-secondary: var(--brand-2);
+  --color-accent: var(--brand-3);
+  --color-link: var(--accent);
+  --color-sky: #74c0dc;
+  --color-sky-light: #a8d0db;
+  --color-sky-ink: var(--blue-ink);
+  --font-sans: var(--font-inter);
   --font-mono: var(--font-geist-mono);
+  --shadow-soft: 0 1px 2px rgb(15 23 42 / 0.04), 0 8px 24px -12px rgb(15 23 42 / 0.12);
+  --shadow-lifted: 0 2px 4px rgb(15 23 42 / 0.05), 0 16px 40px -16px rgb(15 23 42 / 0.22);
+}
+
+html {
+  scroll-behavior: smooth;
 }
 
 body {
   background: var(--background);
   color: var(--foreground);
-  /* Geist Sans (loaded in the root layout) with robust fallbacks. */
-  font-family: var(--font-geist-sans), ui-sans-serif, system-ui, -apple-system,
+  /* Inter (loaded in the root layout) with robust fallbacks. */
+  font-family: var(--font-inter), ui-sans-serif, system-ui, -apple-system,
     "Segoe UI", sans-serif;
   -webkit-font-smoothing: antialiased;
   text-rendering: optimizeLegibility;
@@ -75,7 +109,11 @@ table {
 
 /* Subtle brand touch on text selection. */
 ::selection {
-  background: #cfe3d7;
+  background: #cde7da;
+}
+
+.dark ::selection {
+  background: #2d6a4f;
 }
 
 /* Gentle, uniform interaction polish — quick enough to feel instant. */
@@ -89,31 +127,46 @@ button {
     transform 0.15s ease;
 }
 
+/* Respect users who prefer reduced motion: kill transitions/animations and
+   smooth scrolling globally (Framer Motion also checks this itself). */
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+  *,
+  ::before,
+  ::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
 /* ---- Light-theme re-tint of the utility classes used across the app. ----
    Pages are written with neutral Tailwind classes (bg-white cards on a
    bg-zinc-100 canvas, neutral borders/text). These unlayered overrides map
-   those roles onto the green/blue palette in one place: canvas = soft
-   grey-green, cards = slightly lighter surface, borders and muted text =
-   desaturated grey-greens. Body text stays near-black for contrast. */
+   those roles onto the design tokens in one place: canvas = soft slate,
+   cards = white, borders and muted text = slate greys. Stage B will migrate
+   pages onto the semantic utilities directly. */
 .bg-zinc-100 { background-color: var(--background); }
 .bg-white { background-color: var(--card-bg); }
-.bg-neutral-50 { background-color: #edf2ee; }
-.bg-neutral-100 { background-color: #e2eae4; }
-.hover\:bg-neutral-50:hover { background-color: #e9efe9; }
-.bg-blue-50 { background-color: #e7f2f6; }
+.bg-neutral-50 { background-color: #f1f5f9; }
+.bg-neutral-100 { background-color: #e9eef4; }
+.hover\:bg-neutral-50:hover { background-color: #f1f5f9; }
+.bg-blue-50 { background-color: #eaf4f8; }
 
-.text-neutral-900, .text-zinc-900 { color: #1a1f1b; }
-.text-neutral-800 { color: #27302a; }
-.text-neutral-700 { color: #3a453d; }
-.text-neutral-600, .text-zinc-600 { color: #52615a; }
-.text-neutral-500 { color: #6b7a6f; }
-.text-neutral-400 { color: #8a988e; }
+.text-neutral-900, .text-zinc-900 { color: #0f172a; }
+.text-neutral-800 { color: #1e293b; }
+.text-neutral-700 { color: #334155; }
+.text-neutral-600, .text-zinc-600 { color: #475569; }
+.text-neutral-500 { color: #64748b; }
+.text-neutral-400 { color: #94a3b8; }
 
-.border-neutral-100 { border-color: #e3eae4; }
-.border-neutral-200 { border-color: #d9e2db; }
-.border-neutral-300 { border-color: #c3d0c6; }
-.hover\:border-neutral-500:hover { border-color: #7f9084; }
-.divide-neutral-100 > :not([hidden]) ~ :not([hidden]) { border-color: #e3eae4; }
+.border-neutral-100 { border-color: #edf1f5; }
+.border-neutral-200 { border-color: #e2e8f0; }
+.border-neutral-300 { border-color: #cbd5e1; }
+.hover\:border-neutral-500:hover { border-color: #94a3b8; }
+.divide-neutral-100 > :not([hidden]) ~ :not([hidden]) { border-color: #edf1f5; }
 
 /* ---- Dark-mode re-skin (unchanged roles, dark values). ---- */
 .dark .bg-zinc-100 { background-color: #0f1115; }
