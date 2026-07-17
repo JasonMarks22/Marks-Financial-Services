@@ -16,7 +16,6 @@ const COLUMNS: { title: string; links: { label: string; href: string; external?:
     title: "Company",
     links: [
       { label: "Home", href: "/" },
-      { label: "Pricing", href: "/pricing" },
       { label: "Learn", href: "/learn" },
       { label: "GitHub", href: REPO_URL, external: true },
     ],
@@ -27,7 +26,6 @@ const COLUMNS: { title: string; links: { label: string; href: string; external?:
       { label: "Calculators", href: "/tools/savings-goal" },
       { label: "Compare Securities", href: "/compare" },
       { label: "Portfolio Backtesting", href: "/portfolios/compare" },
-      { label: "Market Analysis", href: "/market-analysis" },
       { label: "API (on GitHub)", href: REPO_URL, external: true },
     ],
   },

@@ -320,3 +320,75 @@ export async function getHistoriesForSymbols(
     }),
   );
 }
+
+/**
+ * Batch-quote several symbols in one request and translate them to our Quote
+ * type. Read-only; used by the homepage market-data widgets. Symbols the
+ * provider can't price are simply dropped (never fabricated).
+ */
+export async function getQuotes(symbols: string[]): Promise<Quote[]> {
+  const unique = [...new Set(symbols.map((s) => s.trim().toUpperCase()))].filter(
+    Boolean,
+  );
+  if (unique.length === 0) return [];
+
+  let raw;
+  try {
+    // validateResult:false — one odd field from Yahoo shouldn't sink the batch.
+    raw = await yahooFinance.quote(unique, undefined, { validateResult: false });
+  } catch (err) {
+    throw new Error(`Batch quote failed: ${errText(err)}`);
+  }
+
+  const list = Array.isArray(raw) ? raw : raw ? [raw] : [];
+  return list
+    .filter((q) => q && q.regularMarketPrice !== undefined)
+    .map((q) => ({
+      symbol: q.symbol ?? "",
+      name: q.longName ?? q.shortName ?? q.symbol ?? "",
+      price: q.regularMarketPrice as number,
+      change: q.regularMarketChange ?? 0,
+      changePercent: q.regularMarketChangePercent ?? 0,
+      currency: q.currency ?? "USD",
+    }));
+}
+
+/**
+ * Today's top gaining US equities, via Yahoo's predefined "day_gainers"
+ * screener (dailyGainers is deprecated). Read-only; returns our Quote type.
+ * A real ranking feed — the homepage labels it "Top gainers today".
+ */
+export async function getTopGainers(count = 6): Promise<Quote[]> {
+  interface ScreenerQuote {
+    symbol?: string;
+    shortName?: string;
+    longName?: string;
+    regularMarketPrice?: number;
+    regularMarketChange?: number;
+    regularMarketChangePercent?: number;
+    currency?: string;
+  }
+
+  let raw: { quotes?: ScreenerQuote[] } | null = null;
+  try {
+    raw = (await yahooFinance.screener(
+      { scrIds: "day_gainers", count },
+      undefined,
+      { validateResult: false },
+    )) as { quotes?: ScreenerQuote[] };
+  } catch (err) {
+    throw new Error(`Gainers lookup failed: ${errText(err)}`);
+  }
+
+  return (raw?.quotes ?? [])
+    .filter((q) => q.symbol && q.regularMarketPrice !== undefined)
+    .slice(0, count)
+    .map((q) => ({
+      symbol: q.symbol as string,
+      name: q.longName ?? q.shortName ?? (q.symbol as string),
+      price: q.regularMarketPrice as number,
+      change: q.regularMarketChange ?? 0,
+      changePercent: q.regularMarketChangePercent ?? 0,
+      currency: q.currency ?? "USD",
+    }));
+}

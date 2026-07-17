@@ -4,8 +4,8 @@
  * Shared app navigation, rendered on every page from the root layout.
  *
  * - Brand wordmark (home) hard left, primary nav beside it:
- *   two grouped dropdowns (Calculators, Portfolio Tools) plus direct links
- *   (Market Analysis, Learn, Pricing). Dropdowns open on click, close on
+ *   two grouped dropdowns (Calculators, Portfolio Tools) plus a direct link
+ *   (Learn). Dropdowns open on click, close on
  *   Escape / focus-out / outside-click / link choice. On small screens the
  *   same groups live in a hamburger menu.
  * - Auth-aware right side via useAuth(): search icon always; Log in /
@@ -68,11 +68,7 @@ const GROUPS: NavGroup[] = [
 
 /** Direct links after the dropdowns (placeholder sections are labeled on
  *  their own pages as coming soon). */
-const LINKS: NavItem[] = [
-  { href: "/market-analysis", label: "Market Analysis" },
-  { href: "/learn", label: "Learn" },
-  { href: "/pricing", label: "Pricing" },
-];
+const LINKS: NavItem[] = [{ href: "/learn", label: "Learn" }];
 
 export function NavBar() {
   const pathname = usePathname();
