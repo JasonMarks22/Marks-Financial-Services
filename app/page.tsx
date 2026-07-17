@@ -20,7 +20,7 @@ export default function Home() {
         <Container>
           <div className="max-w-3xl">
             <h1 className="text-3xl font-bold tracking-tight text-ink sm:text-4xl">
-              The market at a glance
+              Market Trends
             </h1>
             <p className="mt-2 text-base leading-7 text-muted sm:text-lg">
               Live index performance, major ETFs and stocks, and today&rsquo;s
