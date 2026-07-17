@@ -47,7 +47,7 @@ const FEATURES: Feature[] = [
   { title: "Portfolio Builder", description: "Assemble your own mix with a live profile-match rating.", href: "/portfolios/build", icon: <BriefcaseIcon />, tone: "green" },
   { title: "Compare Securities", description: "Any two stocks or funds, side by side with live data.", href: "/compare", icon: <ScaleIcon />, tone: "mint" },
   { title: "Portfolio Backtesting", description: "Simulate how $10,000 would have grown across portfolios.", href: "/portfolios/compare", icon: <HistoryIcon />, tone: "blue" },
-  { title: "Monte Carlo Simulator", description: "Model a range of possible outcomes, not just one path.", icon: <DiceIcon />, tone: "slate" },
+  { title: "Monte Carlo Simulator", description: "Model a range of possible outcomes, not just one path.", href: "/tools/monte-carlo", icon: <DiceIcon />, tone: "green" },
   { title: "Dividend Analyzer", description: "Track dividend history, yield, and growth over time.", icon: <CoinsIcon />, tone: "slate" },
   { title: "Expense Ratio Comparison", description: "See how fund fees compound against returns over years.", icon: <PercentIcon />, tone: "slate" },
 ];

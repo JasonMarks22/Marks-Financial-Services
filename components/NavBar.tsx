@@ -51,6 +51,7 @@ const GROUPS: NavGroup[] = [
       { href: "/tools/allocator", label: "Savings Allocator" },
       { href: "/tools/debt-payoff", label: "Debt Payoff" },
       { href: "/tools/retirement", label: "Retirement Projector" },
+      { href: "/tools/monte-carlo", label: "Monte Carlo Simulator" },
     ],
   },
   {
