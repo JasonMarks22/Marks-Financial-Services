@@ -1,17 +1,20 @@
 "use client";
 
 /**
- * Homepage "Market Trends" lead: live graphics from the app's own data layer.
+ * Homepage "Market Trends": an interactive market chart plus category tiles.
  *
- *   - Market performance (the star): each major index's LAST MONTH plotted as
- *     percent change (all starting at 0%) on one color-coded, legended chart,
- *     shown via index-proxy ETFs (SPY/QQQ/DIA/IWM).
- *   - Major ETFs, Top gainers today, Major stocks: each listed item gets a
- *     last-month sparkline, colored green/red by its actual monthly movement.
+ *   - The big chart shows one GROUP of securities as color-coded percent-change
+ *     lines over a selectable RANGE (Today intraday, 1W, 1M, 3M, 1Y, 5Y). Group
+ *     tabs (and the clickable category cards below) swap which group is shown;
+ *     the range controls apply to whichever group is loaded.
+ *   - Below: Major ETFs, Top gainers today, and Major stocks cards, each with
+ *     last-month sparklines. Clicking a card loads that group into the chart.
  *
- * Everything here is REAL data fetched on mount from /api/market (quotes +
- * last-month history). Each section degrades to an honest "unavailable" note
- * if its feed fails; nothing is ever fabricated, so there is no sample tag.
+ * All data is REAL, from /api/market (quotes + 1-month history, which also
+ * seeds the chart's default view) and /api/market/series (group + range on
+ * demand; "Today" uses intraday bars). Delayed, not real-time. Fetched results
+ * are cached so switching back is instant; the 1W view is derived from the 1M
+ * series. Nothing is fabricated — symbols without data are simply dropped.
  */
 
 import { useEffect, useMemo, useState } from "react";
@@ -33,6 +36,37 @@ import {
   LineChartIcon,
   TrendingUpIcon,
 } from "@/components/ui/icons";
+
+type GroupKey = "indexes" | "etfs" | "gainers" | "stocks";
+type RangeKey = "today" | "1w" | "1mo" | "3mo" | "1y" | "5y";
+
+const GROUPS: { key: GroupKey; label: string }[] = [
+  { key: "indexes", label: "Market Indexes" },
+  { key: "etfs", label: "Major ETFs" },
+  { key: "gainers", label: "Top Gainers Today" },
+  { key: "stocks", label: "Major Stocks" },
+];
+
+const RANGES: { key: RangeKey; label: string }[] = [
+  { key: "today", label: "Today" },
+  { key: "1w", label: "1W" },
+  { key: "1mo", label: "1M" },
+  { key: "3mo", label: "3M" },
+  { key: "1y", label: "1Y" },
+  { key: "5y", label: "5Y" },
+];
+
+// Distinct colors for up to eight lines.
+const PALETTE = [
+  "#1B4332",
+  "#2563EB",
+  "#C2410C",
+  "#7C3AED",
+  "#0D9488",
+  "#DB2777",
+  "#65A30D",
+  "#0891B2",
+];
 
 interface Quote {
   symbol: string;
@@ -56,16 +90,11 @@ interface MarketSnapshot {
   gainers: Section<Quote>;
 }
 
-// One distinct color per index line (also drives the legend tiles).
-const INDEX_COLORS: Record<string, string> = {
-  SPY: "#1B4332", // S&P 500 — brand green
-  QQQ: "#2563EB", // Nasdaq 100 — blue
-  DIA: "#C2410C", // Dow 30 — amber
-  IWM: "#7C3AED", // Russell 2000 — violet
-};
-
-const UP = "var(--brand-3)"; // green
-const DOWN = "#dc2626"; // red-600
+interface SeriesItem {
+  symbol: string;
+  label?: string;
+  points: PricePoint[];
+}
 
 function fmtPrice(value: number, currency = "USD"): string {
   try {
@@ -75,39 +104,40 @@ function fmtPrice(value: number, currency = "USD"): string {
   }
 }
 
-/** Percent change across a history series (first close -> last close), or null. */
-function monthChangePct(history: PricePoint[]): number | null {
-  if (!history || history.length < 2) return null;
-  const first = history[0].close;
-  const last = history[history.length - 1].close;
+function pctText(value: number): string {
+  return `${value >= 0 ? "+" : ""}${value.toFixed(2)}%`;
+}
+
+/** Percent change across a history series (first -> last close), or null. */
+function seriesChangePct(points: PricePoint[]): number | null {
+  if (!points || points.length < 2) return null;
+  const first = points[0].close;
+  const last = points[points.length - 1].close;
   if (!first) return null;
   return ((last - first) / first) * 100;
 }
 
-function ChangePct({
-  value,
-  title,
-}: {
-  value: number;
-  title?: string;
-}) {
-  return (
-    <span
-      title={title}
-      className={`tabular-nums ${
-        value >= 0 ? "font-semibold text-link" : "font-semibold text-red-600"
-      }`}
-    >
-      {value >= 0 ? "+" : ""}
-      {value.toFixed(2)}%
-    </span>
-  );
+/** Slice a daily series to its last ~7 calendar days (for the derived 1W view). */
+function sliceLastWeek(points: PricePoint[]): PricePoint[] {
+  if (points.length === 0) return points;
+  const lastDay = points[points.length - 1].date.slice(0, 10);
+  const cutoff = new Date(new Date(lastDay).getTime() - 7 * 86_400_000)
+    .toISOString()
+    .slice(0, 10);
+  const pts = points.filter((p) => p.date.slice(0, 10) >= cutoff);
+  return pts.length > 1 ? pts : points.slice(-6);
+}
+
+function fetchKey(group: GroupKey, range: RangeKey): string {
+  // 1W reuses the 1M fetch and is sliced client-side.
+  return `${group}:${range === "1w" ? "1mo" : range}`;
 }
 
 export function MarketData() {
   const [data, setData] = useState<MarketSnapshot | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(false);
+  const [group, setGroup] = useState<GroupKey>("indexes");
 
   useEffect(() => {
     let cancelled = false;
@@ -130,7 +160,6 @@ export function MarketData() {
   }, []);
 
   if (loading) return <LoadingState />;
-
   if (error || !data) {
     return (
       <Card className="p-8 text-center">
@@ -141,177 +170,358 @@ export function MarketData() {
     );
   }
 
+  // Seed the chart cache with each group's 1-month series (already loaded for
+  // the tiles), so the default view and 1W need no extra request.
+  const toSeries = (items: Quote[]): SeriesItem[] =>
+    items
+      .map((i) => ({ symbol: i.symbol, label: i.name, points: i.history }))
+      .filter((s) => s.points.length > 1);
+
+  const seed: Record<string, SeriesItem[]> = {
+    "indexes:1mo": data.indexes.items
+      .map((i) => ({ symbol: i.symbol, label: i.label, points: i.history }))
+      .filter((s) => s.points.length > 1),
+    "etfs:1mo": toSeries(data.etfs.items),
+    "gainers:1mo": toSeries(data.gainers.items),
+    "stocks:1mo": toSeries(data.stocks.items),
+  };
+
   return (
     <div className="space-y-5">
-      <MarketPerformance indexes={data.indexes} />
+      <MarketChart group={group} setGroup={setGroup} seed={seed} />
 
       <div className="grid grid-cols-1 gap-5 lg:grid-cols-3">
         <SparkCard
           icon={<BriefcaseIcon className="h-5 w-5" />}
           title="Major ETFs"
           section={data.etfs}
+          active={group === "etfs"}
+          onSelect={() => setGroup("etfs")}
         />
         <SparkCard
           icon={<TrendingUpIcon className="h-5 w-5" />}
           title="Top gainers today"
           section={data.gainers}
+          active={group === "gainers"}
+          onSelect={() => setGroup("gainers")}
         />
         <SparkCard
           icon={<BarChartIcon className="h-5 w-5" />}
           title="Major stocks"
           section={data.stocks}
+          active={group === "stocks"}
+          onSelect={() => setGroup("stocks")}
         />
       </div>
     </div>
   );
 }
 
-/* ---- Market performance: the large multi-line % chart ------------------- */
+/* ---- The interactive big chart ----------------------------------------- */
 
-function MarketPerformance({ indexes }: { indexes: Section<IndexQuote> }) {
-  const withHistory = indexes.items.filter((i) => i.history.length > 1);
+function MarketChart({
+  group,
+  setGroup,
+  seed,
+}: {
+  group: GroupKey;
+  setGroup: (g: GroupKey) => void;
+  seed: Record<string, SeriesItem[]>;
+}) {
+  const [range, setRange] = useState<RangeKey>("1mo");
+  const [cache, setCache] = useState<Record<string, SeriesItem[]>>(seed);
 
-  // Merge every index's history into one dataset, each as % change from its own
-  // first close, so different price levels compare on a single 0%-based axis.
+  const key = fetchKey(group, range);
+  const isToday = range === "today";
+
+  // Fetch the series for the current group/range on demand. The early return
+  // means re-runs after a cache update are harmless (no refetch, no loop).
+  useEffect(() => {
+    const k = fetchKey(group, range);
+    if (cache[k]) return; // already have it (incl. 1W via 1M)
+
+    let cancelled = false;
+    const fetchRange = range === "1w" ? "1mo" : range;
+    (async () => {
+      try {
+        const res = await fetch(
+          `/api/market/series?group=${group}&range=${fetchRange}`,
+        );
+        const json = await res.json();
+        if (cancelled) return;
+        setCache((prev) => ({
+          ...prev,
+          [k]: res.ok && Array.isArray(json.series) ? json.series : [],
+        }));
+      } catch {
+        if (!cancelled) setCache((prev) => ({ ...prev, [k]: [] }));
+      }
+    })();
+    return () => {
+      cancelled = true;
+    };
+  }, [group, range, cache]);
+
+  const raw = cache[key];
+  const isLoading = raw === undefined;
+
+  // Slice for 1W, drop empty series, then normalize each to % change.
+  const displaySeries = useMemo(() => {
+    const source = raw ?? [];
+    const sliced =
+      range === "1w"
+        ? source.map((s) => ({ ...s, points: sliceLastWeek(s.points) }))
+        : source;
+    return sliced.filter((s) => s.points.length > 1);
+  }, [raw, range]);
+
   const chartData = useMemo(() => {
     const rows = new Map<string, Record<string, number | string>>();
-    for (const idx of withHistory) {
-      const first = idx.history[0].close;
+    for (const s of displaySeries) {
+      const first = s.points[0].close;
       if (!first) continue;
-      for (const p of idx.history) {
+      for (const p of s.points) {
         const row = rows.get(p.date) ?? { date: p.date };
-        row[idx.symbol] = ((p.close - first) / first) * 100;
+        row[s.symbol] = ((p.close - first) / first) * 100;
         rows.set(p.date, row);
       }
     }
     return [...rows.values()].sort((a, b) =>
       String(a.date).localeCompare(String(b.date)),
     );
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [indexes]);
+  }, [displaySeries]);
+
+  const colorFor = (symbol: string) => {
+    const i = displaySeries.findIndex((s) => s.symbol === symbol);
+    return PALETTE[(i < 0 ? 0 : i) % PALETTE.length];
+  };
+
+  const formatX = (v: string) =>
+    isToday
+      ? new Date(v).toLocaleTimeString("en-US", {
+          hour: "numeric",
+          minute: "2-digit",
+        })
+      : v;
+
+  const rangeLabel =
+    isToday ? "today" : `past ${RANGES.find((r) => r.key === range)?.label}`;
 
   return (
     <Card className="p-5 sm:p-6">
-      <div className="flex items-center gap-2">
-        <span className="text-link" aria-hidden="true">
-          <LineChartIcon className="h-5 w-5" />
-        </span>
-        <p className="text-base font-bold text-ink">Market performance</p>
-        <span className="ml-auto text-xs text-muted">% change, past month</span>
+      <div className="flex flex-wrap items-center justify-between gap-3">
+        <div className="flex items-center gap-2">
+          <span className="text-link" aria-hidden="true">
+            <LineChartIcon className="h-5 w-5" />
+          </span>
+          <p className="text-base font-bold text-ink">
+            {GROUPS.find((g) => g.key === group)?.label}
+          </p>
+          <span className="text-xs text-muted">
+            {isToday ? "% change from open" : "% change"}
+          </span>
+        </div>
+
+        {/* Range selector */}
+        <div
+          role="group"
+          aria-label="Chart range"
+          className="flex flex-wrap gap-1 rounded-lg border border-edge bg-card-tint p-1"
+        >
+          {RANGES.map((r) => (
+            <button
+              key={r.key}
+              type="button"
+              onClick={() => setRange(r.key)}
+              aria-pressed={range === r.key}
+              className={`rounded-md px-2.5 py-1 text-xs font-semibold transition ${
+                range === r.key
+                  ? "bg-primary text-white shadow-soft"
+                  : "text-neutral-600 hover:text-link"
+              }`}
+            >
+              {r.label}
+            </button>
+          ))}
+        </div>
       </div>
 
-      {indexes.ok && chartData.length > 0 ? (
-        <>
-          <div className="mt-4 h-72 w-full sm:h-80">
-            <ResponsiveContainer width="100%" height="100%">
-              <LineChart
-                data={chartData}
-                margin={{ top: 8, right: 12, left: 0, bottom: 0 }}
-              >
-                <CartesianGrid strokeDasharray="3 3" stroke="var(--card-border)" />
-                <XAxis
-                  dataKey="date"
-                  stroke="var(--muted)"
-                  tick={{ fontSize: 11 }}
-                  interval="preserveStartEnd"
-                  minTickGap={48}
-                />
-                <YAxis
-                  stroke="var(--muted)"
-                  tick={{ fontSize: 11 }}
-                  width={48}
-                  tickFormatter={(v) => `${Number(v).toFixed(0)}%`}
-                />
-                <Tooltip
-                  formatter={(value, name) => [`${Number(value).toFixed(2)}%`, name]}
-                />
-                {withHistory.map((idx) => (
-                  <Line
-                    key={idx.symbol}
-                    type="monotone"
-                    dataKey={idx.symbol}
-                    name={idx.label}
-                    stroke={INDEX_COLORS[idx.symbol] ?? "var(--brand)"}
-                    strokeWidth={2}
-                    dot={false}
-                    isAnimationActive={false}
-                  />
-                ))}
-              </LineChart>
-            </ResponsiveContainer>
-          </div>
+      {/* Group tabs */}
+      <div
+        role="group"
+        aria-label="Chart group"
+        className="mt-4 flex flex-wrap gap-2"
+      >
+        {GROUPS.map((g) => (
+          <button
+            key={g.key}
+            type="button"
+            onClick={() => setGroup(g.key)}
+            aria-pressed={group === g.key}
+            className={`rounded-full border px-3 py-1.5 text-sm font-medium transition ${
+              group === g.key
+                ? "border-accent bg-accent/15 text-link"
+                : "border-edge text-neutral-600 hover:border-accent hover:text-link"
+            }`}
+          >
+            {g.label}
+          </button>
+        ))}
+      </div>
 
-          {/* Legend + quotes: one tile per index (doubles as the color legend). */}
-          <div className="mt-4 grid grid-cols-2 gap-3 sm:grid-cols-4">
-            {indexes.items.map((idx) => {
-              const mchg = monthChangePct(idx.history);
-              return (
-                <Link
-                  key={idx.symbol}
-                  href={`/stock/${idx.symbol}`}
-                  className="rounded-xl border border-edge bg-card-tint p-3 transition hover:border-accent"
-                >
-                  <span className="flex items-center gap-2">
-                    <span
-                      aria-hidden="true"
-                      className="h-2.5 w-2.5 shrink-0 rounded-full"
-                      style={{ backgroundColor: INDEX_COLORS[idx.symbol] ?? "var(--brand)" }}
-                    />
-                    <span className="truncate text-xs font-semibold text-ink">
-                      {idx.label}
-                    </span>
-                  </span>
-                  <span className="mt-1 block text-sm font-bold tabular-nums text-ink">
-                    {fmtPrice(idx.price, idx.currency)}
-                  </span>
-                  {mchg !== null ? (
-                    <ChangePct value={mchg} title="Change over the past month" />
-                  ) : (
-                    <ChangePct
-                      value={idx.changePercent}
-                      title="Today's change (past-month history unavailable)"
-                    />
-                  )}
-                </Link>
-              );
-            })}
+      {/* Chart */}
+      <div className="relative mt-4 h-72 w-full sm:h-80">
+        {isLoading ? (
+          <div className="flex h-full items-center justify-center">
+            <p className="text-sm text-muted">Loading {rangeLabel}…</p>
           </div>
-          <p className="mt-3 text-[11px] text-neutral-400">
-            Shown via index-tracking ETFs (SPY, QQQ, DIA, IWM); lines are percent
-            change over the past month.
-          </p>
-        </>
-      ) : (
-        <Unavailable />
+        ) : chartData.length === 0 ? (
+          <div className="flex h-full items-center justify-center px-6 text-center">
+            <p className="text-sm text-muted">
+              {isToday
+                ? "No session data yet — the market may be closed. Try another range."
+                : "No data available for this selection right now."}
+            </p>
+          </div>
+        ) : (
+          <ResponsiveContainer width="100%" height="100%">
+            <LineChart
+              data={chartData}
+              margin={{ top: 8, right: 12, left: 0, bottom: 0 }}
+            >
+              <CartesianGrid strokeDasharray="3 3" stroke="var(--card-border)" />
+              <XAxis
+                dataKey="date"
+                stroke="var(--muted)"
+                tick={{ fontSize: 11 }}
+                interval="preserveStartEnd"
+                minTickGap={48}
+                tickFormatter={formatX}
+              />
+              <YAxis
+                stroke="var(--muted)"
+                tick={{ fontSize: 11 }}
+                width={48}
+                tickFormatter={(v) => `${Number(v).toFixed(0)}%`}
+              />
+              <Tooltip
+                labelFormatter={(label) => formatX(String(label))}
+                formatter={(value, name) => [`${Number(value).toFixed(2)}%`, name]}
+              />
+              {displaySeries.map((s) => (
+                <Line
+                  key={s.symbol}
+                  type="monotone"
+                  dataKey={s.symbol}
+                  name={s.label ?? s.symbol}
+                  stroke={colorFor(s.symbol)}
+                  strokeWidth={2}
+                  dot={false}
+                  connectNulls
+                  isAnimationActive={false}
+                />
+              ))}
+            </LineChart>
+          </ResponsiveContainer>
+        )}
+      </div>
+
+      {/* Legend + per-security change over the selected range */}
+      {!isLoading && displaySeries.length > 0 && (
+        <div className="mt-4 grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-4">
+          {displaySeries.map((s) => {
+            const chg = seriesChangePct(s.points);
+            const lastClose = s.points[s.points.length - 1]?.close;
+            return (
+              <Link
+                key={s.symbol}
+                href={`/stock/${s.symbol}`}
+                className="rounded-xl border border-edge bg-card-tint p-3 transition hover:border-accent"
+              >
+                <span className="flex items-center gap-2">
+                  <span
+                    aria-hidden="true"
+                    className="h-2.5 w-2.5 shrink-0 rounded-full"
+                    style={{ backgroundColor: colorFor(s.symbol) }}
+                  />
+                  <span className="truncate text-xs font-semibold text-ink">
+                    {s.symbol}
+                  </span>
+                </span>
+                {typeof lastClose === "number" && (
+                  <span className="mt-1 block text-sm font-bold tabular-nums text-ink">
+                    {fmtPrice(lastClose)}
+                  </span>
+                )}
+                {chg !== null && (
+                  <span
+                    className={`block text-xs font-semibold tabular-nums ${
+                      chg >= 0 ? "text-link" : "text-red-600"
+                    }`}
+                  >
+                    {pctText(chg)}
+                  </span>
+                )}
+              </Link>
+            );
+          })}
+        </div>
       )}
+
+      <p className="mt-3 text-[11px] text-neutral-400">
+        Percent change {rangeLabel}. Market indexes shown via tracking ETFs (SPY,
+        QQQ, DIA, IWM). Data delayed, not real-time.
+      </p>
     </Card>
   );
 }
 
-/* ---- Sparkline list cards ---------------------------------------------- */
+/* ---- Category cards (also act as group selectors) ---------------------- */
 
 function SparkCard({
   icon,
   title,
   section,
+  active,
+  onSelect,
 }: {
   icon: React.ReactNode;
   title: string;
   section: Section<Quote>;
+  active: boolean;
+  onSelect: () => void;
 }) {
   return (
-    <Card className="flex flex-col p-5">
-      <div className="flex items-center gap-2">
+    <Card
+      className={`flex flex-col p-5 ${
+        active ? "ring-2 ring-accent" : ""
+      }`}
+    >
+      <button
+        type="button"
+        onClick={onSelect}
+        aria-pressed={active}
+        className="flex w-full items-center gap-2 text-left"
+        title={`Show ${title} in the chart`}
+      >
         <span className="text-link" aria-hidden="true">
           {icon}
         </span>
-        <p className="text-sm font-bold text-ink">{title}</p>
-      </div>
+        <span className="text-sm font-bold text-ink">{title}</span>
+        <span
+          className={`ml-auto text-xs font-semibold ${
+            active ? "text-link" : "text-muted"
+          }`}
+        >
+          {active ? "In chart" : "View in chart"}
+        </span>
+      </button>
+
       {section.ok && section.items.length > 0 ? (
         <ul className="mt-4 space-y-3">
           {section.items.map((q) => {
-            const mchg = monthChangePct(q.history);
-            const up = (mchg ?? q.changePercent) >= 0;
+            const chg = seriesChangePct(q.history);
+            const up = (chg ?? q.changePercent) >= 0;
             return (
               <li key={q.symbol} className="flex items-center gap-3">
                 <Link
@@ -324,23 +534,21 @@ function SparkCard({
                   </span>
                 </Link>
                 <Sparkline history={q.history} up={up} />
-                {mchg !== null ? (
-                  <ChangePct
-                    value={mchg}
-                    title="Change over the past month"
-                  />
-                ) : (
-                  <ChangePct
-                    value={q.changePercent}
-                    title="Today's change (past-month history unavailable)"
-                  />
-                )}
+                <span
+                  className={`w-16 text-right text-sm font-semibold tabular-nums ${
+                    up ? "text-link" : "text-red-600"
+                  }`}
+                >
+                  {pctText(chg ?? q.changePercent)}
+                </span>
               </li>
             );
           })}
         </ul>
       ) : (
-        <Unavailable />
+        <p className="mt-4 text-sm text-muted">
+          Temporarily unavailable. Please try again shortly.
+        </p>
       )}
       <p className="mt-4 text-[11px] text-neutral-400">
         Sparklines and change shown over the past month.
@@ -360,7 +568,7 @@ function Sparkline({ history, up }: { history: PricePoint[]; up: boolean }) {
           <Line
             type="monotone"
             dataKey="close"
-            stroke={up ? UP : DOWN}
+            stroke={up ? "var(--brand-3)" : "#dc2626"}
             strokeWidth={1.5}
             dot={false}
             isAnimationActive={false}
@@ -368,14 +576,6 @@ function Sparkline({ history, up }: { history: PricePoint[]; up: boolean }) {
         </LineChart>
       </ResponsiveContainer>
     </div>
-  );
-}
-
-function Unavailable() {
-  return (
-    <p className="mt-4 text-sm text-muted">
-      Temporarily unavailable. Please try again shortly.
-    </p>
   );
 }
 

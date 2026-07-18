@@ -392,3 +392,37 @@ export async function getTopGainers(count = 6): Promise<Quote[]> {
       currency: q.currency ?? "USD",
     }));
 }
+
+/**
+ * Intraday price history for one ticker: 5-minute bars for the LATEST trading
+ * session (used by the homepage "Today" view). Read-only. Unlike
+ * getPriceHistory this returns full ISO datetime strings in `date` (so the UI
+ * can plot time of day) and returns an EMPTY series rather than throwing when
+ * there are no bars yet (e.g. before the open), so callers can degrade
+ * gracefully instead of erroring.
+ */
+export async function getIntradayHistory(symbol: string): Promise<PriceHistory> {
+  // Pull a few days of 5-minute bars, then keep only the most recent session.
+  const period1 = new Date(Date.now() - 4 * 86_400_000);
+
+  let raw;
+  try {
+    raw = await yahooFinance.chart(symbol, { period1, interval: "5m" });
+  } catch (err) {
+    throw new Error(`Intraday lookup failed for "${symbol}": ${errText(err)}`);
+  }
+
+  const all = (raw?.quotes ?? [])
+    .filter((q) => q.close !== null && q.close !== undefined)
+    .map((q) => ({
+      date: new Date(q.date).toISOString(),
+      close: q.close as number,
+    }));
+
+  if (all.length === 0) return { symbol: symbol.toUpperCase(), points: [] };
+
+  // Keep only bars from the latest calendar day present (the latest session).
+  const lastDay = all[all.length - 1].date.slice(0, 10);
+  const points = all.filter((p) => p.date.slice(0, 10) === lastDay);
+  return { symbol: symbol.toUpperCase(), points };
+}
