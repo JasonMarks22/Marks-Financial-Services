@@ -22,6 +22,7 @@ import {
 } from "recharts";
 import { runMonteCarlo } from "@/lib/finance/monteCarlo";
 import { Disclaimer } from "@/components/ui/Disclaimer";
+import { ScenarioManager } from "@/components/ScenarioManager";
 
 const usd = new Intl.NumberFormat("en-US", {
   style: "currency",
@@ -70,6 +71,24 @@ export default function MonteCarloPage() {
 
   const goalNum = toNumber(goal);
 
+  // Snapshot current inputs / apply a loaded scenario (used by ScenarioManager).
+  const scenarioData = () => ({
+    initial: toNumber(initial),
+    monthly: toNumber(monthly),
+    years: toNumber(years),
+    expected_return: parseFloat(expectedReturn) || 0,
+    volatility: parseFloat(volatility) || 0,
+    goal: toNumber(goal),
+  });
+  function loadScenario(d: Record<string, unknown>) {
+    setInitial(String(d.initial ?? ""));
+    setMonthly(String(d.monthly ?? ""));
+    setYears(String(d.years ?? ""));
+    setExpectedReturn(String(d.expected_return ?? ""));
+    setVolatility(String(d.volatility ?? ""));
+    setGoal(d.goal ? String(d.goal) : "");
+  }
+
   return (
     <main className="flex flex-1 flex-col items-center bg-surface px-6 py-14 text-ink sm:py-16">
       <div className="w-full max-w-6xl">
@@ -107,6 +126,14 @@ export default function MonteCarloPage() {
             value={goal}
             onChange={setGoal}
             hint="See your odds of reaching it"
+          />
+        </div>
+
+        <div className="mt-8 flex justify-center">
+          <ScenarioManager
+            tool="monte_carlo"
+            getData={scenarioData}
+            onLoad={loadScenario}
           />
         </div>
 

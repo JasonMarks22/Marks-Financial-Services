@@ -15,9 +15,8 @@ import {
   extraPaymentComparison,
   monthlyCostBreakdown,
 } from "@/lib/finance/mortgage";
-import { SaveAffordance } from "@/components/SaveAffordance";
+import { ScenarioManager } from "@/components/ScenarioManager";
 import { Disclaimer } from "@/components/ui/Disclaimer";
-import { saveMortgageScenario } from "@/lib/scenarios/mortgageScenarios";
 
 // BYU navy is the main accent; the rest are lighter blues/greys for the
 // secondary cost bands.
@@ -123,19 +122,26 @@ function MortgageCalculator() {
     [breakdown, extraNum],
   );
 
-  // Persist the current inputs as a named scenario (used by SaveAffordance;
-  // only reachable when logged in).
-  async function handleSave(name: string) {
-    return saveMortgageScenario(name, {
-      home_price: priceNum,
-      down_payment: downNum,
-      term_years: toNumber(termYears),
-      interest_rate: parseFloat(rate) || 0,
-      annual_property_tax: toNumber(propertyTax),
-      annual_insurance: toNumber(insurance),
-      monthly_hoa: toNumber(hoa),
-      extra_monthly: extraNum,
-    });
+  // Snapshot current inputs / apply a loaded scenario (used by ScenarioManager).
+  const scenarioData = () => ({
+    home_price: priceNum,
+    down_payment: downNum,
+    term_years: toNumber(termYears),
+    interest_rate: parseFloat(rate) || 0,
+    annual_property_tax: toNumber(propertyTax),
+    annual_insurance: toNumber(insurance),
+    monthly_hoa: toNumber(hoa),
+    extra_monthly: extraNum,
+  });
+  function loadScenario(d: Record<string, unknown>) {
+    setHomePrice(String(d.home_price ?? ""));
+    setDownPayment(String(d.down_payment ?? ""));
+    setTermYears(String(d.term_years ?? ""));
+    setRate(String(d.interest_rate ?? ""));
+    setPropertyTax(String(d.annual_property_tax ?? ""));
+    setInsurance(String(d.annual_insurance ?? ""));
+    setHoa(String(d.monthly_hoa ?? ""));
+    setExtra(String(d.extra_monthly ?? ""));
   }
 
   const donutData = useMemo(
@@ -245,7 +251,11 @@ function MortgageCalculator() {
           <Disclaimer className="mt-6">
             Actual costs vary by lender, location, taxes, and insurance.
           </Disclaimer>
-          <SaveAffordance onSave={handleSave} />
+          <ScenarioManager
+            tool="mortgage"
+            getData={scenarioData}
+            onLoad={loadScenario}
+          />
         </div>
 
         {/* Extra-payment comparison */}

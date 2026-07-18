@@ -35,6 +35,7 @@ import {
 } from "@/lib/portfolios/userPortfolios";
 import type { BacktestResult } from "@/lib/portfolios/backtest";
 import { Disclaimer } from "@/components/ui/Disclaimer";
+import { ScenarioManager } from "@/components/ScenarioManager";
 
 const ACCENT = "#1B4332";
 const LINE_COLORS = ["#1B4332", "#2D6A4F", "#40916C", "#74C0DC", "#8FAF9B", "#5FA97F"];
@@ -108,6 +109,24 @@ export default function PortfolioComparePage() {
       prev.includes(id) ? prev.filter((x) => x !== id) : [...prev, id],
     );
     // Selection changed → previous backtest results no longer match it.
+    setResults({});
+    setErrors({});
+  }
+
+  // Snapshot current selection / apply a loaded scenario (used by ScenarioManager).
+  // Only the inputs (selected portfolios + range) are saved; results recalculate.
+  const scenarioData = () => ({ selected_ids: selectedIds, range });
+  function loadScenario(d: Record<string, unknown>) {
+    const ids = Array.isArray(d.selected_ids)
+      ? d.selected_ids.filter((x): x is string => typeof x === "string")
+      : [];
+    setSelectedIds(ids);
+    const r =
+      typeof d.range === "string" &&
+      BACKTEST_RANGES.includes(d.range as BacktestRange)
+        ? (d.range as BacktestRange)
+        : "3y";
+    setRange(r);
     setResults({});
     setErrors({});
   }
@@ -405,6 +424,14 @@ export default function PortfolioComparePage() {
             )}
           </div>
         )}
+
+        <div className="mt-8 flex justify-center">
+          <ScenarioManager
+            tool="backtest"
+            getData={scenarioData}
+            onLoad={loadScenario}
+          />
+        </div>
 
         <Disclaimer className="mt-8">
           Backtested results are hypothetical estimates based on historical data

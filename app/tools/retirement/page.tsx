@@ -19,6 +19,7 @@ import {
 } from "recharts";
 import { projectRetirement } from "@/lib/finance/retirement";
 import { Disclaimer } from "@/components/ui/Disclaimer";
+import { ScenarioManager } from "@/components/ScenarioManager";
 
 const ACCENT = "#1B4332";
 const GROWTH_BLUE = "#40916C";
@@ -74,6 +75,26 @@ export default function RetirementPage() {
       realBalance: p.realBalance !== null ? Math.round(p.realBalance) : undefined,
     }));
   }, [result]);
+
+  // Snapshot current inputs / apply a loaded scenario (used by ScenarioManager).
+  const scenarioData = () => ({
+    current_age: toNumber(currentAge),
+    retirement_age: toNumber(retirementAge),
+    current_savings: toNumber(currentSavings),
+    monthly_contribution: toNumber(monthlyContribution),
+    annual_return_percent: parseFloat(annualReturn) || 0,
+    inflation_on: inflationOn,
+    annual_inflation_percent: parseFloat(inflationRate) || 0,
+  });
+  function loadScenario(d: Record<string, unknown>) {
+    setCurrentAge(String(d.current_age ?? ""));
+    setRetirementAge(String(d.retirement_age ?? ""));
+    setCurrentSavings(String(d.current_savings ?? ""));
+    setMonthlyContribution(String(d.monthly_contribution ?? ""));
+    setAnnualReturn(String(d.annual_return_percent ?? ""));
+    setInflationOn(Boolean(d.inflation_on));
+    setInflationRate(String(d.annual_inflation_percent ?? ""));
+  }
 
   return (
     <main className="flex flex-1 flex-col items-center bg-surface px-6 py-14 text-ink sm:py-16">
@@ -261,6 +282,14 @@ export default function RetirementPage() {
             </div>
           </>
         )}
+
+        <div className="mt-8 flex justify-center">
+          <ScenarioManager
+            tool="retirement"
+            getData={scenarioData}
+            onLoad={loadScenario}
+          />
+        </div>
 
         <Disclaimer className="mt-8">
           Projections are estimates based on a constant assumed return and

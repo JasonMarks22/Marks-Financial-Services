@@ -14,9 +14,8 @@ import {
   type AllocationKey,
   allocateSavings,
 } from "@/lib/finance/allocator";
-import { SaveAffordance } from "@/components/SaveAffordance";
+import { ScenarioManager } from "@/components/ScenarioManager";
 import { Disclaimer } from "@/components/ui/Disclaimer";
-import { saveAllocatorScenario } from "@/lib/scenarios/allocatorScenarios";
 
 // BYU navy is the main accent; secondary destinations use lighter blues/greys.
 const ACCENT = "#1B4332";
@@ -79,16 +78,20 @@ function AllocatorCalculator() {
     [result],
   );
 
-  // Persist the current inputs as a named scenario (used by SaveAffordance;
-  // only reachable when logged in).
-  async function handleSave(name: string) {
-    return saveAllocatorScenario(name, {
-      monthly_leftover: toNumber(leftover),
-      current_emergency_fund: toNumber(emergencyFund),
-      monthly_essential_expenses: toNumber(essentials),
-      current_checking_buffer: toNumber(checkingBuffer),
-      has_high_interest_debt: hasDebt,
-    });
+  // Snapshot current inputs / apply a loaded scenario (used by ScenarioManager).
+  const scenarioData = () => ({
+    monthly_leftover: toNumber(leftover),
+    current_emergency_fund: toNumber(emergencyFund),
+    monthly_essential_expenses: toNumber(essentials),
+    current_checking_buffer: toNumber(checkingBuffer),
+    has_high_interest_debt: hasDebt,
+  });
+  function loadScenario(d: Record<string, unknown>) {
+    setLeftover(String(d.monthly_leftover ?? ""));
+    setEmergencyFund(String(d.current_emergency_fund ?? ""));
+    setEssentials(String(d.monthly_essential_expenses ?? ""));
+    setCheckingBuffer(String(d.current_checking_buffer ?? ""));
+    setHasDebt(Boolean(d.has_high_interest_debt));
   }
 
   return (
@@ -184,7 +187,11 @@ function AllocatorCalculator() {
               ))}
             </ul>
           </div>
-          <SaveAffordance onSave={handleSave} />
+          <ScenarioManager
+            tool="allocator"
+            getData={scenarioData}
+            onLoad={loadScenario}
+          />
         </div>
 
         {/* The "why" — reasoning for each destination */}

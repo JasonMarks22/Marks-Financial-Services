@@ -21,6 +21,7 @@ import {
   type StrategyResult,
 } from "@/lib/finance/debtPayoff";
 import { Disclaimer } from "@/components/ui/Disclaimer";
+import { ScenarioManager } from "@/components/ScenarioManager";
 
 const ACCENT = "#1B4332";
 const GOLD = "#2D6A4F";
@@ -108,6 +109,33 @@ export default function DebtPayoffPage() {
 
   function deleteRow(id: number) {
     setRows((prev) => prev.filter((r) => r.id !== id));
+  }
+
+  // Snapshot current inputs / apply a loaded scenario (used by ScenarioManager).
+  const scenarioData = () => ({
+    debts: rows.map((r) => ({
+      name: r.name,
+      balance: toNumber(r.balance),
+      rate: parseFloat(r.rate) || 0,
+      min_payment: toNumber(r.minPayment),
+    })),
+    extra: toNumber(extra),
+  });
+  function loadScenario(d: Record<string, unknown>) {
+    const debts = Array.isArray(d.debts) ? d.debts : [];
+    setRows(
+      debts.map((raw) => {
+        const r = raw as Record<string, unknown>;
+        return {
+          id: nextId++,
+          name: typeof r.name === "string" ? r.name : "",
+          balance: String(r.balance ?? ""),
+          rate: String(r.rate ?? ""),
+          minPayment: String(r.min_payment ?? ""),
+        };
+      }),
+    );
+    setExtra(String(d.extra ?? ""));
   }
 
   return (
@@ -327,6 +355,14 @@ export default function DebtPayoffPage() {
             </div>
           </>
         )}
+
+        <div className="mt-8 flex justify-center">
+          <ScenarioManager
+            tool="debt_payoff"
+            getData={scenarioData}
+            onLoad={loadScenario}
+          />
+        </div>
 
         <Disclaimer className="mt-8">
           Estimates assume fixed rates and consistent payments.

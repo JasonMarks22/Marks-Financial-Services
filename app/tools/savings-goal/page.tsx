@@ -13,9 +13,8 @@ import {
   YAxis,
 } from "recharts";
 import { calculateSavingsGoal } from "@/lib/finance/savingsGoal";
-import { SaveAffordance } from "@/components/SaveAffordance";
+import { ScenarioManager } from "@/components/ScenarioManager";
 import { Disclaimer } from "@/components/ui/Disclaimer";
-import { saveSavingsGoalScenario } from "@/lib/scenarios/savingsGoalScenarios";
 
 // BYU navy is the main accent; the interest band uses a lighter blue.
 const ACCENT = "#1B4332";
@@ -84,15 +83,18 @@ function SavingsGoalCalculator() {
 
   const goalValue = toNumber(goalAmount);
 
-  // Persist the current inputs as a named scenario (used by SaveAffordance;
-  // only reachable when logged in).
-  async function handleSave(name: string) {
-    return saveSavingsGoalScenario(name, {
-      goal_amount: toNumber(goalAmount),
-      current_savings: toNumber(currentSavings),
-      years: toNumber(years),
-      annual_rate_percent: parseFloat(annualRatePercent) || 0,
-    });
+  // Snapshot current inputs / apply a loaded scenario (used by ScenarioManager).
+  const scenarioData = () => ({
+    goal_amount: toNumber(goalAmount),
+    current_savings: toNumber(currentSavings),
+    years: toNumber(years),
+    annual_rate_percent: parseFloat(annualRatePercent) || 0,
+  });
+  function loadScenario(d: Record<string, unknown>) {
+    setGoalAmount(String(d.goal_amount ?? ""));
+    setCurrentSavings(String(d.current_savings ?? ""));
+    setYears(String(d.years ?? ""));
+    setAnnualRatePercent(String(d.annual_rate_percent ?? ""));
   }
 
   return (
@@ -159,7 +161,11 @@ function SavingsGoalCalculator() {
           <Disclaimer className="mt-4">
             Assumes a constant return; actual results will vary.
           </Disclaimer>
-          <SaveAffordance onSave={handleSave} />
+          <ScenarioManager
+            tool="savings_goal"
+            getData={scenarioData}
+            onLoad={loadScenario}
+          />
         </div>
 
         {/* Growth chart */}

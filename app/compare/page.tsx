@@ -35,6 +35,7 @@ import type {
 } from "@/lib/marketData/types";
 import { HISTORY_RANGES } from "@/lib/marketData/types";
 import { SecurityDetail } from "@/components/SecurityDetail";
+import { ScenarioManager } from "@/components/ScenarioManager";
 import { Disclaimer } from "@/components/ui/Disclaimer";
 
 const MAX_SECURITIES = 5;
@@ -220,6 +221,36 @@ function CompareTool() {
   function removeSymbol(symbol: string) {
     setSecurities((prev) => prev.filter((s) => s.symbol !== symbol));
     setAddError(null);
+  }
+
+  // Snapshot current selection / apply a loaded scenario (used by ScenarioManager).
+  const scenarioData = () => ({
+    symbols: securities.map((s) => s.symbol),
+    range,
+  });
+  async function loadScenario(d: Record<string, unknown>) {
+    const loadedRange =
+      typeof d.range === "string" &&
+      HISTORY_RANGES.includes(d.range as HistoryRange)
+        ? (d.range as HistoryRange)
+        : "1y";
+    setRange(loadedRange);
+    const symbols = Array.isArray(d.symbols)
+      ? d.symbols
+          .filter((s): s is string => typeof s === "string")
+          .slice(0, MAX_SECURITIES)
+      : [];
+    const loaded: SecurityDetailData[] = [];
+    for (const sym of symbols) {
+      try {
+        const res = await fetch(`/api/security?symbol=${encodeURIComponent(sym)}`);
+        const json = await res.json();
+        if (res.ok) loaded.push(json);
+      } catch {
+        /* Skip a symbol that fails to load. */
+      }
+    }
+    setSecurities(loaded);
   }
 
   const colorFor = (symbol: string) => {
@@ -418,6 +449,15 @@ function CompareTool() {
             <ComparisonTable securities={securities} colorFor={colorFor} />
           </>
         )}
+
+        {/* Save / load */}
+        <div className="mt-8 flex justify-center">
+          <ScenarioManager
+            tool="compare"
+            getData={scenarioData}
+            onLoad={loadScenario}
+          />
+        </div>
 
         {/* Data source + disclaimer */}
         <div className="mt-8 space-y-2">

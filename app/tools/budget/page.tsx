@@ -1,7 +1,6 @@
 "use client";
 
-import { Suspense, useEffect, useMemo, useState } from "react";
-import { useSearchParams } from "next/navigation";
+import { Suspense, useMemo, useState } from "react";
 import {
   Cell,
   Legend,
@@ -15,12 +14,7 @@ import {
   type BudgetCategory,
   calculateBudget,
 } from "@/lib/finance/budget";
-import { SaveAffordance } from "@/components/SaveAffordance";
-import { useAuth } from "@/lib/auth/AuthContext";
-import {
-  getBudgetScenario,
-  saveBudgetScenario,
-} from "@/lib/scenarios/budgetScenarios";
+import { ScenarioManager } from "@/components/ScenarioManager";
 
 // BYU navy is the main accent; a graded blue/grey ramp colors the categories.
 const ACCENT = "#1B4332";
@@ -90,43 +84,6 @@ export default function BudgetPage() {
 function BudgetCalculator() {
   const [income, setIncome] = useState("4500");
   const [rows, setRows] = useState<CategoryRow[]>(DEFAULT_ROWS);
-  const [loadError, setLoadError] = useState<string | null>(null);
-
-  // "Load" from the saved-scenarios page passes just the scenario id in the
-  // URL (the category list is too large for query params); we re-fetch the
-  // row and rebuild the editable list from it. The fetch waits for the auth
-  // session, since RLS only lets the owner read the row.
-  const searchParams = useSearchParams();
-  const scenarioId = searchParams.get("scenario");
-  const { user } = useAuth();
-
-  useEffect(() => {
-    if (!scenarioId || !user) return;
-    let cancelled = false;
-    getBudgetScenario(scenarioId).then(({ data, error }) => {
-      if (cancelled) return;
-      if (error || !data) {
-        setLoadError(
-          error
-            ? `Couldn't load scenario: ${error}`
-            : "Couldn't load scenario: not found.",
-        );
-        return;
-      }
-      setIncome(String(data.monthly_income));
-      setRows(
-        data.categories.map((c) => ({
-          id: nextId++,
-          name: c.name,
-          amount: String(c.amount),
-          bucket: c.bucket,
-        })),
-      );
-    });
-    return () => {
-      cancelled = true;
-    };
-  }, [scenarioId, user]);
 
   const incomeNum = toNumber(income);
 
@@ -156,10 +113,24 @@ function BudgetCalculator() {
     [rows],
   );
 
-  // Persist the current income + full category list as a named scenario
-  // (used by SaveAffordance; only reachable when logged in).
-  async function handleSave(name: string) {
-    return saveBudgetScenario(name, incomeNum, categories);
+  // Snapshot current inputs / apply a loaded scenario (used by ScenarioManager).
+  const scenarioData = () => ({
+    monthly_income: incomeNum,
+    categories,
+  });
+  function loadScenario(d: Record<string, unknown>) {
+    setIncome(String(d.monthly_income ?? ""));
+    const cats = Array.isArray(d.categories)
+      ? (d.categories as BudgetCategory[])
+      : [];
+    setRows(
+      cats.map((c) => ({
+        id: nextId++,
+        name: c.name,
+        amount: String(c.amount),
+        bucket: c.bucket,
+      })),
+    );
   }
 
   function updateRow(id: number, patch: Partial<CategoryRow>) {
@@ -190,11 +161,6 @@ function BudgetCalculator() {
           50/30/20 guideline.
         </p>
 
-        {loadError && (
-          <p className="mt-4 rounded-lg bg-red-50 px-4 py-3 text-sm text-red-600">
-            {loadError}
-          </p>
-        )}
 
         {/* Income */}
         <div className="mt-8 rounded-xl border border-neutral-200 bg-white p-6 shadow-sm">
@@ -317,7 +283,11 @@ function BudgetCalculator() {
               </strong>
             </p>
           )}
-          <SaveAffordance onSave={handleSave} />
+          <ScenarioManager
+            tool="budget"
+            getData={scenarioData}
+            onLoad={loadScenario}
+          />
         </div>
 
         {/* Spending breakdown chart */}
