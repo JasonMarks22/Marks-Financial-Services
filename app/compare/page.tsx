@@ -36,6 +36,11 @@ import type {
 import { HISTORY_RANGES } from "@/lib/marketData/types";
 import { SecurityDetail } from "@/components/SecurityDetail";
 import { ScenarioManager } from "@/components/ScenarioManager";
+import { securityTypeLabel } from "@/lib/marketData/securityType";
+import {
+  similarityScore,
+  SIMILARITY_DISCLAIMER,
+} from "@/lib/funds/similarity";
 import { Disclaimer } from "@/components/ui/Disclaimer";
 
 const MAX_SECURITIES = 5;
@@ -44,16 +49,6 @@ const MAX_SECURITIES = 5;
 const SERIES_COLORS = ["#1B4332", "#2563EB", "#C2410C", "#7C3AED", "#0D9488"];
 
 const POPULAR = ["VOO", "SPY", "AAPL", "SCHD", "QQQ", "VTI"];
-
-const TYPE_LABELS: Record<string, string> = {
-  EQUITY: "Stock",
-  ETF: "ETF",
-  MUTUALFUND: "Mutual fund",
-};
-
-function typeLabel(type: string): string {
-  return TYPE_LABELS[type] ?? type;
-}
 
 function fmtPrice(value: number, currency: string): string {
   try {
@@ -284,6 +279,16 @@ function CompareTool() {
 
   const atMax = securities.length >= MAX_SECURITIES;
 
+  // Similarity is shown only when exactly two securities are compared. null =
+  // one of them isn't in the fund-profile map (report "not available").
+  const similarity = useMemo(
+    () =>
+      securities.length === 2
+        ? similarityScore(securities[0].symbol, securities[1].symbol)
+        : undefined,
+    [securities],
+  );
+
   return (
     <main className="flex flex-1 flex-col items-center bg-surface px-6 py-14 text-ink sm:py-16">
       <div className="w-full max-w-6xl">
@@ -447,6 +452,59 @@ function CompareTool() {
 
             {/* Comparison table */}
             <ComparisonTable securities={securities} colorFor={colorFor} />
+
+            {/* Similarity (exactly two securities) */}
+            {securities.length === 2 && (
+              <div className="mt-8 rounded-2xl border border-edge bg-card p-6 shadow-soft">
+                <h2 className="text-lg font-bold text-ink">Similarity</h2>
+                {!similarity ? (
+                  <p className="mt-2 text-sm text-muted">
+                    Similarity comparison not available for this fund.
+                  </p>
+                ) : (
+                  <>
+                    <div className="mt-2 flex flex-wrap items-center gap-3">
+                      <span className="text-3xl font-bold tabular-nums text-link">
+                        {similarity.score}
+                      </span>
+                      <span className="rounded-full bg-accent/15 px-3 py-0.5 text-xs font-semibold text-link">
+                        {similarity.label}
+                      </span>
+                      <span className="text-sm text-muted">
+                        {securities[0].symbol} vs {securities[1].symbol}
+                      </span>
+                    </div>
+
+                    <div className="mt-4 grid grid-cols-1 gap-4 sm:grid-cols-2">
+                      <div>
+                        <p className="text-xs font-semibold uppercase tracking-wide text-muted">
+                          What they share
+                        </p>
+                        <p className="mt-1 text-sm leading-6 text-neutral-700">
+                          {similarity.matchingAttributes.length > 0
+                            ? similarity.matchingAttributes.join(", ")
+                            : "Only their asset class."}
+                        </p>
+                      </div>
+                      <div>
+                        <p className="text-xs font-semibold uppercase tracking-wide text-muted">
+                          How they differ
+                        </p>
+                        <p className="mt-1 text-sm leading-6 text-neutral-700">
+                          {similarity.differingAttributes.length > 0
+                            ? similarity.differingAttributes.join(", ")
+                            : "No differing attributes among those compared."}
+                        </p>
+                      </div>
+                    </div>
+
+                    <p className="mt-4 text-xs leading-5 text-muted">
+                      {SIMILARITY_DISCLAIMER}
+                    </p>
+                  </>
+                )}
+              </div>
+            )}
           </>
         )}
 
@@ -600,7 +658,7 @@ function AddSecurity({
                   <span className="text-muted">{r.name}</span>
                 </span>
                 <span className="ml-2 shrink-0 text-xs text-muted">
-                  {typeLabel(r.type)}
+                  {securityTypeLabel(r.type)}
                 </span>
               </button>
             </li>
@@ -635,7 +693,7 @@ function ComparisonTable({
     label: string;
     render: (d: SecurityDetailData) => string | null;
   }[] = [
-    { label: "Type", render: (d) => typeLabel(d.type) },
+    { label: "Type", render: (d) => securityTypeLabel(d.type) },
     { label: "Price", render: (d) => fmtPrice(d.price, d.currency) },
     { label: "Day change", render: (d) => `${d.changePercent.toFixed(2)}%` },
     {

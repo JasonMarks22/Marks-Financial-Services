@@ -30,18 +30,9 @@ import { Badge } from "@/components/ui/Badge";
 import { Button } from "@/components/ui/Button";
 import { Card } from "@/components/ui/Card";
 import { Disclaimer } from "@/components/ui/Disclaimer";
+import { securityTypeLabel } from "@/lib/marketData/securityType";
 
 const CHART_RANGE = "1y";
-
-const TYPE_LABELS: Record<string, string> = {
-  EQUITY: "Stock",
-  ETF: "ETF",
-  MUTUALFUND: "Mutual fund",
-};
-
-function typeLabel(type: string): string {
-  return TYPE_LABELS[type] ?? type;
-}
 
 function fmtPrice(value: number, currency: string): string {
   try {
@@ -159,7 +150,7 @@ function FoundView({
   // close is derived exactly from price and day change (price - change), not
   // guessed; day's open/range are not returned by the data layer, so omitted.
   const stats: { label: string; value: string }[] = [];
-  stats.push({ label: "Type", value: typeLabel(detail.type) });
+  stats.push({ label: "Type", value: securityTypeLabel(detail.type) });
   stats.push({
     label: "Previous close",
     value: fmtPrice(detail.price - detail.change, detail.currency),
@@ -203,7 +194,7 @@ function FoundView({
               {detail.symbol}
             </h2>
             <Badge tone={detail.type === "ETF" ? "blue" : "green"}>
-              {typeLabel(detail.type)}
+              {securityTypeLabel(detail.type)}
             </Badge>
           </div>
           <p className="mt-1 text-lg text-muted">{detail.name}</p>

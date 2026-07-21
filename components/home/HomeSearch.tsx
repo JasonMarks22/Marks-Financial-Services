@@ -15,6 +15,7 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import type { SearchResult } from "@/lib/marketData/types";
+import { securityTypeLabel } from "@/lib/marketData/securityType";
 import { SearchIcon } from "@/components/ui/icons";
 
 interface ToolEntry {
@@ -36,11 +37,6 @@ const TOOLS: ToolEntry[] = [
   { href: "/portfolios/compare", title: "Portfolio Backtesting", keywords: "compare backtest simulate growth" },
 ];
 
-const TYPE_LABELS: Record<string, string> = {
-  EQUITY: "Stock",
-  ETF: "ETF",
-  MUTUALFUND: "Mutual fund",
-};
 
 const POPULAR = [
   { label: "VOO", type: "ticker" as const },
@@ -213,7 +209,7 @@ export function HomeSearch() {
                     <span className="text-muted">{r.name}</span>
                   </span>
                   <span className="shrink-0 text-xs text-muted">
-                    {TYPE_LABELS[r.type] ?? r.type}
+                    {securityTypeLabel(r.type)}
                   </span>
                 </button>
               ))}

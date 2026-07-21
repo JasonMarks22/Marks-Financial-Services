@@ -23,6 +23,9 @@ import {
   updateUserPortfolio,
 } from "@/lib/portfolios/userPortfolios";
 import type { SearchResult } from "@/lib/marketData/types";
+import { securityTypeLabel } from "@/lib/marketData/securityType";
+import { matchHoldings } from "@/lib/funds/matchHoldings";
+import { SIMILARITY_DISCLAIMER } from "@/lib/funds/similarity";
 import {
   gradePortfolio,
   type GradeResult,
@@ -124,6 +127,18 @@ function PortfolioBuilder() {
       .filter((r) => r.symbol && toNumber(r.weight) > 0)
       .map((r) => ({ symbol: r.symbol as string, weight: toNumber(r.weight) }));
     return holdings.length > 0 ? gradePortfolio(profile, holdings) : null;
+  }, [rows, profile]);
+
+  // Holdings comparison vs the model portfolio for the selected profile:
+  // exact-ticker matches first, then similarity matches (reported separately).
+  const holdingsMatch = useMemo(() => {
+    const model = MODEL_PORTFOLIOS.find((p) => p.name === profile);
+    if (!model) return null;
+    const holdings = rows
+      .filter((r) => r.symbol && toNumber(r.weight) > 0)
+      .map((r) => ({ symbol: r.symbol as string, weight: toNumber(r.weight) }));
+    if (holdings.length === 0) return null;
+    return { model, result: matchHoldings(holdings, model.holdings) };
   }, [rows, profile]);
 
   const hasWeightedHoldings = rows.some(
@@ -353,6 +368,79 @@ function PortfolioBuilder() {
           </div>
         )}
 
+        {/* Holdings vs the model portfolio for this profile */}
+        {holdingsMatch && (
+          <div className="mt-6 rounded-xl border border-neutral-200 bg-white p-6 shadow-sm">
+            <h2
+              className="text-lg font-semibold"
+              style={{ color: "var(--accent)" }}
+            >
+              Holdings vs the {holdingsMatch.model.name} model
+            </h2>
+            <p className="mt-1 text-xs text-neutral-500">
+              How your holdings line up with the {holdingsMatch.model.name}{" "}
+              model portfolio. Exact ticker matches and similar-fund matches are
+              listed separately, never merged.
+            </p>
+
+            {holdingsMatch.result.exact.length > 0 && (
+              <div className="mt-4">
+                <p className="text-xs font-semibold uppercase tracking-wide text-neutral-500">
+                  Exact matches
+                </p>
+                <ul className="mt-2 space-y-1 text-sm text-neutral-700">
+                  {holdingsMatch.result.exact.map((e) => (
+                    <li key={e.symbol}>
+                      Exact match: <strong>{e.symbol}</strong>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            )}
+
+            {holdingsMatch.result.similar.length > 0 && (
+              <div className="mt-4">
+                <p className="text-xs font-semibold uppercase tracking-wide text-neutral-500">
+                  Similar funds
+                </p>
+                <ul className="mt-2 space-y-1 text-sm text-neutral-700">
+                  {holdingsMatch.result.similar.map((s) => (
+                    <li key={s.userSymbol}>
+                      Similar: <strong>{s.userSymbol}</strong> ≈{" "}
+                      <strong>{s.modelSymbol}</strong> ({s.score} —{" "}
+                      {s.shared.join(", ")})
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            )}
+
+            {holdingsMatch.result.unmatched.length > 0 && (
+              <div className="mt-4">
+                <p className="text-xs font-semibold uppercase tracking-wide text-neutral-500">
+                  No match in this model
+                </p>
+                <p className="mt-2 text-sm text-neutral-600">
+                  {holdingsMatch.result.unmatched
+                    .map((u) => u.symbol)
+                    .join(", ")}
+                </p>
+              </div>
+            )}
+
+            {holdingsMatch.result.exact.length === 0 &&
+              holdingsMatch.result.similar.length === 0 && (
+                <p className="mt-4 text-sm text-neutral-500">
+                  No exact or similar matches with this model&rsquo;s holdings.
+                </p>
+              )}
+
+            <p className="mt-3 text-xs leading-5 text-neutral-400">
+              {SIMILARITY_DISCLAIMER}
+            </p>
+          </div>
+        )}
+
         {/* Save */}
         <div className="mt-6 flex flex-col items-center gap-2">
           {loading ? null : user ? (
@@ -559,7 +647,7 @@ function HoldingRowEditor({
                       <span className="text-neutral-500">{r.name}</span>
                     </span>
                     <span className="ml-2 shrink-0 text-xs text-neutral-400">
-                      {r.type}
+                      {securityTypeLabel(r.type)}
                     </span>
                   </button>
                 </li>
