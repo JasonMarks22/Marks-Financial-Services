@@ -300,7 +300,7 @@ function ProfileMatchPanel({ grade }: { grade: GradeResult | null }) {
     <div className="mt-4 border-t border-neutral-100 pt-4">
       <div className="flex flex-wrap items-center gap-2">
         <span
-          className={`rounded-full border px-3 py-0.5 text-xs font-semibold ${RATING_STYLES[grade.rating]}`}
+          className={`rounded-sm border px-3 py-0.5 text-xs font-semibold ${RATING_STYLES[grade.rating]}`}
         >
           {grade.rating}
         </span>

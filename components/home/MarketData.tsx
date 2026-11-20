@@ -358,7 +358,7 @@ function MarketChart({
             type="button"
             onClick={() => setGroup(g.key)}
             aria-pressed={group === g.key}
-            className={`rounded-full border px-3 py-1.5 text-sm font-medium transition ${
+            className={`rounded-sm border px-3 py-1.5 text-sm font-medium transition ${
               group === g.key
                 ? "border-accent bg-accent/15 text-link"
                 : "border-edge text-neutral-600 hover:border-accent hover:text-link"

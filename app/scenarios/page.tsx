@@ -272,7 +272,7 @@ function FilterChip({
       type="button"
       onClick={onClick}
       aria-pressed={active}
-      className={`rounded-full border px-3 py-1.5 text-sm font-medium transition ${
+      className={`rounded-sm border px-3 py-1.5 text-sm font-medium transition ${
         active
           ? "border-accent bg-accent/15 text-link"
           : "border-edge text-neutral-600 hover:border-accent hover:text-link"

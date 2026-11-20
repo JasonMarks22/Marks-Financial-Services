@@ -305,7 +305,7 @@ function PortfolioBuilder() {
               <>
                 <div className="mt-3 flex flex-wrap items-center gap-2">
                   <span
-                    className={`rounded-full border px-3 py-0.5 text-xs font-semibold ${RATING_STYLES[liveGrade.rating]}`}
+                    className={`rounded-sm border px-3 py-0.5 text-xs font-semibold ${RATING_STYLES[liveGrade.rating]}`}
                   >
                     {liveGrade.rating}
                   </span>

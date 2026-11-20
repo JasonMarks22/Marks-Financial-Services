@@ -471,7 +471,7 @@ function PortfolioPills({
               key={p.id}
               type="button"
               onClick={() => onToggle(p.id)}
-              className={`rounded-full border px-4 py-1.5 text-sm font-medium transition-colors ${
+              className={`rounded-sm border px-4 py-1.5 text-sm font-medium transition-colors ${
                 active
                   ? "text-white"
                   : "border-neutral-300 text-neutral-700 hover:border-neutral-500"
