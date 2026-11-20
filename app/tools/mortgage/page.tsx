@@ -168,7 +168,7 @@ function MortgageCalculator() {
         </p>
 
         {/* Inputs */}
-        <div className="mt-8 grid grid-cols-1 gap-5 rounded-xl border border-neutral-200 bg-white p-6 shadow-sm sm:grid-cols-2">
+        <div className="mt-8 grid grid-cols-1 gap-5 rounded-xl border border-neutral-200 bg-white p-6 sm:grid-cols-2">
           <Field label="Home price" prefix="$" value={homePrice} onChange={setHomePrice} />
           <Field
             label="Down payment"
@@ -186,9 +186,9 @@ function MortgageCalculator() {
         </div>
 
         {/* Result: total + donut */}
-        <div className="mt-8 rounded-xl border border-neutral-200 bg-white p-6 shadow-sm">
+        <div className="mt-8 rounded-xl border border-neutral-200 bg-white p-6">
           <div className="text-center">
-            <p className="text-sm font-medium uppercase tracking-wide text-neutral-500">
+            <p className="text-sm font-medium text-neutral-500">
               Total monthly cost
             </p>
             <p className="mt-1 text-4xl font-semibold" style={{ color: "var(--accent)" }}>
@@ -260,7 +260,7 @@ function MortgageCalculator() {
 
         {/* Extra-payment comparison */}
         {extraNum > 0 && breakdown.loanAmount > 0 && (
-          <div className="mt-8 rounded-xl border border-neutral-200 bg-white p-6 shadow-sm">
+          <div className="mt-8 rounded-xl border border-neutral-200 bg-white p-6">
             <h2 className="text-lg font-semibold" style={{ color: "var(--accent)" }}>
               Paying {usd.format(extraNum)} extra per month
             </h2>
@@ -292,7 +292,7 @@ function MortgageCalculator() {
         )}
 
         {/* Amortization schedule */}
-        <div className="mt-8 rounded-xl border border-neutral-200 bg-white p-6 shadow-sm">
+        <div className="mt-8 rounded-xl border border-neutral-200 bg-white p-6">
           <div className="flex items-center justify-between">
             <h2 className="text-lg font-semibold" style={{ color: "var(--accent)" }}>
               Amortization schedule

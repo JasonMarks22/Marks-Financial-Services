@@ -108,7 +108,7 @@ function SavingsGoalCalculator() {
         </p>
 
         {/* Inputs */}
-        <div className="mt-8 grid grid-cols-1 gap-5 rounded-xl border border-neutral-200 bg-white p-6 shadow-sm sm:grid-cols-2">
+        <div className="mt-8 grid grid-cols-1 gap-5 rounded-xl border border-neutral-200 bg-white p-6 sm:grid-cols-2">
           <Field
             label="Goal amount"
             prefix="$"
@@ -131,7 +131,7 @@ function SavingsGoalCalculator() {
         </div>
 
         {/* Result */}
-        <div className="mt-8 rounded-xl border border-neutral-200 bg-white p-6 text-center shadow-sm">
+        <div className="mt-8 rounded-xl border border-neutral-200 bg-white p-6 text-center">
           {result.alreadyOnTrack ? (
             <p className="text-2xl font-semibold" style={{ color: "var(--accent)" }}>
               You&rsquo;re already on track. No monthly contribution needed.
@@ -169,7 +169,7 @@ function SavingsGoalCalculator() {
         </div>
 
         {/* Growth chart */}
-        <div className="mt-8 rounded-xl border border-neutral-200 bg-white p-6 shadow-sm">
+        <div className="mt-8 rounded-xl border border-neutral-200 bg-white p-6">
           <h2 className="mb-4 text-sm font-semibold text-neutral-700">
             Projected growth
           </h2>

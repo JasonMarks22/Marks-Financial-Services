@@ -301,7 +301,7 @@ function CompareTool() {
         </p>
 
         {/* Add + current selection */}
-        <div className="mt-8 rounded-2xl border border-edge bg-card p-6 shadow-soft">
+        <div className="mt-8 rounded-2xl border border-edge bg-card p-6">
           <div className="flex flex-col gap-4 sm:flex-row sm:items-start">
             <div className="flex-1">
               <AddSecurity onAdd={addSymbol} disabled={atMax} />
@@ -336,7 +336,7 @@ function CompareTool() {
                 return (
                   <span
                     key={s.symbol}
-                    className="inline-flex items-center gap-2 rounded-full border border-edge bg-card-tint px-3 py-1.5 text-sm"
+                    className="inline-flex items-center gap-2 rounded-sm border border-edge bg-card-tint px-3 py-1.5 text-sm"
                   >
                     {securities.length >= 2 && (
                       <span
@@ -361,7 +361,7 @@ function CompareTool() {
                       type="button"
                       onClick={() => removeSymbol(s.symbol)}
                       aria-label={`Remove ${s.symbol}`}
-                      className="ml-0.5 flex h-4 w-4 items-center justify-center rounded-full text-muted hover:bg-edge hover:text-ink"
+                      className="ml-0.5 flex h-4 w-4 items-center justify-center rounded-sm text-muted hover:bg-edge hover:text-ink"
                     >
                       ×
                     </button>
@@ -389,7 +389,7 @@ function CompareTool() {
         ) : (
           <>
             {/* Performance chart */}
-            <div className="mt-8 rounded-2xl border border-edge bg-card p-6 shadow-soft">
+            <div className="mt-8 rounded-2xl border border-edge bg-card p-6">
               <h2 className="text-lg font-bold text-ink">Relative performance</h2>
               <p className="mt-1 text-xs text-muted">
                 Each line is % change from its own price at the start of the
@@ -455,7 +455,7 @@ function CompareTool() {
 
             {/* Similarity (exactly two securities) */}
             {securities.length === 2 && (
-              <div className="mt-8 rounded-2xl border border-edge bg-card p-6 shadow-soft">
+              <div className="mt-8 rounded-2xl border border-edge bg-card p-6">
                 <h2 className="text-lg font-bold text-ink">Similarity</h2>
                 {!similarity ? (
                   <p className="mt-2 text-sm text-muted">
@@ -467,7 +467,7 @@ function CompareTool() {
                       <span className="text-3xl font-bold tabular-nums text-link">
                         {similarity.score}
                       </span>
-                      <span className="rounded-full bg-accent/15 px-3 py-0.5 text-xs font-semibold text-link">
+                      <span className="rounded-sm bg-accent/15 px-3 py-0.5 text-xs font-semibold text-link">
                         {similarity.label}
                       </span>
                       <span className="text-sm text-muted">
@@ -477,7 +477,7 @@ function CompareTool() {
 
                     <div className="mt-4 grid grid-cols-1 gap-4 sm:grid-cols-2">
                       <div>
-                        <p className="text-xs font-semibold uppercase tracking-wide text-muted">
+                        <p className="text-xs font-semibold text-muted">
                           What they share
                         </p>
                         <p className="mt-1 text-sm leading-6 text-neutral-700">
@@ -487,7 +487,7 @@ function CompareTool() {
                         </p>
                       </div>
                       <div>
-                        <p className="text-xs font-semibold uppercase tracking-wide text-muted">
+                        <p className="text-xs font-semibold text-muted">
                           How they differ
                         </p>
                         <p className="mt-1 text-sm leading-6 text-neutral-700">
@@ -533,7 +533,7 @@ function CompareTool() {
 
 function EmptyState({ onAdd }: { onAdd: (symbol: string) => void }) {
   return (
-    <div className="mt-8 rounded-2xl border border-dashed border-edge bg-card p-10 text-center shadow-soft">
+    <div className="mt-8 rounded-2xl border border-dashed border-edge bg-card p-10 text-center">
       <p className="text-base font-semibold text-ink">
         Search for a security to get started
       </p>
@@ -547,7 +547,7 @@ function EmptyState({ onAdd }: { onAdd: (symbol: string) => void }) {
             key={sym}
             type="button"
             onClick={() => onAdd(sym)}
-            className="rounded-full border border-edge bg-card px-3 py-1 text-sm font-medium text-neutral-700 shadow-soft transition hover:-translate-y-px hover:border-accent hover:text-link"
+            className="rounded-sm border border-edge bg-card px-3 py-1 text-sm font-medium text-neutral-700 transition hover:border-accent hover:text-link"
           >
             {sym}
           </button>
@@ -645,7 +645,7 @@ function AddSecurity({
       )}
       {error && <p className="mt-1 text-xs text-red-600">{error}</p>}
       {results.length > 0 && (
-        <ul className="absolute z-20 mt-1 w-full divide-y divide-neutral-100 overflow-hidden rounded-lg border border-edge bg-card shadow-lifted">
+        <ul className="absolute z-20 mt-1 w-full divide-y divide-neutral-100 overflow-hidden rounded-lg border border-edge bg-card">
           {results.map((r) => (
             <li key={r.symbol}>
               <button
@@ -733,7 +733,7 @@ function ComparisonTable({
   ];
 
   return (
-    <div className="mt-8 overflow-x-auto rounded-2xl border border-edge bg-card p-6 shadow-soft">
+    <div className="mt-8 overflow-x-auto rounded-2xl border border-edge bg-card p-6">
       <h2 className="text-lg font-bold text-ink">Side by side</h2>
       <table className="mt-4 w-full min-w-[520px] text-sm">
         <thead>

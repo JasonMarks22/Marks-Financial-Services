@@ -71,7 +71,7 @@ export default function PortfoliosPage() {
         </p>
 
         {/* Prominent disclaimer */}
-        <div className="mt-6 rounded-xl border border-neutral-300 bg-white p-4 text-sm leading-6 text-neutral-700 shadow-sm">
+        <div className="mt-6 rounded-xl border border-neutral-300 bg-white p-4 text-sm leading-6 text-neutral-700">
           These model portfolios are illustrative examples based on published
           asset-allocation frameworks (e.g. Vanguard, Fidelity), for educational
           purposes only. They are not investment advice or recommendations.
@@ -142,14 +142,14 @@ function MyPortfoliosSection() {
         <div className="flex gap-2">
           <Link
             href="/portfolios/compare"
-            className="rounded-full border px-5 py-2 text-sm font-medium"
+            className="rounded-sm border px-5 py-2 text-sm font-medium"
             style={{ borderColor: ACCENT, color: "var(--accent)" }}
           >
             Compare &amp; backtest
           </Link>
           <Link
             href="/portfolios/build"
-            className="rounded-full px-5 py-2 text-sm font-medium text-white shadow-sm"
+            className="rounded-sm px-5 py-2 text-sm font-medium text-white"
             style={{ backgroundColor: ACCENT }}
           >
             + Build a new portfolio
@@ -218,12 +218,12 @@ function UserPortfolioCard({
   const chartData = row.holdings.filter((h) => h.weight > 0);
 
   return (
-    <div className="flex flex-col rounded-xl border border-neutral-200 bg-white p-6 shadow-sm">
+    <div className="flex flex-col rounded-xl border border-neutral-200 bg-white p-6">
       <div className="flex items-baseline justify-between gap-2">
         <h3 className="text-lg font-semibold" style={{ color: "var(--accent)" }}>
           {row.name}
         </h3>
-        <span className="shrink-0 rounded-full border border-neutral-200 px-3 py-0.5 text-xs font-medium text-neutral-500">
+        <span className="shrink-0 rounded-sm border border-neutral-200 px-3 py-0.5 text-xs font-medium text-neutral-500">
           {row.target_profile}
         </span>
       </div>
@@ -269,7 +269,7 @@ function UserPortfolioCard({
       <div className="mt-4 flex items-center gap-2 border-t border-neutral-100 pt-4">
         <Link
           href={`/portfolios/build?id=${row.id}`}
-          className="rounded-full px-4 py-1.5 text-sm font-medium text-white"
+          className="rounded-sm px-4 py-1.5 text-sm font-medium text-white"
           style={{ backgroundColor: ACCENT }}
         >
           Edit
@@ -277,7 +277,7 @@ function UserPortfolioCard({
         <button
           type="button"
           onClick={onDelete}
-          className="rounded-full border border-neutral-300 px-4 py-1.5 text-sm font-medium text-neutral-600 transition-colors hover:border-red-300 hover:text-red-600"
+          className="rounded-sm border border-neutral-300 px-4 py-1.5 text-sm font-medium text-neutral-600 transition-colors hover:border-red-300 hover:text-red-600"
         >
           Delete
         </button>
@@ -312,7 +312,7 @@ function ProfileMatchPanel({ grade }: { grade: GradeResult | null }) {
       </div>
 
       {/* Actual split as one stacked bar */}
-      <div className="mt-2 flex h-3 w-full overflow-hidden rounded-full bg-neutral-100">
+      <div className="mt-2 flex h-3 w-full overflow-hidden rounded-none bg-neutral-100">
         <div style={{ width: `${grade.split.stocks}%`, backgroundColor: ACCENT }} />
         <div style={{ width: `${grade.split.bonds}%`, backgroundColor: "#40916C" }} />
         <div style={{ width: `${grade.split.cash}%`, backgroundColor: "#A8D0DB" }} />
@@ -341,12 +341,12 @@ function PortfolioCard({ portfolio }: { portfolio: ModelPortfolio }) {
   ].filter((d) => d.value > 0);
 
   return (
-    <div className="flex flex-col rounded-xl border border-neutral-200 bg-white p-6 shadow-sm">
+    <div className="flex flex-col rounded-xl border border-neutral-200 bg-white p-6">
       <div className="flex items-baseline justify-between gap-2">
         <h2 className="text-lg font-semibold" style={{ color: "var(--accent)" }}>
           {portfolio.name}
         </h2>
-        <span className="shrink-0 rounded-full border border-neutral-200 px-3 py-0.5 text-xs font-medium text-neutral-500">
+        <span className="shrink-0 rounded-sm border border-neutral-200 px-3 py-0.5 text-xs font-medium text-neutral-500">
           {portfolio.profile}
         </span>
       </div>
@@ -399,7 +399,7 @@ function PortfolioCard({ portfolio }: { portfolio: ModelPortfolio }) {
 
       {/* Holdings */}
       <div className="mt-4 border-t border-neutral-100 pt-4">
-        <p className="text-xs font-medium uppercase tracking-wide text-neutral-400">
+        <p className="text-xs font-medium text-neutral-400">
           Example holdings
         </p>
         <ul className="mt-2 space-y-1.5">
@@ -408,9 +408,9 @@ function PortfolioCard({ portfolio }: { portfolio: ModelPortfolio }) {
               <span className="w-14 shrink-0 font-medium text-neutral-900">
                 {h.symbol}
               </span>
-              <span className="relative h-2 flex-1 rounded-full bg-neutral-100">
+              <span className="relative h-2 flex-1 rounded-none bg-neutral-100">
                 <span
-                  className="absolute left-0 top-0 h-2 rounded-full"
+                  className="absolute left-0 top-0 h-2 rounded-none"
                   style={{
                     width: `${h.weight}%`,
                     backgroundColor: h.symbol === "CASH" ? "#A8D0DB" : ACCENT,

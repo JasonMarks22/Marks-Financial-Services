@@ -102,7 +102,7 @@ export default function MonteCarloPage() {
         </p>
 
         {/* Inputs */}
-        <div className="mt-8 grid grid-cols-1 gap-5 rounded-xl border border-neutral-200 bg-white p-6 shadow-sm sm:grid-cols-2 lg:grid-cols-3">
+        <div className="mt-8 grid grid-cols-1 gap-5 rounded-xl border border-neutral-200 bg-white p-6 sm:grid-cols-2 lg:grid-cols-3">
           <Field label="Starting amount" prefix="$" value={initial} onChange={setInitial} />
           <Field label="Monthly contribution" prefix="$" value={monthly} onChange={setMonthly} />
           <Field label="Years" value={years} onChange={setYears} />
@@ -138,7 +138,7 @@ export default function MonteCarloPage() {
         </div>
 
         {!result.ok ? (
-          <div className="mt-8 rounded-xl border border-neutral-200 bg-white p-6 text-center shadow-sm">
+          <div className="mt-8 rounded-xl border border-neutral-200 bg-white p-6 text-center">
             <p className="text-sm text-red-600">{result.error}</p>
           </div>
         ) : (
@@ -178,7 +178,7 @@ export default function MonteCarloPage() {
             </div>
 
             {/* Fan chart */}
-            <div className="mt-8 rounded-xl border border-neutral-200 bg-white p-6 shadow-sm">
+            <div className="mt-8 rounded-xl border border-neutral-200 bg-white p-6">
               <h2 className="text-lg font-bold text-ink">Range of outcomes over time</h2>
               <p className="mt-1 text-sm text-neutral-600">
                 The shaded band spans the 10th–90th percentile of simulated
@@ -332,7 +332,7 @@ function SummaryCard({
 }) {
   return (
     <div
-      className="rounded-xl border p-5 shadow-sm"
+      className="rounded-xl border p-5"
       style={{
         borderColor: accent ? "var(--accent)" : "var(--card-border)",
         backgroundColor: accent ? "var(--card-accent-bg)" : "var(--card-bg)",

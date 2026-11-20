@@ -1,38 +1,18 @@
-"use client";
-
-import { motion, useReducedMotion } from "framer-motion";
 import type { ReactNode } from "react";
 
 /**
- * Fade-up-on-scroll wrapper for section content. Animates once when the
- * element enters the viewport; renders statically when the user prefers
- * reduced motion.
+ * Formerly a fade-up-on-scroll wrapper. Content now renders in place with no
+ * entrance animation: data tools should feel instant and steady, not staged.
+ * Kept as a pass-through so existing call sites keep working.
  */
 export function Reveal({
-  delay = 0,
   className = "",
   children,
 }: {
-  /** Seconds to stagger this element after its siblings. */
+  /** Unused; kept for call-site compatibility. */
   delay?: number;
   className?: string;
   children: ReactNode;
 }) {
-  const reduceMotion = useReducedMotion();
-
-  if (reduceMotion) {
-    return <div className={className}>{children}</div>;
-  }
-
-  return (
-    <motion.div
-      className={className}
-      initial={{ opacity: 0, y: 24 }}
-      whileInView={{ opacity: 1, y: 0 }}
-      viewport={{ once: true, margin: "-60px" }}
-      transition={{ duration: 0.55, delay, ease: [0.21, 0.65, 0.36, 1] }}
-    >
-      {children}
-    </motion.div>
-  );
+  return <div className={className}>{children}</div>;
 }

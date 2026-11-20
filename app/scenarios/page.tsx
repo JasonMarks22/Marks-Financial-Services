@@ -101,11 +101,11 @@ export default function ScenariosPage() {
         </h1>
 
         {loading ? null : !user ? (
-          <div className="mt-8 max-w-lg rounded-2xl border border-edge bg-card p-8 text-center shadow-soft">
+          <div className="mt-8 max-w-lg rounded-2xl border border-edge bg-card p-8 text-center">
             <p className="text-muted">Saved scenarios live with your account.</p>
             <Link
               href="/login"
-              className="mt-4 inline-block rounded-full bg-primary px-6 py-2.5 text-sm font-semibold text-white"
+              className="mt-4 inline-block rounded-sm bg-primary px-6 py-2.5 text-sm font-semibold text-white"
             >
               Log in to see yours
             </Link>
@@ -160,7 +160,7 @@ export default function ScenariosPage() {
                             {items.map((row) => (
                               <li
                                 key={row.id}
-                                className="flex flex-col gap-3 rounded-2xl border border-edge bg-card p-4 shadow-soft sm:flex-row sm:items-center sm:justify-between"
+                                className="flex flex-col gap-3 rounded-2xl border border-edge bg-card p-4 sm:flex-row sm:items-center sm:justify-between"
                               >
                                 <div className="min-w-0">
                                   {renaming === row.id ? (
@@ -215,7 +215,7 @@ export default function ScenariosPage() {
                                 <div className="flex shrink-0 items-center gap-2">
                                   <Link
                                     href={`${meta.path}?scenario=${row.id}`}
-                                    className="rounded-full bg-primary px-4 py-1.5 text-sm font-semibold text-white"
+                                    className="rounded-sm bg-primary px-4 py-1.5 text-sm font-semibold text-white"
                                   >
                                     Open
                                   </Link>
@@ -225,14 +225,14 @@ export default function ScenariosPage() {
                                       setRenaming(row.id);
                                       setRenameValue(row.name);
                                     }}
-                                    className="rounded-full border border-edge px-4 py-1.5 text-sm font-medium text-neutral-600 hover:border-accent"
+                                    className="rounded-sm border border-edge px-4 py-1.5 text-sm font-medium text-neutral-600 hover:border-accent"
                                   >
                                     Rename
                                   </button>
                                   <button
                                     type="button"
                                     onClick={() => handleDelete(row)}
-                                    className="rounded-full border border-edge px-4 py-1.5 text-sm font-medium text-neutral-600 hover:border-red-300 hover:text-red-600"
+                                    className="rounded-sm border border-edge px-4 py-1.5 text-sm font-medium text-neutral-600 hover:border-red-300 hover:text-red-600"
                                   >
                                     Delete
                                   </button>

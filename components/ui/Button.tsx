@@ -14,9 +14,9 @@ type Size = "md" | "lg";
 
 const VARIANTS: Record<Variant, string> = {
   primary:
-    "bg-primary text-white shadow-soft hover:bg-secondary hover:shadow-lifted",
+    "bg-primary text-white hover:bg-secondary",
   secondary:
-    "border border-edge bg-card text-ink shadow-soft hover:border-accent hover:text-link",
+    "border border-edge bg-card text-ink hover:border-accent hover:text-link",
   ghost: "text-link hover:bg-card-tint",
 };
 
@@ -26,7 +26,7 @@ const SIZES: Record<Size, string> = {
 };
 
 const BASE =
-  "inline-flex items-center justify-center gap-2 rounded-full font-semibold tracking-tight transition hover:-translate-y-px active:translate-y-0";
+  "inline-flex items-center justify-center gap-2 rounded-sm font-semibold tracking-tight transition";
 
 export function Button({
   href,

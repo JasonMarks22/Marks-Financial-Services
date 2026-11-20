@@ -106,7 +106,7 @@ function AllocatorCalculator() {
         </p>
 
         {/* Inputs */}
-        <div className="mt-8 grid grid-cols-1 gap-5 rounded-xl border border-neutral-200 bg-white p-6 shadow-sm sm:grid-cols-2">
+        <div className="mt-8 grid grid-cols-1 gap-5 rounded-xl border border-neutral-200 bg-white p-6 sm:grid-cols-2">
           <Field label="Monthly leftover to allocate" prefix="$" value={leftover} onChange={setLeftover} />
           <Field label="Current emergency fund" prefix="$" value={emergencyFund} onChange={setEmergencyFund} />
           <Field label="Monthly essential expenses" prefix="$" value={essentials} onChange={setEssentials} />
@@ -125,7 +125,7 @@ function AllocatorCalculator() {
         </div>
 
         {/* Recommended split: cards + chart */}
-        <div className="mt-8 rounded-xl border border-neutral-200 bg-white p-6 shadow-sm">
+        <div className="mt-8 rounded-xl border border-neutral-200 bg-white p-6">
           <h2 className="text-lg font-semibold" style={{ color: "var(--accent)" }}>
             Recommended monthly split
           </h2>
@@ -195,7 +195,7 @@ function AllocatorCalculator() {
         </div>
 
         {/* The "why" — reasoning for each destination */}
-        <div className="mt-8 rounded-xl border border-neutral-200 bg-white p-6 shadow-sm">
+        <div className="mt-8 rounded-xl border border-neutral-200 bg-white p-6">
           <h2 className="text-lg font-semibold" style={{ color: "var(--accent)" }}>
             Why this split?
           </h2>

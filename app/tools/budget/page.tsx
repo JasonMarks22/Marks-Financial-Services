@@ -163,7 +163,7 @@ function BudgetCalculator() {
 
 
         {/* Income */}
-        <div className="mt-8 rounded-xl border border-neutral-200 bg-white p-6 shadow-sm">
+        <div className="mt-8 rounded-xl border border-neutral-200 bg-white p-6">
           <label className="flex flex-col gap-1.5 sm:max-w-xs">
             <span className="text-sm font-medium text-neutral-600">
               Monthly take-home income
@@ -183,7 +183,7 @@ function BudgetCalculator() {
         </div>
 
         {/* Editable category list */}
-        <div className="mt-8 rounded-xl border border-neutral-200 bg-white p-6 shadow-sm">
+        <div className="mt-8 rounded-xl border border-neutral-200 bg-white p-6">
           <div className="flex items-center justify-between">
             <h2 className="text-lg font-semibold" style={{ color: "var(--accent)" }}>
               Spending categories
@@ -200,7 +200,7 @@ function BudgetCalculator() {
 
           <div className="mt-4 space-y-2">
             {/* Column headers */}
-            <div className="hidden grid-cols-12 gap-2 px-1 text-xs font-medium uppercase tracking-wide text-neutral-400 sm:grid">
+            <div className="hidden grid-cols-12 gap-2 px-1 text-xs font-medium text-neutral-400 sm:grid">
               <span className="col-span-5">Category</span>
               <span className="col-span-3">Amount</span>
               <span className="col-span-3">Bucket</span>
@@ -262,8 +262,8 @@ function BudgetCalculator() {
         </div>
 
         {/* Totals + leftover */}
-        <div className="mt-8 rounded-xl border border-neutral-200 bg-white p-6 text-center shadow-sm">
-          <p className="text-sm font-medium uppercase tracking-wide text-neutral-500">
+        <div className="mt-8 rounded-xl border border-neutral-200 bg-white p-6 text-center">
+          <p className="text-sm font-medium text-neutral-500">
             Total spending
           </p>
           <p className="mt-1 text-3xl font-semibold" style={{ color: "var(--accent)" }}>
@@ -291,7 +291,7 @@ function BudgetCalculator() {
         </div>
 
         {/* Spending breakdown chart */}
-        <div className="mt-8 rounded-xl border border-neutral-200 bg-white p-6 shadow-sm">
+        <div className="mt-8 rounded-xl border border-neutral-200 bg-white p-6">
           <h2 className="mb-2 text-lg font-semibold" style={{ color: "var(--accent)" }}>
             Spending by category
           </h2>
@@ -327,7 +327,7 @@ function BudgetCalculator() {
         </div>
 
         {/* 50/30/20 comparison */}
-        <div className="mt-8 rounded-xl border border-neutral-200 bg-white p-6 shadow-sm">
+        <div className="mt-8 rounded-xl border border-neutral-200 bg-white p-6">
           <h2 className="text-lg font-semibold" style={{ color: "var(--accent)" }}>
             Needs / Wants / Savings vs. 50/30/20
           </h2>
@@ -356,9 +356,9 @@ function BudgetCalculator() {
                     </span>
                   </div>
                   {/* Actual bar with the target marked as a vertical line. */}
-                  <div className="relative mt-1.5 h-3 w-full rounded-full bg-neutral-100">
+                  <div className="relative mt-1.5 h-3 w-full rounded-none bg-neutral-100">
                     <div
-                      className="h-3 rounded-full"
+                      className="h-3 rounded-sm"
                       style={{
                         width: `${Math.min(100, b.percentOfIncome)}%`,
                         backgroundColor: ACCENT,

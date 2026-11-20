@@ -4,10 +4,11 @@ import { Disclaimer } from "@/components/ui/Disclaimer";
 import { MarketData } from "@/components/home/MarketData";
 import { HomeSearch } from "@/components/home/HomeSearch";
 import { FeatureGrid } from "@/components/home/FeatureGrid";
+import { PHOTOS, photoUrl } from "@/lib/photos";
 
 /**
- * Home page. Product-first: it leads with real market data, puts search under
- * it, and closes with a showcase of the actual tools. Shared NavBar/Footer
+ * Home page. Opens with a photo hero and search, then live market data, then
+ * every tool as a photo row. Shared NavBar/Footer
  * live in the root layout. Accounts still work (sign-in lives in the navbar);
  * the homepage just doesn't market them.
  */
@@ -15,55 +16,54 @@ import { FeatureGrid } from "@/components/home/FeatureGrid";
 export default function Home() {
   return (
     <main className="flex-1 bg-surface">
-      {/* ── Market data (the lead) ───────────────────────────────────── */}
-      <section className="pb-8 pt-12 sm:pt-16">
+      {/* ── Hero: photo, headline, search ─────────────────────────────── */}
+      <section className="relative isolate overflow-hidden bg-ink">
+        {/* eslint-disable-next-line @next/next/no-img-element */}
+        <img
+          src={photoUrl(PHOTOS.hero, 2000, 900)}
+          alt={PHOTOS.hero.alt}
+          className="absolute inset-0 -z-10 h-full w-full object-cover"
+        />
+        <div
+          aria-hidden="true"
+          className="absolute inset-0 -z-10 bg-[linear-gradient(90deg,rgb(10_16_13/0.88)_0%,rgb(10_16_13/0.7)_45%,rgb(10_16_13/0.25)_100%)]"
+        />
+        <Container className="py-16 sm:py-24">
+          <h1 className="max-w-2xl text-4xl font-semibold leading-[1.1] tracking-tight text-white sm:text-5xl">
+            Research a stock, test a portfolio, plan the next 30 years
+          </h1>
+          <p className="mt-4 max-w-xl text-base leading-7 text-white/85 sm:text-lg">
+            Live market data, backtests on real prices, and planning
+            calculators in one place.
+          </p>
+          <div id="search" className="mt-8 scroll-mt-24">
+            <HomeSearch onPhoto />
+          </div>
+        </Container>
+      </section>
+
+      {/* ── Market data ──────────────────────────────────────────────── */}
+      <section className="pb-10 pt-10 sm:pt-12">
         <Container>
-          <div className="max-w-3xl">
-            <h1 className="text-3xl font-bold tracking-tight text-ink sm:text-4xl">
-              Market Trends
-            </h1>
-            <p className="mt-2 text-base leading-7 text-muted sm:text-lg">
-              Live index performance, major ETFs and stocks, and today&rsquo;s
-              top gainers. Select any symbol for a full breakdown.
+          <div className="flex flex-wrap items-end justify-between gap-2 border-b-2 border-ink pb-2">
+            <h2 className="text-2xl font-semibold tracking-tight text-ink">
+              Markets today
+            </h2>
+            <p className="text-xs text-muted">
+              Yahoo Finance data; may be delayed.
             </p>
           </div>
-          <div className="mt-8">
+          <div className="mt-6">
             <MarketData />
           </div>
-          <p className="mt-6 text-xs leading-5 text-muted">
-            Market data provided by Yahoo Finance; may be delayed (not
-            real-time) and can be incomplete. Shown for educational purposes.
-          </p>
         </Container>
       </section>
 
-      {/* ── Search ───────────────────────────────────────────────────── */}
-      <section
-        id="search"
-        className="scroll-mt-24 border-y border-edge bg-card py-14 sm:py-16"
-      >
-        <Container>
-          <div className="mx-auto max-w-2xl text-center">
-            <h2 className="text-2xl font-bold tracking-tight text-ink sm:text-3xl">
-              Find a tool or a security
-            </h2>
-            <p className="mt-2 text-muted">
-              Search across every calculator and portfolio tool, plus live
-              stocks, ETFs, and funds.
-            </p>
-          </div>
-          <div className="mt-8">
-            <HomeSearch />
-          </div>
-        </Container>
-      </section>
-
-      {/* ── Tools showcase ───────────────────────────────────────────── */}
+      {/* ── Tools ────────────────────────────────────────────────────── */}
       <Section
-        eyebrow="Everything you need"
-        title="One platform, every planning tool"
-        subtitle="Calculators, portfolio analysis, backtesting, and securities research, all in one place."
-        center
+        className="border-t border-edge bg-card"
+        title="Tools"
+        subtitle="Calculators for everyday planning, and research tools for investing."
       >
         <FeatureGrid />
       </Section>

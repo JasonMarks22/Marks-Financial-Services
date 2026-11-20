@@ -112,7 +112,7 @@ export function NavBar() {
     <nav
       ref={navRef}
       className={`sticky top-0 z-40 backdrop-blur-md transition-shadow ${
-        scrolled ? "border-b border-edge shadow-soft" : ""
+        scrolled ? "border-b border-edge" : ""
       }`}
       style={{
         backgroundColor: scrolled
@@ -183,7 +183,7 @@ export function NavBar() {
                   {open && (
                     <div
                       role="menu"
-                      className="absolute left-0 top-full z-50 mt-2 w-60 rounded-2xl border border-edge bg-card py-2 shadow-lifted"
+                      className="absolute left-0 top-full z-50 mt-2 w-60 rounded-2xl border border-edge bg-card py-2"
                     >
                       {group.items.map((item) => {
                         const itemActive = pathname === item.href;
@@ -243,7 +243,7 @@ export function NavBar() {
             href="/#search"
             onClick={closeMenus}
             aria-label="Search tools and securities"
-            className="flex h-9 w-9 items-center justify-center rounded-full text-neutral-600 hover:bg-card-tint hover:text-link"
+            className="flex h-9 w-9 items-center justify-center rounded-sm text-neutral-600 hover:bg-card-tint hover:text-link"
           >
             <SearchIcon className="h-[18px] w-[18px]" />
           </Link>
@@ -255,7 +255,7 @@ export function NavBar() {
               <span
                 title="Notifications (coming soon)"
                 aria-label="Notifications (coming soon)"
-                className="flex h-9 w-9 cursor-default items-center justify-center rounded-full text-neutral-400"
+                className="flex h-9 w-9 cursor-default items-center justify-center rounded-sm text-neutral-400"
               >
                 <BellIcon className="h-[18px] w-[18px]" />
               </span>
@@ -271,7 +271,7 @@ export function NavBar() {
               </Link>
               <span
                 aria-hidden="true"
-                className="flex h-8 w-8 items-center justify-center rounded-full bg-accent/20 text-sm font-bold text-link"
+                className="flex h-8 w-8 items-center justify-center rounded-sm bg-accent/20 text-sm font-bold text-link"
               >
                 {(user.email ?? "?").charAt(0).toUpperCase()}
               </span>
@@ -284,13 +284,13 @@ export function NavBar() {
             <>
               <Link
                 href="/login"
-                className="rounded-full px-4 py-2 text-sm font-medium text-neutral-700 hover:bg-card-tint hover:text-link"
+                className="rounded-sm px-4 py-2 text-sm font-medium text-neutral-700 hover:bg-card-tint hover:text-link"
               >
                 Log in
               </Link>
               <Link
                 href="/signup"
-                className="rounded-full bg-primary px-5 py-2 text-sm font-semibold text-white shadow-soft transition hover:-translate-y-px hover:bg-secondary hover:shadow-lifted"
+                className="rounded-sm bg-primary px-5 py-2 text-sm font-semibold text-white transition hover:bg-secondary"
               >
                 Sign up
               </Link>
@@ -319,7 +319,7 @@ export function NavBar() {
         <div className="border-t border-edge bg-card px-6 pb-5 lg:hidden">
           {GROUPS.map((group) => (
             <div key={group.label} className="mt-4">
-              <p className="text-xs font-semibold uppercase tracking-wide text-neutral-400">
+              <p className="text-xs font-semibold text-neutral-400">
                 {group.label}
               </p>
               {group.items.map((item) => (
@@ -345,7 +345,7 @@ export function NavBar() {
           ))}
 
           <div className="mt-4">
-            <p className="text-xs font-semibold uppercase tracking-wide text-neutral-400">
+            <p className="text-xs font-semibold text-neutral-400">
               Explore
             </p>
             {LINKS.map((link) => (
@@ -388,14 +388,14 @@ export function NavBar() {
                 <Link
                   href="/login"
                   onClick={closeMenus}
-                  className="flex-1 rounded-full border border-edge px-4 py-2 text-center text-sm font-medium text-neutral-700"
+                  className="flex-1 rounded-sm border border-edge px-4 py-2 text-center text-sm font-medium text-neutral-700"
                 >
                   Log in
                 </Link>
                 <Link
                   href="/signup"
                   onClick={closeMenus}
-                  className="flex-1 rounded-full bg-primary px-4 py-2 text-center text-sm font-semibold text-white"
+                  className="flex-1 rounded-sm bg-primary px-4 py-2 text-center text-sm font-semibold text-white"
                 >
                   Sign up
                 </Link>

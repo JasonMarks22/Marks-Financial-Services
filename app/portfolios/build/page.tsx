@@ -196,7 +196,7 @@ function PortfolioBuilder() {
         </p>
 
         {/* Name + profile */}
-        <div className="mt-8 grid grid-cols-1 gap-5 rounded-xl border border-neutral-200 bg-white p-6 shadow-sm sm:grid-cols-2">
+        <div className="mt-8 grid grid-cols-1 gap-5 rounded-xl border border-neutral-200 bg-white p-6 sm:grid-cols-2">
           <label className="flex flex-col gap-1.5">
             <span className="text-sm font-medium text-neutral-600">
               Portfolio name
@@ -228,7 +228,7 @@ function PortfolioBuilder() {
         </div>
 
         {/* Holdings */}
-        <div className="mt-6 rounded-xl border border-neutral-200 bg-white p-6 shadow-sm">
+        <div className="mt-6 rounded-xl border border-neutral-200 bg-white p-6">
           <div className="flex flex-wrap items-center justify-between gap-3">
             <h2
               className="text-lg font-semibold"
@@ -294,7 +294,7 @@ function PortfolioBuilder() {
 
         {/* Live profile match */}
         {hasWeightedHoldings && (
-          <div className="mt-6 rounded-xl border border-neutral-200 bg-white p-6 shadow-sm">
+          <div className="mt-6 rounded-xl border border-neutral-200 bg-white p-6">
             <h2
               className="text-lg font-semibold"
               style={{ color: "var(--accent)" }}
@@ -321,7 +321,7 @@ function PortfolioBuilder() {
                   </span>
                 </div>
 
-                <div className="mt-3 flex h-3 w-full overflow-hidden rounded-full bg-neutral-100">
+                <div className="mt-3 flex h-3 w-full overflow-hidden rounded-none bg-neutral-100">
                   <div
                     style={{
                       width: `${liveGrade.split.stocks}%`,
@@ -370,7 +370,7 @@ function PortfolioBuilder() {
 
         {/* Holdings vs the model portfolio for this profile */}
         {holdingsMatch && (
-          <div className="mt-6 rounded-xl border border-neutral-200 bg-white p-6 shadow-sm">
+          <div className="mt-6 rounded-xl border border-neutral-200 bg-white p-6">
             <h2
               className="text-lg font-semibold"
               style={{ color: "var(--accent)" }}
@@ -385,7 +385,7 @@ function PortfolioBuilder() {
 
             {holdingsMatch.result.exact.length > 0 && (
               <div className="mt-4">
-                <p className="text-xs font-semibold uppercase tracking-wide text-neutral-500">
+                <p className="text-xs font-semibold text-neutral-500">
                   Exact matches
                 </p>
                 <ul className="mt-2 space-y-1 text-sm text-neutral-700">
@@ -400,7 +400,7 @@ function PortfolioBuilder() {
 
             {holdingsMatch.result.similar.length > 0 && (
               <div className="mt-4">
-                <p className="text-xs font-semibold uppercase tracking-wide text-neutral-500">
+                <p className="text-xs font-semibold text-neutral-500">
                   Similar funds
                 </p>
                 <ul className="mt-2 space-y-1 text-sm text-neutral-700">
@@ -417,7 +417,7 @@ function PortfolioBuilder() {
 
             {holdingsMatch.result.unmatched.length > 0 && (
               <div className="mt-4">
-                <p className="text-xs font-semibold uppercase tracking-wide text-neutral-500">
+                <p className="text-xs font-semibold text-neutral-500">
                   No match in this model
                 </p>
                 <p className="mt-2 text-sm text-neutral-600">
@@ -448,7 +448,7 @@ function PortfolioBuilder() {
               type="button"
               onClick={handleSave}
               disabled={!canSave}
-              className="rounded-full px-8 py-3 text-base font-medium text-white shadow-sm disabled:opacity-40"
+              className="rounded-sm px-8 py-3 text-base font-medium text-white disabled:opacity-40"
               style={{ backgroundColor: ACCENT }}
             >
               {busy
@@ -584,7 +584,7 @@ function HoldingRowEditor({
             <button
               type="button"
               onClick={onClear}
-              className="shrink-0 rounded-full border border-neutral-300 px-2 py-0.5 text-xs text-neutral-500 hover:border-neutral-500"
+              className="shrink-0 rounded-sm border border-neutral-300 px-2 py-0.5 text-xs text-neutral-500 hover:border-neutral-500"
             >
               Change
             </button>

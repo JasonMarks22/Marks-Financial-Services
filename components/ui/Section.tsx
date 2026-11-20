@@ -16,7 +16,7 @@ export function Section({
 }: {
   id?: string;
   className?: string;
-  /** Small uppercase label above the title. */
+  /** Deprecated: no longer rendered (labels above titles read as template chrome). */
   eyebrow?: string;
   title?: string;
   subtitle?: string;
@@ -26,28 +26,23 @@ export function Section({
 }) {
   const hasHeader = Boolean(eyebrow || title || subtitle);
   return (
-    <section id={id} className={`scroll-mt-24 py-16 sm:py-20 lg:py-24 ${className}`}>
+    <section id={id} className={`scroll-mt-24 py-12 sm:py-16 ${className}`}>
       <Container>
         {hasHeader && (
           <div className={center ? "mx-auto max-w-3xl text-center" : "max-w-3xl"}>
-            {eyebrow && (
-              <p className="text-sm font-semibold uppercase tracking-widest text-link">
-                {eyebrow}
-              </p>
-            )}
             {title && (
-              <h2 className="mt-2 text-3xl font-bold tracking-tight text-ink sm:text-4xl lg:text-[2.6rem] lg:leading-[1.15]">
+              <h2 className="text-2xl font-semibold tracking-tight text-ink sm:text-3xl">
                 {title}
               </h2>
             )}
             {subtitle && (
-              <p className={`mt-4 text-base leading-7 text-muted sm:text-lg sm:leading-8 ${center ? "mx-auto" : ""}`}>
+              <p className={`mt-2 text-base leading-7 text-muted ${center ? "mx-auto" : ""}`}>
                 {subtitle}
               </p>
             )}
           </div>
         )}
-        <div className={hasHeader ? "mt-10 sm:mt-12" : ""}>{children}</div>
+        <div className={hasHeader ? "mt-6 sm:mt-8" : ""}>{children}</div>
       </Container>
     </section>
   );

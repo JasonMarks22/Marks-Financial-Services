@@ -108,7 +108,7 @@ export default function RetirementPage() {
         </p>
 
         {/* Inputs */}
-        <div className="mt-8 grid grid-cols-1 gap-5 rounded-xl border border-neutral-200 bg-white p-6 shadow-sm sm:grid-cols-2 lg:grid-cols-3">
+        <div className="mt-8 grid grid-cols-1 gap-5 rounded-xl border border-neutral-200 bg-white p-6 sm:grid-cols-2 lg:grid-cols-3">
           <Field label="Current age" value={currentAge} onChange={setCurrentAge} />
           <Field label="Retirement age" value={retirementAge} onChange={setRetirementAge} />
           <Field label="Current savings" prefix="$" value={currentSavings} onChange={setCurrentSavings} />
@@ -152,10 +152,10 @@ export default function RetirementPage() {
         ) : (
           <>
             {/* Headline results */}
-            <div className="mt-8 rounded-xl border border-neutral-200 bg-white p-6 shadow-sm">
+            <div className="mt-8 rounded-xl border border-neutral-200 bg-white p-6">
               <div className="grid grid-cols-1 gap-6 text-center sm:grid-cols-2">
                 <div>
-                  <p className="text-sm font-medium uppercase tracking-wide text-neutral-500">
+                  <p className="text-sm font-medium text-neutral-500">
                     Projected balance at {toNumber(retirementAge)}
                   </p>
                   <p
@@ -170,7 +170,7 @@ export default function RetirementPage() {
                 </div>
                 {result.realFinalBalance !== null && (
                   <div>
-                    <p className="text-sm font-medium uppercase tracking-wide text-neutral-500">
+                    <p className="text-sm font-medium text-neutral-500">
                       In today&rsquo;s dollars
                     </p>
                     <p
@@ -203,7 +203,7 @@ export default function RetirementPage() {
             </div>
 
             {/* Growth chart */}
-            <div className="mt-8 rounded-xl border border-neutral-200 bg-white p-6 shadow-sm">
+            <div className="mt-8 rounded-xl border border-neutral-200 bg-white p-6">
               <h2
                 className="mb-4 text-lg font-semibold"
                 style={{ color: "var(--accent)" }}

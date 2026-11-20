@@ -198,7 +198,7 @@ export default function PortfolioComparePage() {
         </p>
 
         {/* ---- Selection ---- */}
-        <div className="mt-8 rounded-xl border border-neutral-200 bg-white p-6 shadow-sm">
+        <div className="mt-8 rounded-xl border border-neutral-200 bg-white p-6">
           <h2 className="text-lg font-semibold" style={{ color: "var(--accent)" }}>
             Choose portfolios
           </h2>
@@ -261,7 +261,7 @@ export default function PortfolioComparePage() {
 
         {/* ---- Backtest ---- */}
         {selected.length > 0 && (
-          <div className="mt-8 rounded-xl border border-neutral-200 bg-white p-6 shadow-sm">
+          <div className="mt-8 rounded-xl border border-neutral-200 bg-white p-6">
             <div className="flex flex-wrap items-center justify-between gap-3">
               <h2
                 className="text-lg font-semibold"
@@ -285,7 +285,7 @@ export default function PortfolioComparePage() {
                   type="button"
                   onClick={runBacktests}
                   disabled={running}
-                  className="rounded-full px-5 py-2 text-sm font-medium text-white disabled:opacity-50"
+                  className="rounded-sm px-5 py-2 text-sm font-medium text-white disabled:opacity-50"
                   style={{ backgroundColor: ACCENT }}
                 >
                   {running ? "Running…" : "Run backtest"}
@@ -460,7 +460,7 @@ function PortfolioPills({
   if (portfolios.length === 0) return null;
   return (
     <div className="mt-4">
-      <p className="text-xs font-medium uppercase tracking-wide text-neutral-400">
+      <p className="text-xs font-medium text-neutral-400">
         {title}
       </p>
       <div className="mt-2 flex flex-wrap gap-2">
@@ -501,12 +501,12 @@ function ComparisonCard({ portfolio }: { portfolio: SelectablePortfolio }) {
         .map((h) => ({ name: h.symbol, value: h.weight }));
 
   return (
-    <div className="rounded-xl border border-neutral-200 bg-white p-5 shadow-sm">
+    <div className="rounded-xl border border-neutral-200 bg-white p-5">
       <div className="flex items-baseline justify-between gap-2">
         <h3 className="font-semibold" style={{ color: "var(--accent)" }}>
           {portfolio.name}
         </h3>
-        <span className="shrink-0 rounded-full border border-neutral-200 px-2.5 py-0.5 text-xs text-neutral-500">
+        <span className="shrink-0 rounded-sm border border-neutral-200 px-2.5 py-0.5 text-xs text-neutral-500">
           {portfolio.profile}
         </span>
       </div>

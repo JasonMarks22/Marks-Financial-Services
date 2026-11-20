@@ -63,7 +63,7 @@ export default function SignupPage() {
 
         <form
           onSubmit={handleSubmit}
-          className="mt-8 space-y-4 rounded-xl border border-neutral-200 bg-white p-6 shadow-sm"
+          className="mt-8 space-y-4 rounded-xl border border-neutral-200 bg-white p-6"
         >
           <label className="flex flex-col gap-1.5">
             <span className="text-sm font-medium text-neutral-600">Email</span>
@@ -109,7 +109,7 @@ export default function SignupPage() {
           <button
             type="submit"
             disabled={busy}
-            className="w-full rounded-full px-6 py-3 text-base font-medium text-white shadow-sm transition-colors disabled:opacity-50"
+            className="w-full rounded-sm px-6 py-3 text-base font-medium text-white transition-colors disabled:opacity-50"
             style={{ backgroundColor: ACCENT }}
           >
             {busy ? "Creating account…" : "Sign up"}

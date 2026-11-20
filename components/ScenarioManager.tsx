@@ -198,7 +198,7 @@ export function ScenarioManager({
         <button
           type="button"
           onClick={() => setMsg({ kind: "error", text: "sign-in-required" })}
-          className="rounded-full border border-edge px-4 py-1.5 text-xs font-semibold text-link transition hover:border-accent"
+          className="rounded-sm border border-edge px-4 py-1.5 text-xs font-semibold text-link transition hover:border-accent"
         >
           Save scenario
         </button>
@@ -225,14 +225,14 @@ export function ScenarioManager({
         <button
           type="button"
           onClick={openSave}
-          className="rounded-full bg-primary px-4 py-1.5 text-xs font-semibold text-white transition hover:bg-secondary"
+          className="rounded-sm bg-primary px-4 py-1.5 text-xs font-semibold text-white transition hover:bg-secondary"
         >
           Save scenario
         </button>
         <button
           type="button"
           onClick={openManage}
-          className="rounded-full border border-edge px-4 py-1.5 text-xs font-semibold text-link transition hover:border-accent"
+          className="rounded-sm border border-edge px-4 py-1.5 text-xs font-semibold text-link transition hover:border-accent"
         >
           Saved ({count})
         </button>
@@ -240,7 +240,7 @@ export function ScenarioManager({
 
       {/* Save panel */}
       {panel === "save" && (
-        <div className="w-full max-w-sm rounded-xl border border-edge bg-card p-4 shadow-soft">
+        <div className="w-full max-w-sm rounded-xl border border-edge bg-card p-4">
           {!clash ? (
             <form onSubmit={handleSaveSubmit} className="flex flex-col gap-2">
               <label className="text-xs font-medium text-muted">
@@ -259,7 +259,7 @@ export function ScenarioManager({
                 <button
                   type="submit"
                   disabled={busy || !name.trim()}
-                  className="rounded-full bg-primary px-4 py-1.5 text-xs font-semibold text-white disabled:opacity-50"
+                  className="rounded-sm bg-primary px-4 py-1.5 text-xs font-semibold text-white disabled:opacity-50"
                 >
                   {busy ? "Saving…" : "Save"}
                 </button>
@@ -277,7 +277,7 @@ export function ScenarioManager({
                   type="button"
                   disabled={busy}
                   onClick={() => doOverwrite(clash)}
-                  className="rounded-full bg-primary px-4 py-1.5 text-xs font-semibold text-white disabled:opacity-50"
+                  className="rounded-sm bg-primary px-4 py-1.5 text-xs font-semibold text-white disabled:opacity-50"
                 >
                   Overwrite
                 </button>
@@ -285,7 +285,7 @@ export function ScenarioManager({
                   type="button"
                   disabled={busy}
                   onClick={() => doCreate(name.trim())}
-                  className="rounded-full border border-edge px-4 py-1.5 text-xs font-semibold text-link disabled:opacity-50"
+                  className="rounded-sm border border-edge px-4 py-1.5 text-xs font-semibold text-link disabled:opacity-50"
                 >
                   Keep both
                 </button>
@@ -304,7 +304,7 @@ export function ScenarioManager({
 
       {/* Manage panel */}
       {panel === "manage" && (
-        <div className="w-full max-w-md rounded-xl border border-edge bg-card p-4 shadow-soft">
+        <div className="w-full max-w-md rounded-xl border border-edge bg-card p-4">
           {rows === null ? (
             <p className="text-sm text-muted">Loading…</p>
           ) : rows.length === 0 ? (
@@ -358,7 +358,7 @@ export function ScenarioManager({
                       <button
                         type="button"
                         onClick={() => handleLoad(row)}
-                        className="rounded-full bg-primary px-3 py-1 text-xs font-semibold text-white"
+                        className="rounded-sm bg-primary px-3 py-1 text-xs font-semibold text-white"
                       >
                         Load
                       </button>
@@ -368,14 +368,14 @@ export function ScenarioManager({
                           setRenaming(row.id);
                           setRenameValue(row.name);
                         }}
-                        className="rounded-full border border-edge px-3 py-1 text-xs font-medium text-neutral-600 hover:border-accent"
+                        className="rounded-sm border border-edge px-3 py-1 text-xs font-medium text-neutral-600 hover:border-accent"
                       >
                         Rename
                       </button>
                       <button
                         type="button"
                         onClick={() => handleDelete(row)}
-                        className="rounded-full border border-edge px-3 py-1 text-xs font-medium text-neutral-600 hover:border-red-300 hover:text-red-600"
+                        className="rounded-sm border border-edge px-3 py-1 text-xs font-medium text-neutral-600 hover:border-red-300 hover:text-red-600"
                       >
                         Delete
                       </button>

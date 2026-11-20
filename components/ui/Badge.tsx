@@ -1,7 +1,7 @@
 import type { ReactNode } from "react";
 
 /**
- * Small rounded label. Tones map to the design tokens; all pass AA contrast
+ * Small square-cornered label. Tones map to the design tokens; all pass AA contrast
  * on their tinted backgrounds in both themes.
  */
 

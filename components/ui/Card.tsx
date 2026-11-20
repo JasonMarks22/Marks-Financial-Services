@@ -1,8 +1,8 @@
 import type { ReactNode } from "react";
 
 /**
- * Shared panel: white card on the page canvas, 16px radius, soft shadow.
- * `hover` adds a gentle lift for interactive cards (links, tools).
+ * Shared panel: card surface with a 1px border and square-ish corners.
+ * `hover` darkens the border for interactive cards (links, tools).
  */
 export function Card({
   className = "",
@@ -15,10 +15,8 @@ export function Card({
 }) {
   return (
     <div
-      className={`rounded-2xl border border-edge bg-card shadow-soft ${
-        hover
-          ? "transition duration-200 hover:-translate-y-1 hover:border-accent hover:shadow-lifted"
-          : ""
+      className={`rounded-sm border border-edge bg-card ${
+        hover ? "transition-colors hover:border-ink/40" : ""
       } ${className}`}
     >
       {children}

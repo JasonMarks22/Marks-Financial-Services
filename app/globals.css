@@ -19,16 +19,16 @@
    border-edge, bg-card, text-muted, shadow-soft, etc. Theme-aware roles go
    through CSS variables so dark mode swaps them in one place.
 
-   Typography: Inter app-wide (loaded in the root layout); financial figures
+   Typography: IBM Plex Sans app-wide (self-hosted via @fontsource); financial figures
    use tabular numerals (all tables get them automatically below).
 
    Spacing: 8px system — prefer Tailwind steps 2/4/6/8/10/12/16/20/24.
-   Shape: cards use 16px radius (rounded-2xl); soft shadows, no harsh borders.
+   Shape: sharp, 0-4px radii; 1px borders carry structure, no drop shadows.
    ========================================================================= */
 
 :root {
-  --background: #f8fafc;
-  --foreground: #0f172a;
+  --background: #f6f7f6;
+  --foreground: #141a17;
   /* Brand greens. --accent is kept (legacy name) for text accents/links and
      inline style={{ color: "var(--accent)" }} usages across existing pages. */
   --accent: #1b4332;
@@ -37,10 +37,10 @@
   --brand-3: #40916c;
   /* Adaptive ink for blue-tinted tiles/badges (readable in both themes). */
   --blue-ink: #1e6e8c;
-  --muted: #64748b;
+  --muted: #5b6660;
   --card-bg: #ffffff;
-  --card-accent-bg: #edf5f0;
-  --card-border: #e2e8f0;
+  --card-accent-bg: #eef2ef;
+  --card-border: #d5dad6;
 }
 
 /* Dark theme — toggled by adding the `dark` class to <html> (see ThemeToggle). */
@@ -74,10 +74,18 @@
   --color-sky: #74c0dc;
   --color-sky-light: #a8d0db;
   --color-sky-ink: var(--blue-ink);
-  --font-sans: var(--font-inter);
-  --font-mono: var(--font-geist-mono);
-  --shadow-soft: 0 1px 2px rgb(15 23 42 / 0.04), 0 8px 24px -12px rgb(15 23 42 / 0.12);
-  --shadow-lifted: 0 2px 4px rgb(15 23 42 / 0.05), 0 16px 40px -16px rgb(15 23 42 / 0.22);
+  --font-sans: "IBM Plex Sans", ui-sans-serif, system-ui, sans-serif;
+  --font-mono: "IBM Plex Mono", ui-monospace, monospace;
+  --shadow-soft: 0 0 #0000;
+  --shadow-lifted: 0 0 #0000;
+  /* Sharp, institutional geometry: every Tailwind radius step tops out at 4px. */
+  --radius-xs: 1px;
+  --radius-sm: 2px;
+  --radius-md: 2px;
+  --radius-lg: 3px;
+  --radius-xl: 4px;
+  --radius-2xl: 4px;
+  --radius-3xl: 4px;
 }
 
 html {
@@ -88,7 +96,7 @@ body {
   background: var(--background);
   color: var(--foreground);
   /* Inter (loaded in the root layout) with robust fallbacks. */
-  font-family: var(--font-inter), ui-sans-serif, system-ui, -apple-system,
+  font-family: "IBM Plex Sans", ui-sans-serif, system-ui, -apple-system,
     "Segoe UI", sans-serif;
   -webkit-font-smoothing: antialiased;
   text-rendering: optimizeLegibility;
@@ -104,7 +112,7 @@ table {
 :focus-visible {
   outline: 2px solid var(--accent);
   outline-offset: 2px;
-  border-radius: 4px;
+  border-radius: 2px;
 }
 
 /* Subtle brand touch on text selection. */
@@ -174,7 +182,7 @@ button {
    soft shadows in one place, so every card across the app matches the new
    components without duplicating styles per page. (Inputs/chips use
    rounded-lg and are unaffected.) */
-.rounded-xl { border-radius: 1rem; }
+.rounded-xl { border-radius: 4px; }
 .shadow-sm { box-shadow: var(--shadow-soft); }
 .shadow-md { box-shadow: var(--shadow-lifted); }
 .hover\:shadow-md:hover { box-shadow: var(--shadow-lifted); }
@@ -200,3 +208,6 @@ button {
 .dark .border-neutral-200 { border-color: #2e3540; }
 .dark .border-neutral-300 { border-color: #3b434f; }
 .dark .hover\:border-neutral-500:hover { border-color: #5b6674; }
+
+/* Numbers everywhere line up like a terminal: tabular figures app-wide. */
+body { font-variant-numeric: tabular-nums; }

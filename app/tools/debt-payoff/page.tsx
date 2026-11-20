@@ -150,7 +150,7 @@ export default function DebtPayoffPage() {
         </p>
 
         {/* Debts list */}
-        <div className="mt-8 rounded-xl border border-neutral-200 bg-white p-6 shadow-sm">
+        <div className="mt-8 rounded-xl border border-neutral-200 bg-white p-6">
           <div className="flex items-center justify-between">
             <h2 className="text-lg font-semibold" style={{ color: "var(--accent)" }}>
               Your debts
@@ -166,7 +166,7 @@ export default function DebtPayoffPage() {
           </div>
 
           <div className="mt-4 space-y-2">
-            <div className="hidden grid-cols-12 gap-2 px-1 text-xs font-medium uppercase tracking-wide text-neutral-400 sm:grid">
+            <div className="hidden grid-cols-12 gap-2 px-1 text-xs font-medium text-neutral-400 sm:grid">
               <span className="col-span-4">Debt</span>
               <span className="col-span-3">Balance</span>
               <span className="col-span-2">Rate</span>
@@ -296,7 +296,7 @@ export default function DebtPayoffPage() {
             )}
 
             {/* Chart */}
-            <div className="mt-8 rounded-xl border border-neutral-200 bg-white p-6 shadow-sm">
+            <div className="mt-8 rounded-xl border border-neutral-200 bg-white p-6">
               <h2 className="text-lg font-semibold" style={{ color: "var(--accent)" }}>
                 Total remaining debt over time
               </h2>
@@ -385,7 +385,7 @@ function StrategyCard({
 }) {
   return (
     <div
-      className="rounded-xl border bg-white p-6 shadow-sm"
+      className="rounded-xl border bg-white p-6"
       style={{ borderColor: accent ? ACCENT : "#dce4dd" }}
     >
       <h3 className="text-lg font-semibold" style={{ color: "var(--accent)" }}>
@@ -395,7 +395,7 @@ function StrategyCard({
 
       <div className="mt-4 flex gap-8">
         <div>
-          <p className="text-xs font-medium uppercase tracking-wide text-neutral-400">
+          <p className="text-xs font-medium text-neutral-400">
             Debt-free in
           </p>
           <p className="mt-0.5 text-2xl font-semibold" style={{ color: "var(--accent)" }}>
@@ -403,7 +403,7 @@ function StrategyCard({
           </p>
         </div>
         <div>
-          <p className="text-xs font-medium uppercase tracking-wide text-neutral-400">
+          <p className="text-xs font-medium text-neutral-400">
             Total interest
           </p>
           <p className="mt-0.5 text-2xl font-semibold" style={{ color: "var(--accent)" }}>
@@ -413,7 +413,7 @@ function StrategyCard({
       </div>
 
       <div className="mt-4 border-t border-neutral-100 pt-3">
-        <p className="text-xs font-medium uppercase tracking-wide text-neutral-400">
+        <p className="text-xs font-medium text-neutral-400">
           Payoff order
         </p>
         <ol className="mt-1.5 space-y-1 text-sm text-neutral-700">

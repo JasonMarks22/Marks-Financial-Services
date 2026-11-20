@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { Container } from "@/components/ui/Container";
 import { GithubIcon } from "@/components/ui/icons";
+import { PHOTO_CREDITS } from "@/lib/photos";
 
 /**
  * Shared multi-column footer, rendered on every page from the root layout.
@@ -48,7 +49,7 @@ export function Footer() {
             <Link href="/" className="flex items-center gap-2.5">
               <span
                 aria-hidden="true"
-                className="flex h-8 w-8 items-center justify-center rounded-lg bg-primary text-sm font-bold text-white"
+                className="flex h-8 w-8 items-center justify-center rounded-sm bg-primary text-sm font-bold text-white"
               >
                 M
               </span>
@@ -69,7 +70,7 @@ export function Footer() {
                 target="_blank"
                 rel="noopener noreferrer"
                 aria-label="Marks Investment Analytics on GitHub"
-                className="flex h-9 w-9 items-center justify-center rounded-full border border-edge text-neutral-600 hover:border-accent hover:text-link"
+                className="flex h-9 w-9 items-center justify-center rounded-sm border border-edge text-neutral-600 hover:border-accent hover:text-link"
               >
                 <GithubIcon className="h-[18px] w-[18px]" />
               </a>
@@ -114,6 +115,18 @@ export function Footer() {
           </span>
           <span>Educational tools, not financial advice.</span>
         </div>
+        <p className="mt-3 text-center text-xs leading-5 text-muted sm:text-left">
+          Photos by {PHOTO_CREDITS.join(", ")} on{" "}
+          <a
+            href="https://unsplash.com"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="underline underline-offset-2 hover:text-link"
+          >
+            Unsplash
+          </a>
+          .
+        </p>
       </Container>
     </footer>
   );

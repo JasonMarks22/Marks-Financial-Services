@@ -47,7 +47,7 @@ const POPULAR = [
   { label: "Retirement Planner", type: "tool" as const, href: "/tools/retirement" },
 ];
 
-export function HomeSearch() {
+export function HomeSearch({ onPhoto = false }: { onPhoto?: boolean } = {}) {
   const router = useRouter();
   const [query, setQuery] = useState("");
   const [open, setOpen] = useState(false);
@@ -143,12 +143,12 @@ export function HomeSearch() {
     q.length >= 2 && !searching && !hasResults;
 
   return (
-    <div ref={boxRef} className="relative mx-auto w-full max-w-2xl">
+    <div ref={boxRef} className={`relative w-full max-w-2xl ${onPhoto ? "" : "mx-auto"}`}>
       <form onSubmit={handleSubmit} role="search" className="relative">
         <button
           type="submit"
           aria-label="Search"
-          className="absolute left-4 top-1/2 flex h-8 w-8 -translate-y-1/2 items-center justify-center rounded-full text-muted hover:text-link"
+          className="absolute left-4 top-1/2 flex h-8 w-8 -translate-y-1/2 items-center justify-center rounded-sm text-muted hover:text-link"
         >
           <SearchIcon className="h-5 w-5" />
         </button>
@@ -164,19 +164,19 @@ export function HomeSearch() {
             setOpen(true);
           }}
           onFocus={() => setOpen(true)}
-          placeholder="Search Stocks, ETFs, Calculators..."
-          className="w-full rounded-full border border-edge bg-card py-4 pl-14 pr-5 text-base text-ink shadow-soft outline-none transition focus:border-accent focus:shadow-lifted"
+          placeholder="Search a ticker, fund or calculator"
+          className="w-full rounded-sm border border-edge bg-card py-3.5 pl-14 pr-5 text-base text-ink outline-none transition focus:border-accent"
         />
       </form>
 
       {open && (hasResults || showNoMatch || searching) && (
         <div
           id="home-search-results"
-          className="absolute z-30 mt-2 w-full overflow-hidden rounded-2xl border border-edge bg-card py-2 text-left shadow-lifted"
+          className="absolute z-30 mt-2 w-full overflow-hidden rounded-sm border border-ink/20 bg-card py-2 text-left"
         >
           {toolMatches.length > 0 && (
             <div>
-              <p className="px-4 py-1.5 text-[11px] font-semibold uppercase tracking-wide text-muted">
+              <p className="px-4 py-1.5 text-xs font-semibold text-muted">
                 Tools
               </p>
               {toolMatches.map((t) => (
@@ -194,7 +194,7 @@ export function HomeSearch() {
 
           {tickerResults.length > 0 && (
             <div className="mt-1">
-              <p className="px-4 py-1.5 text-[11px] font-semibold uppercase tracking-wide text-muted">
+              <p className="px-4 py-1.5 text-xs font-semibold text-muted">
                 Securities
               </p>
               {tickerResults.map((r) => (
@@ -231,14 +231,14 @@ export function HomeSearch() {
       )}
 
       {/* Popular searches */}
-      <div className="mt-5 flex flex-wrap items-center justify-center gap-2">
-        <span className="text-sm text-muted">Popular:</span>
+      <div className={`mt-4 flex flex-wrap items-center gap-2 ${onPhoto ? "" : "justify-center"}`}>
+        <span className={`text-sm ${onPhoto ? "text-white/85" : "text-muted"}`}>Popular:</span>
         {POPULAR.map((chip) => (
           <button
             key={chip.label}
             type="button"
             onClick={() => handlePopular(chip)}
-            className="rounded-full border border-edge bg-card px-3 py-1 text-sm font-medium text-neutral-700 shadow-soft transition hover:-translate-y-px hover:border-accent hover:text-link"
+            className="rounded-sm border border-edge bg-card px-3 py-1 text-sm font-medium text-neutral-700 transition hover:border-accent hover:text-link"
           >
             {chip.label}
           </button>
